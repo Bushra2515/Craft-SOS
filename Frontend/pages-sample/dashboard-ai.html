@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Dashboard - CraftSOS</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Dashboard</h2>
+
+      <button onclick="goToPost()">Create Post</button>
+      <button onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+      function logout() {
+        localStorage.removeItem("token");
+        window.location.href = "login.html";
+      }
+
+      function goToPost() {
+        window.location.href = "post.html";
+      }
+
+      // Redirect if not logged in
+      if (!localStorage.getItem("token")) {
+        window.location.href = "login.html";
+      }
+    </script>
+  </body>
+</html>

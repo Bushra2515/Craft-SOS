@@ -1,0 +1,3137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Craft-SOS — My Dashboard</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #eef0e8;
+        --panel: #d4dbbf;
+        --sidebar-bg: #c9d3af;
+        --card: #dde4cb;
+        --card2: #e4ead6;
+        --accent: #7a8f52;
+        --accent-dark: #5e6e3b;
+        --accent-light: #e6ecda;
+        --accent-mid: #a8bc70;
+        --text-dark: #2e3520;
+        --text-mid: #4a5730;
+        --text-light: #6b7a50;
+        --green: #4a8c42;
+        --amber: #b8920e;
+        --red: #c84830;
+        --blue: #3a7ab8;
+        --sb-w: 64px;
+        --sb-full: 220px;
+        --top-h: 60px;
+        --sub-h: 44px;
+        --ease: cubic-bezier(0.4, 0, 0.2, 1);
+        --r: 16px;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text-dark);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* Craft background texture */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        opacity: 0.038;
+        pointer-events: none;
+        z-index: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='480'%3E%3Ccircle cx='68' cy='68' r='28' fill='none' stroke='%237a8f52' stroke-width='1.8'/%3E%3Cpath d='M50 88 Q68 48 86 88' fill='none' stroke='%237a8f52' stroke-width='1.2'/%3E%3Crect x='188' y='26' width='64' height='11' rx='5.5' fill='none' stroke='%237a8f52' stroke-width='1.4' transform='rotate(28 220 31)'/%3E%3Ccircle cx='218' cy='18' r='7' fill='none' stroke='%237a8f52' stroke-width='1.4'/%3E%3Cellipse cx='400' cy='120' rx='22' ry='32' fill='none' stroke='%237a8f52' stroke-width='1.6' transform='rotate(-18 400 120)'/%3E%3Cpath d='M378 138 Q400 88 422 138' fill='none' stroke='%237a8f52' stroke-width='1.2'/%3E%3Cpath d='M78 360 L98 334 L118 360 L98 386Z' fill='none' stroke='%237a8f52' stroke-width='1.4'/%3E%3Crect x='310' y='300' width='52' height='70' rx='6' fill='none' stroke='%237a8f52' stroke-width='1.4'/%3E%3Cline x1='310' y1='338' x2='362' y2='338' stroke='%237a8f52' stroke-width='1'/%3E%3Ccircle cx='240' cy='390' rx='38' fill='none' stroke='%237a8f52' stroke-width='1.6'/%3E%3Cpath d='M214 390 Q240 354 266 390' fill='none' stroke='%237a8f52' stroke-width='1.2'/%3E%3Cpath d='M214 402 Q240 438 266 402' fill='none' stroke='%237a8f52' stroke-width='1.2'/%3E%3C/svg%3E");
+      }
+
+      /* ══════════════ TOPBAR ══════════════ */
+      #topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--top-h);
+        background: rgba(238, 240, 232, 0.92);
+        backdrop-filter: blur(12px);
+        display: flex;
+        align-items: center;
+        padding: 0 18px 0 0;
+        z-index: 200;
+        border-bottom: 1.5px solid rgba(122, 143, 82, 0.14);
+      }
+      .tb-logo-zone {
+        width: var(--sb-w);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .tb-logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 12px rgba(122, 143, 82, 0.3);
+      }
+      .tb-logo svg {
+        width: 17px;
+        height: 17px;
+        fill: white;
+      }
+      .tb-title {
+        flex: 1;
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: var(--text-dark);
+        display: none;
+      }
+
+      .tb-search {
+        flex: 1;
+        max-width: 380px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--card);
+        border: 1.5px solid rgba(122, 143, 82, 0.18);
+        border-radius: 22px;
+        padding: 8px 16px;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+      .tb-search:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(122, 143, 82, 0.12);
+      }
+      .tb-search svg {
+        width: 14px;
+        height: 14px;
+        stroke: var(--text-light);
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        flex-shrink: 0;
+      }
+      .tb-search input {
+        background: none;
+        border: none;
+        outline: none;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.86rem;
+        color: var(--text-dark);
+        width: 100%;
+      }
+      .tb-search input::placeholder {
+        color: var(--text-light);
+      }
+
+      .tb-right {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
+      .distress-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--red);
+        color: white;
+        border: none;
+        border-radius: 22px;
+        padding: 8px 15px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.84rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.18s;
+        white-space: nowrap;
+        box-shadow: 0 3px 12px rgba(200, 72, 48, 0.28);
+      }
+      .distress-btn:hover {
+        background: #a83828;
+        transform: scale(1.04);
+      }
+      .distress-btn svg {
+        width: 13px;
+        height: 13px;
+        stroke: white;
+        fill: none;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+      }
+
+      .tb-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: none;
+        background: var(--card);
+        color: var(--text-mid);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background 0.15s,
+          color 0.15s;
+        position: relative;
+      }
+      .tb-icon:hover {
+        background: var(--panel);
+        color: var(--text-dark);
+      }
+      .tb-icon svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+      }
+      .tb-notif-dot {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--red);
+        border: 2px solid var(--bg);
+      }
+
+      .tb-av {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #b5c98a, var(--accent));
+        border: 2.5px solid var(--accent);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 0.82rem;
+        color: white;
+        flex-shrink: 0;
+        transition: transform 0.15s;
+      }
+      .tb-av:hover {
+        transform: scale(1.08);
+      }
+
+      #hamburger {
+        display: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 6px;
+        color: var(--text-mid);
+      }
+      #hamburger svg {
+        width: 20px;
+        height: 20px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+
+      /* ══════════════ SUBNAV ══════════════ */
+      #subnav {
+        display: none;
+        position: fixed;
+        top: var(--top-h);
+        left: 0;
+        right: 0;
+        height: var(--sub-h);
+        background: rgba(238, 240, 232, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1.5px solid rgba(122, 143, 82, 0.1);
+        z-index: 190;
+        align-items: center;
+        padding: 0 14px;
+        gap: 4px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      #subnav::-webkit-scrollbar {
+        display: none;
+      }
+      .snav {
+        font-size: 0.84rem;
+        font-weight: 600;
+        color: var(--text-light);
+        padding: 5px 13px;
+        border-radius: 20px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.15s;
+      }
+      .snav.on {
+        background: var(--accent);
+        color: white;
+      }
+      .snav:hover:not(.on) {
+        background: rgba(122, 143, 82, 0.14);
+        color: var(--text-dark);
+      }
+
+      /* ══════════════ SIDEBAR ══════════════ */
+      #sidebar {
+        width: var(--sb-w);
+        flex-shrink: 0;
+        position: fixed;
+        top: var(--top-h);
+        left: 0;
+        bottom: 0;
+        z-index: 100;
+        background: var(--sidebar-bg);
+        border-right: 1.5px solid rgba(122, 143, 82, 0.14);
+        display: flex;
+        flex-direction: column;
+        padding: 14px 0;
+        transition: width 0.28s var(--ease);
+        overflow: hidden;
+      }
+      #sidebar:hover,
+      #sidebar.open {
+        width: var(--sb-full);
+      }
+      .sb-me {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 12px 14px;
+        border-bottom: 1.5px solid rgba(122, 143, 82, 0.18);
+        margin-bottom: 8px;
+        overflow: hidden;
+      }
+      .sb-av {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #b5c98a, var(--accent));
+        border: 2px solid var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 0.86rem;
+        color: white;
+        flex-shrink: 0;
+      }
+      .sb-me-info {
+        opacity: 0;
+        transition: opacity 0.2s;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      #sidebar:hover .sb-me-info,
+      #sidebar.open .sb-me-info {
+        opacity: 1;
+      }
+      .sb-me-name {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+      }
+      .sb-me-pts {
+        font-size: 0.72rem;
+        color: var(--accent-dark);
+        font-weight: 600;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 10px 18px;
+        cursor: pointer;
+        color: var(--text-mid);
+        font-size: 0.88rem;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        border-radius: 0 14px 14px 0;
+        margin: 1px 8px 1px 0;
+        transition:
+          background 0.16s,
+          color 0.16s;
+        position: relative;
+        user-select: none;
+      }
+      .nav-item:hover {
+        background: rgba(122, 143, 82, 0.15);
+        color: var(--text-dark);
+      }
+      .nav-item.on {
+        background: rgba(122, 143, 82, 0.25);
+        color: var(--text-dark);
+        font-weight: 600;
+      }
+      .nav-item.on::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 22%;
+        bottom: 22%;
+        width: 3.5px;
+        background: var(--accent);
+        border-radius: 0 3px 3px 0;
+      }
+      .ni-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .ni-label {
+        opacity: 0;
+        transition: opacity 0.2s;
+        flex: 1;
+      }
+      .ni-badge {
+        font-size: 0.65rem;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: 2px 6px;
+        background: var(--red);
+        color: white;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      #sidebar:hover .ni-label,
+      #sidebar.open .ni-label,
+      #sidebar:hover .ni-badge,
+      #sidebar.open .ni-badge {
+        opacity: 1;
+      }
+
+      /* ══════════════ SHELL / PAGE ══════════════ */
+      #shell {
+        display: flex;
+        margin-top: var(--top-h);
+        min-height: calc(100vh - var(--top-h));
+        position: relative;
+        z-index: 1;
+      }
+      #page {
+        flex: 1;
+        margin-left: var(--sb-w);
+        padding: 26px 26px 60px;
+        min-width: 0;
+      }
+
+      /* ══════════════ SECTIONS ══════════════ */
+      .dash-section {
+        display: none;
+      }
+      .dash-section.on {
+        display: block;
+        animation: fadeUp 0.3s var(--ease) both;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes popIn {
+        from {
+          opacity: 0;
+          transform: scale(0.6);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      @keyframes countUp {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* ══════════════ HERO GREETING ══════════════ */
+      .greeting-hero {
+        background: linear-gradient(
+          128deg,
+          #c8d9a0 0%,
+          #8da05e 42%,
+          #5e7840 78%,
+          #3e5228 100%
+        );
+        border-radius: 20px;
+        padding: 28px 30px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+        animation: fadeUp 0.35s 0.04s var(--ease) both;
+      }
+      .gh-svg {
+        position: absolute;
+        inset: 0;
+        opacity: 0.12;
+        pointer-events: none;
+      }
+      .gh-fade {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 40%;
+        background: linear-gradient(
+          to left,
+          rgba(62, 82, 40, 0.5),
+          transparent
+        );
+      }
+      .gh-left {
+        position: relative;
+        z-index: 1;
+      }
+      .gh-eyebrow {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .gh-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #7adf7a;
+        box-shadow: 0 0 0 3px rgba(122, 223, 122, 0.2);
+        animation: pulse 2s ease infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 3px rgba(122, 223, 122, 0.2);
+        }
+        50% {
+          box-shadow: 0 0 0 6px rgba(122, 223, 122, 0.1);
+        }
+      }
+      .gh-name {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: white;
+        line-height: 1.15;
+        margin-bottom: 6px;
+      }
+      .gh-name em {
+        font-style: italic;
+        color: rgba(255, 255, 255, 0.82);
+      }
+      .gh-sub {
+        font-size: 0.88rem;
+        color: rgba(255, 255, 255, 0.78);
+        line-height: 1.6;
+        max-width: 360px;
+      }
+      .gh-actions {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .gh-btn {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 18px;
+        border-radius: 22px;
+        border: none;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.84rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.18s;
+        white-space: nowrap;
+      }
+      .gh-btn.prim {
+        background: white;
+        color: var(--accent-dark);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      }
+      .gh-btn.prim:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.2);
+      }
+      .gh-btn.sec {
+        background: rgba(255, 255, 255, 0.22);
+        color: white;
+        border: 1.5px solid rgba(255, 255, 255, 0.3);
+      }
+      .gh-btn.sec:hover {
+        background: rgba(255, 255, 255, 0.32);
+        transform: translateY(-1px);
+      }
+      .gh-btn svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+
+      /* ══════════════ STATS STRIP ══════════════ */
+      .stats-strip {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .stat-pill {
+        background: var(--card);
+        border-radius: var(--r);
+        padding: 16px 16px 14px;
+        border: 1.5px solid rgba(122, 143, 82, 0.14);
+        transition:
+          box-shadow 0.18s,
+          transform 0.15s,
+          border-color 0.18s;
+        animation: fadeUp 0.32s var(--ease) both;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+      .stat-pill::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        border-radius: var(--r) var(--r) 0 0;
+      }
+      .stat-pill.c-accent::after {
+        background: linear-gradient(90deg, var(--accent), var(--accent-mid));
+      }
+      .stat-pill.c-green::after {
+        background: linear-gradient(90deg, #5cb85c, #8fe88f);
+      }
+      .stat-pill.c-amber::after {
+        background: linear-gradient(90deg, #c8a21a, #e8d060);
+      }
+      .stat-pill.c-blue::after {
+        background: linear-gradient(90deg, #3a7ab8, #70b0e8);
+      }
+      .stat-pill.c-red::after {
+        background: linear-gradient(90deg, var(--red), #e87050);
+      }
+      .stat-pill:hover {
+        box-shadow: 0 5px 20px rgba(46, 53, 32, 0.12);
+        transform: translateY(-2px);
+        border-color: rgba(122, 143, 82, 0.28);
+      }
+      .sp-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      .sp-icon svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+      .sp-icon.accent {
+        background: var(--accent-light);
+        color: var(--accent);
+      }
+      .sp-icon.green {
+        background: rgba(92, 184, 92, 0.15);
+        color: var(--green);
+      }
+      .sp-icon.amber {
+        background: rgba(200, 162, 26, 0.12);
+        color: var(--amber);
+      }
+      .sp-icon.blue {
+        background: rgba(58, 122, 184, 0.12);
+        color: var(--blue);
+      }
+      .sp-icon.red {
+        background: rgba(200, 72, 48, 0.1);
+        color: var(--red);
+      }
+      .sp-num {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 1.58rem;
+        color: var(--text-dark);
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+      .sp-label {
+        font-size: 0.71rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-light);
+      }
+      .sp-delta {
+        font-size: 0.73rem;
+        font-weight: 600;
+        color: var(--green);
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+      }
+      .sp-delta.neutral {
+        color: var(--text-light);
+      }
+      .sp-delta svg {
+        width: 11px;
+        height: 11px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+      }
+
+      /* ══════════════ MAIN GRID ══════════════ */
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 18px;
+        align-items: start;
+      }
+
+      /* ══════════════ CARDS ══════════════ */
+      .widget {
+        background: var(--card);
+        border-radius: var(--r);
+        border: 1.5px solid rgba(122, 143, 82, 0.15);
+        overflow: hidden;
+        animation: fadeUp 0.36s var(--ease) both;
+      }
+      .w-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px 12px;
+        border-bottom: 1.5px solid rgba(122, 143, 82, 0.12);
+      }
+      .w-title {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 0.96rem;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .w-title svg {
+        width: 14px;
+        height: 14px;
+        stroke: var(--accent);
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+      .w-link {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--accent-dark);
+        cursor: pointer;
+        transition: color 0.14s;
+      }
+      .w-link:hover {
+        color: var(--accent);
+      }
+      .w-body {
+        padding: 14px 18px;
+      }
+
+      /* ══════════════ QUICK ACTIONS ══════════════ */
+      .qa-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .qa-card {
+        background: var(--card2);
+        border-radius: 14px;
+        padding: 16px 14px;
+        border: 1.5px solid rgba(122, 143, 82, 0.15);
+        cursor: pointer;
+        transition: all 0.18s var(--ease);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .qa-card:hover {
+        background: var(--panel);
+        border-color: rgba(122, 143, 82, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(46, 53, 32, 0.1);
+      }
+      .qa-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+      }
+      .qa-title {
+        font-size: 0.87rem;
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+      .qa-desc {
+        font-size: 0.74rem;
+        color: var(--text-light);
+        line-height: 1.45;
+      }
+      .qa-card.sos {
+        border-color: rgba(200, 72, 48, 0.2);
+      }
+      .qa-card.sos:hover {
+        background: rgba(200, 72, 48, 0.07);
+        border-color: rgba(200, 72, 48, 0.35);
+      }
+      .qa-card.sos .qa-icon {
+        background: rgba(200, 72, 48, 0.1);
+      }
+
+      /* ══════════════ FEED ITEMS ══════════════ */
+      .feed-item {
+        display: flex;
+        gap: 12px;
+        padding: 13px 0;
+        border-bottom: 1.5px solid rgba(122, 143, 82, 0.1);
+        transition: opacity 0.15s;
+      }
+      .feed-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      .fi-av {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 0.84rem;
+        color: white;
+      }
+      .fi-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .fi-top {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        flex-wrap: wrap;
+        margin-bottom: 4px;
+      }
+      .fi-name {
+        font-size: 0.86rem;
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+      .fi-time {
+        font-size: 0.72rem;
+        color: var(--text-light);
+      }
+      .fi-badge {
+        font-size: 0.65rem;
+        font-weight: 700;
+        border-radius: 8px;
+        padding: 2px 7px;
+      }
+      .fi-badge.sos {
+        background: rgba(200, 72, 48, 0.12);
+        color: var(--red);
+      }
+      .fi-badge.tut {
+        background: var(--accent-light);
+        color: var(--accent-dark);
+      }
+      .fi-badge.com {
+        background: rgba(184, 146, 14, 0.12);
+        color: var(--amber);
+      }
+      .fi-badge.res {
+        background: rgba(74, 140, 66, 0.12);
+        color: var(--green);
+      }
+      .fi-text {
+        font-size: 0.84rem;
+        color: var(--text-mid);
+        line-height: 1.6;
+        display: -webkit-box;
+        /* -webkit-line-clamp: 2; */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .fi-foot {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 7px;
+      }
+      .fi-stat {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 0.74rem;
+        color: var(--text-light);
+        cursor: pointer;
+        transition: color 0.13s;
+      }
+      .fi-stat:hover {
+        color: var(--accent);
+      }
+      .fi-stat svg {
+        width: 12px;
+        height: 12px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+      }
+      .fi-read {
+        margin-left: auto;
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: var(--accent);
+        cursor: pointer;
+        transition: color 0.14s;
+      }
+      .fi-read:hover {
+        color: var(--accent-dark);
+      }
+
+      /* ══════════════ NOTIFICATIONS ══════════════ */
+      .notif-item {
+        display: flex;
+        gap: 11px;
+        padding: 11px 0;
+        border-bottom: 1px solid rgba(122, 143, 82, 0.1);
+        transition: opacity 0.15s;
+        cursor: pointer;
+      }
+      .notif-item:last-child {
+        border-bottom: none;
+      }
+      .notif-item:hover {
+        opacity: 0.8;
+      }
+      .notif-item.unread .notif-body::before {
+        content: "";
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        margin-right: 5px;
+        vertical-align: middle;
+        flex-shrink: 0;
+      }
+      .notif-dot {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.84rem;
+      }
+      .notif-dot.reply {
+        background: var(--accent-light);
+      }
+      .notif-dot.helped {
+        background: rgba(74, 140, 66, 0.15);
+      }
+      .notif-dot.badge {
+        background: rgba(184, 146, 14, 0.12);
+      }
+      .notif-dot.sos {
+        background: rgba(200, 72, 48, 0.1);
+      }
+      .notif-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .notif-text {
+        font-size: 0.82rem;
+        color: var(--text-mid);
+        line-height: 1.5;
+      }
+      .notif-text strong {
+        color: var(--text-dark);
+      }
+      .notif-time {
+        font-size: 0.7rem;
+        color: var(--text-light);
+        margin-top: 3px;
+      }
+
+      /* ══════════════ MY OPEN POSTS ══════════════ */
+      .open-post {
+        background: var(--card2);
+        border-radius: 13px;
+        padding: 14px 15px;
+        border: 1.5px solid rgba(122, 143, 82, 0.15);
+        margin-bottom: 10px;
+        transition: all 0.16s;
+      }
+      .open-post:last-child {
+        margin-bottom: 0;
+      }
+      .open-post:hover {
+        border-color: rgba(122, 143, 82, 0.3);
+        box-shadow: 0 3px 14px rgba(46, 53, 32, 0.08);
+      }
+      .op-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 7px;
+      }
+      .op-title {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        cursor: pointer;
+        line-height: 1.35;
+      }
+      .op-title:hover {
+        color: var(--accent);
+      }
+      .op-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .op-badge {
+        font-size: 0.66rem;
+        font-weight: 700;
+        border-radius: 8px;
+        padding: 2px 8px;
+      }
+      .op-badge.sos {
+        background: rgba(200, 72, 48, 0.12);
+        color: var(--red);
+      }
+      .op-badge.open {
+        background: rgba(200, 72, 48, 0.12);
+        color: var(--red);
+      }
+      .op-badge.resolved {
+        background: rgba(74, 140, 66, 0.12);
+        color: var(--green);
+      }
+      .op-badge.pending {
+        background: rgba(184, 146, 14, 0.12);
+        color: var(--amber);
+      }
+      .op-time {
+        font-size: 0.71rem;
+        color: var(--text-light);
+      }
+      .op-stats {
+        display: flex;
+        gap: 12px;
+        margin-top: 8px;
+      }
+      .op-stat {
+        font-size: 0.75rem;
+        color: var(--text-light);
+        display: flex;
+        align-items: center;
+        gap: 3px;
+      }
+      .op-stat svg {
+        width: 12px;
+        height: 12px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+      }
+      .op-stat.new-reply {
+        color: var(--accent-dark);
+        font-weight: 700;
+      }
+
+      /* ══════════════ PROGRESS BARS ══════════════ */
+      .progress-item {
+        margin-bottom: 14px;
+      }
+      .progress-item:last-child {
+        margin-bottom: 0;
+      }
+      .pr-top {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+      .pr-label {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--text-mid);
+      }
+      .pr-val {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+      .pr-bar {
+        height: 7px;
+        background: rgba(122, 143, 82, 0.15);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .pr-fill {
+        height: 100%;
+        border-radius: 4px;
+        width: 0;
+        transition: width 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* ══════════════ STREAK CALENDAR ══════════════ */
+      .streak-row {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+      .streak-day {
+        width: 28px;
+        height: 28px;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.68rem;
+        font-weight: 700;
+      }
+      .streak-day.done {
+        background: var(--accent);
+        color: white;
+      }
+      .streak-day.today {
+        background: var(--accent-dark);
+        color: white;
+        box-shadow: 0 0 0 3px rgba(122, 143, 82, 0.3);
+      }
+      .streak-day.missed {
+        background: rgba(200, 72, 48, 0.15);
+        color: var(--red);
+      }
+      .streak-day.empty {
+        background: rgba(122, 143, 82, 0.1);
+        color: var(--text-light);
+      }
+      .streak-info {
+        font-size: 0.82rem;
+        color: var(--text-mid);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .streak-info strong {
+        color: var(--text-dark);
+      }
+      .streak-fire {
+        font-size: 1rem;
+      }
+
+      /* ══════════════ BADGE SHELF ══════════════ */
+      .badge-shelf {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .badge-pill {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--card2);
+        border: 1.5px solid rgba(122, 143, 82, 0.18);
+        border-radius: 22px;
+        padding: 6px 13px;
+        font-size: 0.77rem;
+        font-weight: 700;
+        color: var(--text-mid);
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .badge-pill:hover {
+        background: var(--panel);
+        border-color: rgba(122, 143, 82, 0.3);
+        color: var(--text-dark);
+      }
+      .badge-pill .bp-icon {
+        font-size: 0.9rem;
+      }
+      .badge-pill.gold {
+        border-color: rgba(200, 162, 26, 0.3);
+        color: #8a6c0a;
+      }
+      .badge-pill.gold:hover {
+        background: rgba(200, 162, 26, 0.1);
+      }
+
+      /* ══════════════ PEOPLE MIGHT KNOW ══════════════ */
+      .people-item {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 9px 0;
+        border-bottom: 1px solid rgba(122, 143, 82, 0.1);
+      }
+      .people-item:last-child {
+        border-bottom: none;
+      }
+      .pp-av {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 0.8rem;
+        color: white;
+      }
+      .pp-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .pp-name {
+        font-size: 0.84rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .pp-meta {
+        font-size: 0.71rem;
+        color: var(--text-light);
+      }
+      .pp-follow {
+        font-size: 0.75rem;
+        font-weight: 700;
+        border: 1.5px solid rgba(122, 143, 82, 0.3);
+        background: none;
+        color: var(--accent-dark);
+        border-radius: 20px;
+        padding: 4px 12px;
+        cursor: pointer;
+        transition: all 0.14s;
+        white-space: nowrap;
+      }
+      .pp-follow:hover {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+      }
+      .pp-follow.on {
+        background: var(--accent-light);
+        color: var(--accent-dark);
+        border-color: rgba(122, 143, 82, 0.2);
+      }
+
+      /* ══════════════ UPCOMING CHALLENGES ══════════════ */
+      .challenge-item {
+        display: flex;
+        gap: 12px;
+        padding: 11px 0;
+        border-bottom: 1px solid rgba(122, 143, 82, 0.1);
+        cursor: pointer;
+        transition: opacity 0.14s;
+      }
+      .challenge-item:last-child {
+        border-bottom: none;
+      }
+      .challenge-item:hover {
+        opacity: 0.8;
+      }
+      .ch-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+      }
+      .ch-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .ch-title {
+        font-size: 0.84rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 2px;
+      }
+      .ch-meta {
+        font-size: 0.72rem;
+        color: var(--text-light);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .ch-meta svg {
+        width: 11px;
+        height: 11px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+      .ch-join {
+        font-size: 0.73rem;
+        font-weight: 700;
+        color: white;
+        background: var(--accent);
+        border: none;
+        border-radius: 14px;
+        padding: 4px 12px;
+        cursor: pointer;
+        transition: background 0.14s;
+        white-space: nowrap;
+        align-self: center;
+      }
+      .ch-join:hover {
+        background: var(--accent-dark);
+      }
+      .ch-join.on {
+        background: var(--accent-light);
+        color: var(--accent-dark);
+      }
+
+      /* ══════════════ DISTRESS PULSE ══════════════ */
+      .sos-pulse-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+      }
+      .sos-live {
+        background: rgba(200, 72, 48, 0.06);
+        border: 1.5px solid rgba(200, 72, 48, 0.18);
+        border-radius: 13px;
+        padding: 12px 14px;
+        cursor: pointer;
+        transition: all 0.16s;
+      }
+      .sos-live:hover {
+        background: rgba(200, 72, 48, 0.1);
+        border-color: rgba(200, 72, 48, 0.3);
+      }
+      .sos-live-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 5px;
+      }
+      .sos-live-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--red);
+        animation: pulse 1.5s ease infinite;
+        flex-shrink: 0;
+      }
+      .sos-live-tag {
+        font-size: 0.67rem;
+        font-weight: 700;
+        background: var(--red);
+        color: white;
+        border-radius: 7px;
+        padding: 1px 7px;
+        letter-spacing: 0.04em;
+      }
+      .sos-live-title {
+        font-size: 0.84rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        line-height: 1.35;
+      }
+      .sos-live-meta {
+        font-size: 0.72rem;
+        color: var(--text-light);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 5px;
+      }
+
+      /* ══════════════ PAGES: ACTIVITY, SAVED ══════════════ */
+      .page-head {
+        margin-bottom: 20px;
+      }
+      .page-head h2 {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 1.38rem;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+      }
+      .page-head p {
+        font-size: 0.86rem;
+        color: var(--text-light);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+      }
+      .empty-state .es-icon {
+        font-size: 2.4rem;
+        margin-bottom: 12px;
+        display: block;
+      }
+      .empty-state h3 {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--text-dark);
+        margin-bottom: 6px;
+      }
+      .empty-state p {
+        font-size: 0.84rem;
+        color: var(--text-light);
+        line-height: 1.6;
+      }
+
+      /* ══════════════ BUTTONS ══════════════ */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 18px;
+        border-radius: 22px;
+        border: none;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.84rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.16s;
+        white-space: nowrap;
+      }
+      .btn.prim {
+        background: var(--accent);
+        color: white;
+        box-shadow: 0 3px 12px rgba(122, 143, 82, 0.3);
+      }
+      .btn.prim:hover {
+        background: var(--accent-dark);
+        transform: translateY(-1px);
+      }
+      .btn.ghost {
+        background: var(--card2);
+        color: var(--text-mid);
+        border: 1.5px solid rgba(122, 143, 82, 0.22);
+      }
+      .btn.ghost:hover {
+        background: var(--panel);
+        color: var(--text-dark);
+      }
+      .btn svg {
+        width: 13px;
+        height: 13px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+
+      /* Toast */
+      #toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(16px);
+        background: var(--text-dark);
+        color: white;
+        border-radius: 22px;
+        padding: 10px 18px;
+        font-size: 0.83rem;
+        font-weight: 600;
+        opacity: 0;
+        transition:
+          opacity 0.3s,
+          transform 0.3s;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        pointer-events: none;
+        max-width: 90vw;
+      }
+      #toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      #toast svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2.2;
+        stroke-linecap: round;
+      }
+
+      #overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(46, 53, 32, 0.22);
+        z-index: 150;
+        backdrop-filter: blur(2px);
+      }
+      #overlay.on {
+        display: block;
+      }
+
+      /* ══════════════ RESPONSIVE ══════════════ */
+      @media (max-width: 1100px) {
+        .main-grid {
+          grid-template-columns: 1fr;
+        }
+        .stats-strip {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      @media (max-width: 720px) {
+        #subnav {
+          display: flex;
+        }
+        #shell {
+          margin-top: calc(var(--top-h) + var(--sub-h));
+        }
+        #sidebar {
+          top: calc(var(--top-h) + var(--sub-h));
+        }
+        .stats-strip {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .gh-actions {
+          display: none;
+        }
+        .gh-name {
+          font-size: 1.4rem;
+        }
+      }
+      @media (max-width: 520px) {
+        #hamburger {
+          display: block;
+        }
+        .tb-logo-zone {
+          display: none;
+        }
+        .tb-title {
+          display: block;
+        }
+        #topbar {
+          padding: 0 14px;
+          gap: 8px;
+        }
+        #page {
+          padding: 16px 14px 60px;
+        }
+        #sidebar {
+          position: fixed;
+          width: 0 !important;
+          transition:
+            width 0.28s var(--ease),
+            box-shadow 0.28s;
+        }
+        #sidebar.open {
+          width: var(--sb-full) !important;
+          box-shadow: 4px 0 24px rgba(46, 53, 32, 0.18);
+        }
+        .stats-strip {
+          grid-template-columns: 1fr 1fr;
+        }
+        .tb-search {
+          display: none;
+        }
+        .distress-btn span {
+          display: none;
+        }
+        .distress-btn {
+          padding: 8px 11px;
+        }
+        .qa-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="overlay" onclick="closeSidebar()"></div>
+    <div id="toast">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+      <span id="toast-msg"></span>
+    </div>
+
+    <!-- ══════════════ TOPBAR ══════════════ -->
+    <header id="topbar">
+      <button id="hamburger" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+      <div class="tb-logo-zone">
+        <div class="tb-logo">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"
+            />
+          </svg>
+        </div>
+      </div>
+      <span class="tb-title">Craft-SOS</span>
+      <div class="tb-search">
+        <svg viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search posts, people, topics…"
+          oninput="toast('Search coming soon')"
+        />
+      </div>
+      <div class="tb-right">
+        <button
+          class="distress-btn"
+          onclick="toast('Opening distress call form…')"
+        >
+          <svg viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>Distress Call</span>
+        </button>
+        <button class="tb-icon" onclick="switchSection('notifications', null)">
+          <svg viewBox="0 0 24 24">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 01-3.46 0" />
+          </svg>
+          <div class="tb-notif-dot"></div>
+        </button>
+        <div class="tb-av" onclick="toast('Opening profile…')">W</div>
+      </div>
+    </header>
+
+    <!-- ══════════════ SUBNAV (mobile) ══════════════ -->
+    <nav id="subnav">
+      <span class="snav on" onclick="switchSection('home', this)">Home</span>
+      <span class="snav" onclick="switchSection('my-posts', this)"
+        >My Posts</span
+      >
+      <span class="snav" onclick="switchSection('notifications', this)"
+        >Notifications</span
+      >
+      <span class="snav" onclick="switchSection('saved', this)">Saved</span>
+      <span class="snav" onclick="switchSection('progress', this)"
+        >Progress</span
+      >
+    </nav>
+
+    <!-- ══════════════ SHELL ══════════════ -->
+    <div id="shell">
+      <!-- SIDEBAR -->
+      <aside id="sidebar">
+        <div class="sb-me">
+          <div class="sb-av">W</div>
+          <div class="sb-me-info">
+            <div class="sb-me-name">WoolCraft Co</div>
+            <div class="sb-me-pts">🏆 2,100 pts · Mentor</div>
+          </div>
+        </div>
+        <nav>
+          <div class="nav-item on" onclick="navPick(this, 'home')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <span class="ni-label">Dashboard</span>
+          </div>
+          <div class="nav-item" onclick="navPick(this, 'my-posts')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            <span class="ni-label">My Posts</span>
+            <span class="ni-badge">3</span>
+          </div>
+          <div class="nav-item" onclick="navPick(this, 'notifications')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <span class="ni-label">Notifications</span>
+            <span class="ni-badge">5</span>
+          </div>
+          <div class="nav-item" onclick="navPick(this, 'saved')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+            </svg>
+            <span class="ni-label">Saved Posts</span>
+          </div>
+          <div class="nav-item" onclick="navPick(this, 'progress')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            <span class="ni-label">My Progress</span>
+          </div>
+          <div class="nav-item" onclick="toast('Opening your profile…')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span class="ni-label">My Profile</span>
+          </div>
+          <div class="nav-item" onclick="toast('Opening messages…')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <path
+                d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+              />
+            </svg>
+            <span class="ni-label">Messages</span>
+            <span class="ni-badge">2</span>
+          </div>
+          <div class="nav-item" onclick="toast('Opening settings…')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+              />
+            </svg>
+            <span class="ni-label">Settings</span>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- ══════════════ PAGE ══════════════ -->
+      <div id="page">
+        <!-- ════════ HOME DASHBOARD ════════ -->
+        <section class="dash-section on" id="sec-home">
+          <!-- Greeting hero -->
+          <div class="greeting-hero">
+            <svg
+              class="gh-svg"
+              viewBox="0 0 900 200"
+              preserveAspectRatio="xMidYMid slice"
+            >
+              <circle
+                cx="50"
+                cy="60"
+                r="44"
+                fill="none"
+                stroke="white"
+                stroke-width="1.4"
+              />
+              <path
+                d="M22 80 Q50 20 78 80"
+                fill="none"
+                stroke="white"
+                stroke-width="1"
+              />
+              <circle
+                cx="840"
+                cy="140"
+                r="36"
+                fill="none"
+                stroke="white"
+                stroke-width="1.4"
+              />
+              <path
+                d="M816 152 Q840 100 864 152"
+                fill="none"
+                stroke="white"
+                stroke-width="1"
+              />
+              <rect
+                x="350"
+                y="22"
+                width="80"
+                height="13"
+                rx="6.5"
+                fill="none"
+                stroke="white"
+                stroke-width="1.2"
+                transform="rotate(14 390 28)"
+              />
+              <circle
+                cx="394"
+                cy="14"
+                r="8"
+                fill="none"
+                stroke="white"
+                stroke-width="1.2"
+              />
+              <path
+                d="M720 160 L740 134 L760 160 L740 186Z"
+                fill="none"
+                stroke="white"
+                stroke-width="1.2"
+              />
+              <path
+                d="M130 170 L150 144 L170 170 L150 196Z"
+                fill="none"
+                stroke="white"
+                stroke-width="1"
+              />
+            </svg>
+            <div class="gh-fade"></div>
+            <div class="gh-left">
+              <div class="gh-eyebrow">
+                <div class="gh-dot"></div>
+                You're online · Monday 16 Feb
+              </div>
+              <div class="gh-name">
+                Good morning,<br /><em>WoolCraft Co</em> 🌿
+              </div>
+              <div class="gh-sub">
+                3 new replies on your posts · 1 distress call matching your
+                skills
+              </div>
+            </div>
+            <div class="gh-actions">
+              <button
+                class="gh-btn prim"
+                onclick="switchSection('my-posts', null)"
+              >
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                  />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+                My Posts
+              </button>
+              <button
+                class="gh-btn sec"
+                onclick="toast('Opening community feed…')"
+              >
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                  />
+                </svg>
+                See Feed
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats strip -->
+          <div class="stats-strip">
+            <div
+              class="stat-pill c-accent"
+              style="animation-delay: 0.07s"
+              onclick="switchSection('progress', null)"
+            >
+              <div class="sp-icon accent">
+                <svg viewBox="0 0 24 24">
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  />
+                </svg>
+              </div>
+              <div class="sp-num" data-target="2100">0</div>
+              <div class="sp-label">Points</div>
+              <div class="sp-delta">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="18 15 12 9 6 15" />
+                </svg>
+                +180 this month
+              </div>
+            </div>
+            <div class="stat-pill c-green" style="animation-delay: 0.12s">
+              <div class="sp-icon green">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div class="sp-num" data-target="312">0</div>
+              <div class="sp-label">People Helped</div>
+              <div class="sp-delta">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="18 15 12 9 6 15" />
+                </svg>
+                +18 this month
+              </div>
+            </div>
+            <div
+              class="stat-pill c-blue"
+              style="animation-delay: 0.17s"
+              onclick="switchSection('my-posts', null)"
+            >
+              <div class="sp-icon blue">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                  />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+              </div>
+              <div class="sp-num" data-target="54">0</div>
+              <div class="sp-label">Posts</div>
+              <div class="sp-delta neutral">3 need replies</div>
+            </div>
+            <div class="stat-pill c-amber" style="animation-delay: 0.22s">
+              <div class="sp-icon amber">
+                <svg viewBox="0 0 24 24">
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                  <path d="M16 3.13a4 4 0 010 7.75" />
+                </svg>
+              </div>
+              <div class="sp-num" data-target="142">0</div>
+              <div class="sp-label">Friends</div>
+              <div class="sp-delta">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="18 15 12 9 6 15" />
+                </svg>
+                +4 this week
+              </div>
+            </div>
+            <div class="stat-pill c-red" style="animation-delay: 0.27s">
+              <div class="sp-icon red">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              </div>
+              <div class="sp-num">1.8h</div>
+              <div class="sp-label">Avg Response</div>
+              <div class="sp-delta">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="18 15 12 9 6 15" />
+                </svg>
+                Faster than 82%
+              </div>
+            </div>
+          </div>
+
+          <!-- Main grid -->
+          <div class="main-grid">
+            <!-- LEFT COL -->
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <!-- Quick actions -->
+              <div class="widget" style="animation-delay: 0.1s">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Quick Actions
+                  </div>
+                </div>
+                <div class="w-body">
+                  <div class="qa-grid">
+                    <div
+                      class="qa-card sos"
+                      onclick="toast('Opening distress call form…')"
+                    >
+                      <div
+                        class="qa-icon"
+                        style="background: rgba(200, 72, 48, 0.1)"
+                      >
+                        🆘
+                      </div>
+                      <div class="qa-title">Post Distress Call</div>
+                      <div class="qa-desc">
+                        Something's gone wrong — get help fast from the
+                        community
+                      </div>
+                    </div>
+                    <div
+                      class="qa-card"
+                      onclick="toast('Opening tutorial editor…')"
+                    >
+                      <div
+                        class="qa-icon"
+                        style="background: var(--accent-light)"
+                      >
+                        📚
+                      </div>
+                      <div class="qa-title">Write a Tutorial</div>
+                      <div class="qa-desc">
+                        Share your knowledge — earn points and help others
+                      </div>
+                    </div>
+                    <div
+                      class="qa-card"
+                      onclick="toast('Opening community post…')"
+                    >
+                      <div
+                        class="qa-icon"
+                        style="background: rgba(184, 146, 14, 0.1)"
+                      >
+                        💬
+                      </div>
+                      <div class="qa-title">Community Post</div>
+                      <div class="qa-desc">
+                        Start a discussion, ask a question, share a win
+                      </div>
+                    </div>
+                    <div
+                      class="qa-card"
+                      onclick="toast('Searching for posts to help with…')"
+                    >
+                      <div
+                        class="qa-icon"
+                        style="background: rgba(74, 140, 66, 0.1)"
+                      >
+                        🤝
+                      </div>
+                      <div class="qa-title">Help Someone</div>
+                      <div class="qa-desc">
+                        Browse open distress calls matching your skills
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Live distress calls -->
+              <div class="widget" style="animation-delay: 0.14s">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                      />
+                      <line x1="12" y1="9" x2="12" y2="13" />
+                      <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                    Needs Your Help
+                  </div>
+                  <span
+                    class="w-link"
+                    onclick="toast('Browsing all distress calls…')"
+                    >Browse all →</span
+                  >
+                </div>
+                <div class="w-body">
+                  <div class="sos-pulse-wrap" id="sos-pulse"></div>
+                </div>
+              </div>
+
+              <!-- Community feed preview -->
+              <div class="widget" style="animation-delay: 0.18s">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                      />
+                    </svg>
+                    Community Feed
+                  </div>
+                  <span class="w-link" onclick="toast('Opening full feed…')"
+                    >View all →</span
+                  >
+                </div>
+                <div class="w-body" id="feed-list"></div>
+              </div>
+            </div>
+
+            <!-- RIGHT COL -->
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <!-- My open posts -->
+              <div class="widget" style="animation-delay: 0.1s">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                      />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    My Open Posts
+                  </div>
+                  <span class="w-link" onclick="switchSection('my-posts', null)"
+                    >All →</span
+                  >
+                </div>
+                <div class="w-body" id="open-posts-widget"></div>
+              </div>
+
+              <!-- Streak -->
+              <div class="widget" style="animation-delay: 0.15s">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                    Activity Streak
+                  </div>
+                </div>
+                <div class="w-body">
+                  <div class="streak-row" id="streak-row"></div>
+                  <div class="streak-info">
+                    <span class="streak-fire">🔥</span>You're on a
+                    <strong>7-day streak!</strong> Keep it up.
+                  </div>
+                </div>
+              </div>
+
+              <!-- People you might know -->
+              <div class="widget" style="animation-delay: 0.2s">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                      <path d="M16 3.13a4 4 0 010 7.75" />
+                    </svg>
+                    Suggested Friends
+                  </div>
+                </div>
+                <div class="w-body" id="people-list"></div>
+              </div>
+
+              <!-- Upcoming challenges -->
+              <div class="widget" style="animation-delay: 0.25s">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <circle cx="12" cy="8" r="6" />
+                      <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+                    </svg>
+                    Challenges
+                  </div>
+                </div>
+                <div class="w-body" id="challenges-list"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ════════ MY POSTS ════════ -->
+        <section class="dash-section" id="sec-my-posts">
+          <div class="page-head">
+            <h2>My Posts</h2>
+            <p>Your posts, tutorials, and distress calls — all in one place</p>
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 10px;
+              margin-bottom: 18px;
+              flex-wrap: wrap;
+            "
+          >
+            <button class="btn prim" onclick="toast('Opening create post…')">
+              <svg viewBox="0 0 24 24">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              New Post
+            </button>
+            <button class="btn ghost">All</button>
+            <button class="btn ghost">Distress Calls</button>
+            <button class="btn ghost">Tutorials</button>
+            <button class="btn ghost">Resolved</button>
+          </div>
+          <div id="my-posts-full"></div>
+        </section>
+
+        <!-- ════════ NOTIFICATIONS ════════ -->
+        <section class="dash-section" id="sec-notifications">
+          <div class="page-head">
+            <h2>Notifications</h2>
+            <p>5 unread · last updated just now</p>
+          </div>
+          <div class="widget">
+            <div class="w-head">
+              <div class="w-title">Recent</div>
+              <span class="w-link" onclick="toast('All marked as read')"
+                >Mark all read</span
+              >
+            </div>
+            <div class="w-body" id="notif-full"></div>
+          </div>
+        </section>
+
+        <!-- ════════ SAVED ════════ -->
+        <section class="dash-section" id="sec-saved">
+          <div class="page-head">
+            <h2>Saved Posts</h2>
+            <p>Things you bookmarked to come back to</p>
+          </div>
+          <div id="saved-list"></div>
+        </section>
+
+        <!-- ════════ PROGRESS ════════ -->
+        <section class="dash-section" id="sec-progress">
+          <div class="page-head">
+            <h2>My Progress</h2>
+            <p>Your journey in the Craft-SOS community</p>
+          </div>
+          <div class="main-grid">
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <div class="widget">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                      />
+                    </svg>
+                    Rank Progress
+                  </div>
+                </div>
+                <div class="w-body">
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 16px;
+                      margin-bottom: 20px;
+                    "
+                  >
+                    <div
+                      style="
+                        width: 64px;
+                        height: 64px;
+                        border-radius: 50%;
+                        background: linear-gradient(135deg, #e8c94e, #c0980e);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.8rem;
+                        box-shadow: 0 4px 18px rgba(192, 152, 14, 0.3);
+                        flex-shrink: 0;
+                      "
+                    >
+                      🏆
+                    </div>
+                    <div>
+                      <div
+                        style="
+                          font-family: &quot;Lora&quot;, serif;
+                          font-weight: 700;
+                          font-size: 1.2rem;
+                          color: var(--text-dark);
+                        "
+                      >
+                        Mentor Rank
+                      </div>
+                      <div
+                        style="
+                          font-size: 0.82rem;
+                          color: var(--text-light);
+                          margin-top: 2px;
+                        "
+                      >
+                        2,100 of 5,000 points to Diamond
+                      </div>
+                      <div
+                        style="
+                          font-size: 0.76rem;
+                          color: var(--accent-dark);
+                          font-weight: 700;
+                          margin-top: 4px;
+                        "
+                      >
+                        Top 3% of all contributors
+                      </div>
+                    </div>
+                  </div>
+                  <div class="progress-item">
+                    <div class="pr-top">
+                      <span class="pr-label">🏆 Mentor → 💎 Diamond</span
+                      ><span class="pr-val">2,100 / 5,000</span>
+                    </div>
+                    <div class="pr-bar">
+                      <div
+                        class="pr-fill"
+                        data-pct="42"
+                        style="
+                          background: linear-gradient(
+                            90deg,
+                            var(--accent),
+                            var(--accent-mid)
+                          );
+                        "
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="progress-item">
+                    <div class="pr-top">
+                      <span class="pr-label">🎓 25 Tutorials (22 done)</span
+                      ><span class="pr-val">22 / 25</span>
+                    </div>
+                    <div class="pr-bar">
+                      <div
+                        class="pr-fill"
+                        data-pct="88"
+                        style="
+                          background: linear-gradient(90deg, #5cb85c, #8fe88f);
+                        "
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="progress-item">
+                    <div class="pr-top">
+                      <span class="pr-label">🤝 500 Helped (312 done)</span
+                      ><span class="pr-val">312 / 500</span>
+                    </div>
+                    <div class="pr-bar">
+                      <div
+                        class="pr-fill"
+                        data-pct="62"
+                        style="
+                          background: linear-gradient(90deg, #3a7ab8, #70b0e8);
+                        "
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="progress-item">
+                    <div class="pr-top">
+                      <span class="pr-label"
+                        >🌍 Global Reach (14 countries)</span
+                      ><span class="pr-val">14 / 20</span>
+                    </div>
+                    <div class="pr-bar">
+                      <div
+                        class="pr-fill"
+                        data-pct="70"
+                        style="
+                          background: linear-gradient(90deg, #c8a21a, #e8d060);
+                        "
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="widget">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <line x1="12" y1="1" x2="12" y2="23" />
+                      <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                    </svg>
+                    Points Breakdown
+                  </div>
+                </div>
+                <div class="w-body">
+                  <div id="pts-breakdown"></div>
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <div class="widget">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <circle cx="12" cy="8" r="6" />
+                      <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+                    </svg>
+                    Badges Earned
+                  </div>
+                </div>
+                <div class="w-body">
+                  <div class="badge-shelf" id="badge-shelf"></div>
+                </div>
+              </div>
+
+              <div class="widget">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M18 20V10" />
+                      <path d="M12 20V4" />
+                      <path d="M6 20v-6" />
+                    </svg>
+                    Top Topics
+                  </div>
+                </div>
+                <div class="w-body" id="top-topics-pg"></div>
+              </div>
+
+              <div class="widget">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                    30-Day Streak
+                  </div>
+                </div>
+                <div class="w-body">
+                  <div
+                    style="
+                      font-family: &quot;Lora&quot;, serif;
+                      font-weight: 700;
+                      font-size: 2.2rem;
+                      color: var(--text-dark);
+                      margin-bottom: 4px;
+                    "
+                  >
+                    🔥 7 days
+                  </div>
+                  <div
+                    style="
+                      font-size: 0.82rem;
+                      color: var(--text-light);
+                      margin-bottom: 14px;
+                    "
+                  >
+                    Current streak · Best: 14 days in October
+                  </div>
+                  <div class="streak-row" id="streak-row-full"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <!-- /page -->
+    </div>
+    <!-- /shell -->
+
+    <script>
+      /* ════════════════════════════
+   DATA
+════════════════════════════ */
+      const feedData = [
+        {
+          av: "K",
+          col: "#a8c4d8",
+          name: "KnitQueen",
+          time: "2h ago",
+          type: "tut",
+          text: "Just published my complete guide to pricing yarn — finally got my numbers where they need to be. Took 3 years but here we are.",
+          views: 1240,
+          replies: 34,
+          saves: 88,
+        },
+        {
+          av: "F",
+          col: "#c8a98a",
+          name: "FiberArts Jo",
+          time: "4h ago",
+          type: "sos",
+          text: "My main courier just lost £280 of stock and they're refusing to pay out. Anyone dealt with DPD claims before? Getting nowhere.",
+          views: 890,
+          replies: 28,
+          saves: 22,
+        },
+        {
+          av: "N",
+          col: "#b5c98a",
+          name: "NaturalDyes UK",
+          time: "6h ago",
+          type: "res",
+          text: "Free mordant ratio calculator — just put in your fibre weight and it calculates alum, tannin and iron quantities automatically.",
+          views: 2100,
+          replies: 18,
+          saves: 312,
+        },
+        {
+          av: "L",
+          col: "#f0c07a",
+          name: "LoopNeedle",
+          time: "Yesterday",
+          type: "com",
+          text: "Does anyone else find the winter months brutally slow for Etsy? Down 40% on last November. Wondering if it's just me or the platform.",
+          views: 560,
+          replies: 45,
+          saves: 14,
+        },
+      ];
+
+      const sosPulse = [
+        {
+          title: "Etsy account restricted — all listings deactivated overnight",
+          av: "S",
+          col: "#9ec4a0",
+          name: "StitchWorks",
+          time: "1 hour ago",
+          replies: 3,
+        },
+        {
+          title:
+            "HMRC letter about undeclared income from 2023 — really scared",
+          av: "C",
+          col: "#c4b8a8",
+          name: "CraftsByClara",
+          time: "3 hours ago",
+          replies: 1,
+        },
+      ];
+
+      const openPosts = [
+        {
+          title: "How I priced my yarn for a living wage — the full formula",
+          badge: "tut",
+          status: "active",
+          time: "3 days ago",
+          views: 2841,
+          replies: 89,
+          newReplies: 3,
+        },
+        {
+          title: "Etsy suspended my shop — £840 frozen. What can I do?",
+          badge: "sos",
+          status: "resolved",
+          time: "2 weeks ago",
+          views: 5392,
+          replies: 68,
+          newReplies: 0,
+        },
+        {
+          title: "UK Real Living Wage updated — check your pricing",
+          badge: "com",
+          status: "active",
+          time: "1 week ago",
+          views: 1204,
+          replies: 42,
+          newReplies: 1,
+        },
+      ];
+
+      const notifications = [
+        {
+          dot: "reply",
+          ic: "💬",
+          text: '<strong>KnitQueen</strong> replied to your pricing tutorial — "This is exactly what I needed, genuinely changed how I think about my costs."',
+          time: "45 min ago",
+          unread: true,
+        },
+        {
+          dot: "helped",
+          ic: "✅",
+          text: "<strong>YarnWitch</strong> marked your Etsy suspension advice as resolved — shop reinstated in 9 days",
+          time: "2 hours ago",
+          unread: true,
+        },
+        {
+          dot: "reply",
+          ic: "💬",
+          text: "<strong>FiberArts Jo</strong> commented on your living wage post",
+          time: "4 hours ago",
+          unread: true,
+        },
+        {
+          dot: "badge",
+          ic: "🏆",
+          text: "You earned the <strong>Top Responder</strong> badge — top 5% helpful responses this month!",
+          time: "Yesterday",
+          unread: true,
+        },
+        {
+          dot: "sos",
+          ic: "🆘",
+          text: 'New distress call matching your skills: <strong>"HMRC undeclared income letter"</strong> — 1 reply so far',
+          time: "3 hours ago",
+          unread: true,
+        },
+        {
+          dot: "reply",
+          ic: "💬",
+          text: "<strong>LoopNeedle</strong> followed you",
+          time: "2 days ago",
+          unread: false,
+        },
+        {
+          dot: "helped",
+          ic: "✅",
+          text: "Your tutorial reached <strong>2,500 views</strong> 🎉",
+          time: "3 days ago",
+          unread: false,
+        },
+      ];
+
+      const savedPosts = [
+        {
+          av: "W",
+          col: "#7a8f52",
+          name: "WoolCraft Co",
+          type: "tut",
+          title: "Natural mordanting with alum — complete beginner guide",
+          time: "Saved 5 days ago",
+          views: 1840,
+          replies: 29,
+        },
+        {
+          av: "K",
+          col: "#a8c4d8",
+          name: "KnitQueen",
+          type: "res",
+          title: "Free invoice template for UK craft sellers (Google Sheets)",
+          time: "Saved 1 week ago",
+          views: 1220,
+          replies: 18,
+        },
+        {
+          av: "N",
+          col: "#b5c98a",
+          name: "NaturalDyes UK",
+          type: "tut",
+          title:
+            "Setting up a UK craft business — sole trader vs limited company",
+          time: "Saved 2 weeks ago",
+          views: 2210,
+          replies: 55,
+        },
+      ];
+
+      const people = [
+        {
+          av: "M",
+          col: "#a8b8d0",
+          name: "MerriweatherFibre",
+          meta: "Wool · 3 mutual friends",
+          followed: false,
+        },
+        {
+          av: "T",
+          col: "#d0a8b8",
+          name: "TheKnittery",
+          meta: "Knitwear · 2 mutual friends",
+          followed: false,
+        },
+        {
+          av: "A",
+          col: "#e8b4a0",
+          name: "CeramicsBy Ada",
+          meta: "Ceramics · 1 mutual friend",
+          followed: false,
+        },
+      ];
+      const pFollow = {};
+
+      const challenges = [
+        {
+          ic: "🌱",
+          bg: "rgba(74,140,66,.12)",
+          title: "Publish 3 tutorials this month",
+          meta: "22 / 25 tutorials towards badge",
+          joined: true,
+        },
+        {
+          ic: "⚡",
+          bg: "rgba(184,146,14,.1)",
+          title: "7-day response streak",
+          meta: "Ends in 3 days · 214 joined",
+          joined: true,
+        },
+        {
+          ic: "🎯",
+          bg: "rgba(58,122,184,.12)",
+          title: "Help 5 new members this week",
+          meta: "2 / 5 complete · 89 members",
+          joined: false,
+        },
+      ];
+      const cJoined = { 0: true, 1: true, 2: false };
+
+      const badges = [
+        { ic: "🏆", label: "Mentor", tier: "gold" },
+        { ic: "⭐", label: "Top Responder", tier: "gold" },
+        { ic: "🏅", label: "Verified Expert", tier: "gold" },
+        { ic: "🧶", label: "Master Dyer", tier: "" },
+        { ic: "💚", label: "Community Pillar", tier: "" },
+        { ic: "📚", label: "Published Author", tier: "" },
+        { ic: "✅", label: "Problem Solver", tier: "" },
+        { ic: "🔥", label: "7-Day Streak", tier: "" },
+        { ic: "🆘", label: "First Responder", tier: "" },
+        { ic: "🌱", label: "Early Adopter", tier: "" },
+      ];
+
+      const ptsBreakdown = [
+        { ic: "💬", label: "Responses given", val: "+1,248", g: true },
+        { ic: "📚", label: "Tutorials posted", val: "+440", g: true },
+        { ic: "🌟", label: "Marked helpful", val: "+286", g: true },
+        { ic: "✅", label: "Resolved issues", val: "+180", g: true },
+        { ic: "👋", label: "Bonuses earned", val: "+50", g: true },
+      ];
+
+      const topTopics = [
+        { name: "Pricing & Margins", pct: 90, count: 28 },
+        { name: "Etsy & Marketplaces", pct: 62, count: 19 },
+        { name: "Natural Dyeing", pct: 52, count: 16 },
+        { name: "Business & Legal", pct: 40, count: 12 },
+        { name: "Wholesale", pct: 30, count: 9 },
+      ];
+
+      /* ════════════════════════════
+   RENDER
+════════════════════════════ */
+      function renderFeed() {
+        document.getElementById("feed-list").innerHTML = feedData
+          .map(
+            (p) => `
+    <div class="feed-item">
+      <div class="fi-av" style="background:${p.col}">${p.av}</div>
+      <div class="fi-body">
+        <div class="fi-top">
+          <span class="fi-name">${p.name}</span>
+          <span class="fi-badge ${p.type}">${p.type === "sos" ? "Distress Call" : p.type === "tut" ? "Tutorial" : p.type === "com" ? "Community" : "Resource"}</span>
+          <span class="fi-time">${p.time}</span>
+        </div>
+        <div class="fi-text">${p.text}</div>
+        <div class="fi-foot">
+          <span class="fi-stat"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${p.views.toLocaleString()}</span>
+          <span class="fi-stat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${p.replies}</span>
+          <span class="fi-stat"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>${p.saves}</span>
+          <span class="fi-read" onclick="toast('Opening post…')">Read →</span>
+        </div>
+      </div>
+    </div>`,
+          )
+          .join("");
+      }
+
+      function renderSosPulse() {
+        document.getElementById("sos-pulse").innerHTML = sosPulse
+          .map(
+            (s) => `
+    <div class="sos-live" onclick="toast('Opening distress call…')">
+      <div class="sos-live-top">
+        <div class="sos-live-dot"></div>
+        <span class="sos-live-tag">LIVE · SOS</span>
+      </div>
+      <div class="sos-live-title">${s.title}</div>
+      <div class="sos-live-meta">
+        <div style="width:20px;height:20px;border-radius:50%;background:${s.col};display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-weight:700;font-size:.6rem;color:white;flex-shrink:0">${s.av}</div>
+        ${s.name} · ${s.time} · ${s.replies} ${s.replies === 1 ? "reply" : "replies"} so far
+      </div>
+    </div>`,
+          )
+          .join("");
+      }
+
+      function renderOpenPostsWidget() {
+        document.getElementById("open-posts-widget").innerHTML = openPosts
+          .slice(0, 3)
+          .map(
+            (p) => `
+    <div class="open-post">
+      <div class="op-top">
+        <div class="op-title" onclick="toast('Opening post…')">${p.title}</div>
+      </div>
+      <div class="op-meta">
+        <span class="op-badge ${p.badge}">${p.badge === "sos" ? "SOS" : p.badge === "tut" ? "Tutorial" : "Community"}</span>
+        <span class="op-badge ${p.status}">${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span>
+        <span class="op-time">${p.time}</span>
+      </div>
+      <div class="op-stats">
+        <span class="op-stat"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${p.views.toLocaleString()}</span>
+        <span class="op-stat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${p.replies}</span>
+        ${p.newReplies > 0 ? `<span class="op-stat new-reply">🔔 ${p.newReplies} new</span>` : ""}
+      </div>
+    </div>`,
+          )
+          .join("");
+      }
+
+      function renderMyPostsFull() {
+        document.getElementById("my-posts-full").innerHTML =
+          openPosts
+            .map(
+              (p) => `
+    <div class="open-post" style="margin-bottom:12px">
+      <div class="op-top">
+        <div class="op-title" onclick="toast('Opening post…')">${p.title}</div>
+      </div>
+      <div class="op-meta">
+        <span class="op-badge ${p.badge}">${p.badge === "sos" ? "SOS" : p.badge === "tut" ? "Tutorial" : "Community"}</span>
+        <span class="op-badge ${p.status}">${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span>
+        <span class="op-time">${p.time}</span>
+      </div>
+      <div class="op-stats">
+        <span class="op-stat"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${p.views.toLocaleString()}</span>
+        <span class="op-stat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${p.replies}</span>
+        ${p.newReplies > 0 ? `<span class="op-stat new-reply">🔔 ${p.newReplies} new replies</span>` : ""}
+      </div>
+    </div>`,
+            )
+            .join("") +
+          `<button class="btn ghost" style="margin-top:4px" onclick="toast('Opening create post…')">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Create new post
+    </button>`;
+      }
+
+      function renderStreak(containerId, len) {
+        const days = ["M", "T", "W", "T", "F", "S", "S"];
+        const status = [
+          "done",
+          "done",
+          "done",
+          "done",
+          "done",
+          "done",
+          "today",
+        ];
+        const extra =
+          len > 7
+            ? Array.from({ length: len - 7 }, (_, i) => ({
+                d: String(i + 1),
+                s: "done",
+              })).reverse()
+            : [];
+        const items = status
+          .map((s, i) => `<div class="streak-day ${s}">${days[i]}</div>`)
+          .join("");
+        document.getElementById(containerId).innerHTML = items;
+      }
+
+      function renderPeople() {
+        document.getElementById("people-list").innerHTML = people
+          .map(
+            (p, i) => `
+    <div class="people-item">
+      <div class="pp-av" style="background:${p.col}">${p.av}</div>
+      <div class="pp-info">
+        <div class="pp-name">${p.name}</div>
+        <div class="pp-meta">${p.meta}</div>
+      </div>
+      <button class="pp-follow${pFollow[i] ? " on" : ""}" onclick="followPerson(${i},this)">${pFollow[i] ? "✓ Following" : "+ Follow"}</button>
+    </div>`,
+          )
+          .join("");
+      }
+
+      function followPerson(i, btn) {
+        pFollow[i] = !pFollow[i];
+        btn.classList.toggle("on", pFollow[i]);
+        btn.textContent = pFollow[i] ? "✓ Following" : "+ Follow";
+        toast(
+          pFollow[i]
+            ? `Now following ${people[i].name}`
+            : `Unfollowed ${people[i].name}`,
+        );
+      }
+
+      function renderChallenges() {
+        document.getElementById("challenges-list").innerHTML = challenges
+          .map(
+            (c, i) => `
+    <div class="challenge-item">
+      <div class="ch-icon" style="background:${c.bg}">${c.ic}</div>
+      <div class="ch-body">
+        <div class="ch-title">${c.title}</div>
+        <div class="ch-meta"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${c.meta}</div>
+      </div>
+      <button class="ch-join${cJoined[i] ? " on" : ""}" onclick="joinChallenge(${i},this)">${cJoined[i] ? "Joined" : "Join"}</button>
+    </div>`,
+          )
+          .join("");
+      }
+
+      function joinChallenge(i, btn) {
+        cJoined[i] = !cJoined[i];
+        btn.classList.toggle("on", cJoined[i]);
+        btn.textContent = cJoined[i] ? "Joined" : "Join";
+        toast(
+          cJoined[i]
+            ? `Joined "${challenges[i].title.slice(0, 28)}…"`
+            : "Left challenge",
+        );
+      }
+
+      function renderNotifications() {
+        const cont = document.getElementById("notif-full");
+        if (!cont) return;
+        cont.innerHTML = notifications
+          .map(
+            (n) => `
+    <div class="notif-item${n.unread ? " unread" : ""}" onclick="toast('Opening notification…')">
+      <div class="notif-dot ${n.dot}">${n.ic}</div>
+      <div class="notif-body">
+        <div class="notif-text">${n.text}</div>
+        <div class="notif-time">${n.time}</div>
+      </div>
+    </div>`,
+          )
+          .join("");
+      }
+
+      function renderSaved() {
+        const cont = document.getElementById("saved-list");
+        if (!cont) return;
+        cont.innerHTML = savedPosts
+          .map(
+            (p) => `
+    <div class="open-post" style="margin-bottom:12px">
+      <div class="op-top">
+        <div class="op-title" onclick="toast('Opening post…')">${p.title}</div>
+        <button onclick="toast('Bookmark removed')" style="background:none;border:none;cursor:pointer;color:var(--text-light);font-size:1rem;padding:0;flex-shrink:0" title="Remove bookmark">🔖</button>
+      </div>
+      <div class="op-meta">
+        <span class="op-badge ${p.type}">${p.type === "tut" ? "Tutorial" : p.type === "res" ? "Resource" : "Community"}</span>
+        <span class="op-time">${p.time}</span>
+      </div>
+      <div class="op-stats">
+        <span class="op-stat"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${p.views.toLocaleString()}</span>
+        <span class="op-stat">by ${p.name}</span>
+      </div>
+    </div>`,
+          )
+          .join("");
+      }
+
+      function renderBadges() {
+        document.getElementById("badge-shelf").innerHTML = badges
+          .map(
+            (b) => `
+    <div class="badge-pill${b.tier === " gold" ? " gold" : ""}" onclick="toast('${b.label} badge')">
+      <span class="bp-icon">${b.ic}</span>${b.label}
+    </div>`,
+          )
+          .join("");
+      }
+
+      function renderPtsBreakdown() {
+        document.getElementById("pts-breakdown").innerHTML =
+          ptsBreakdown
+            .map(
+              (r) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(122,143,82,.1);font-size:.84rem">
+      <span style="color:var(--text-mid);display:flex;align-items:center;gap:7px"><span style="font-size:.9rem">${r.ic}</span>${r.label}</span>
+      <span style="font-weight:700;color:var(--green)">${r.val}</span>
+    </div>`,
+            )
+            .join("") +
+          `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0 0;font-size:.9rem;border-top:2px solid rgba(122,143,82,.18);margin-top:2px">
+      <span style="font-weight:700;color:var(--text-dark)">Total earned</span>
+      <span style="font-family:'Lora',serif;font-weight:700;font-size:1.1rem;color:var(--accent-dark)">2,204 pts</span>
+    </div>`;
+      }
+
+      function renderTopTopics(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.innerHTML = topTopics
+          .map(
+            (t, i) => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(122,143,82,.1)">
+      <span style="font-family:'Lora',serif;font-weight:700;font-size:.76rem;color:var(--text-light);min-width:16px">${i + 1}</span>
+      <span style="font-size:.82rem;color:var(--text-dark);flex:1">${t.name}</span>
+      <div style="width:56px;height:5px;background:rgba(122,143,82,.15);border-radius:3px;overflow:hidden">
+        <div style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-mid));border-radius:3px;width:0;transition:width 1.1s cubic-bezier(.4,0,.2,1)" data-pct="${t.pct}"></div>
+      </div>
+      <span style="font-size:.73rem;color:var(--text-light);min-width:22px;text-align:right">${t.count}</span>
+    </div>`,
+          )
+          .join("");
+        setTimeout(() => {
+          el.querySelectorAll("[data-pct]").forEach(
+            (b) => (b.style.width = b.dataset.pct + "%"),
+          );
+        }, 180);
+      }
+
+      /* ════════════════════════════
+   SECTION SWITCHING
+════════════════════════════ */
+      function switchSection(name, navEl) {
+        document
+          .querySelectorAll(".dash-section")
+          .forEach((s) => s.classList.remove("on"));
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((n) => n.classList.remove("on"));
+        document
+          .querySelectorAll(".snav")
+          .forEach((n) => n.classList.remove("on"));
+
+        document.getElementById(`sec-${name}`).classList.add("on");
+
+        // activate sidebar nav
+        document.querySelectorAll(".nav-item").forEach((n) => {
+          if (
+            n.getAttribute("onclick") &&
+            n.getAttribute("onclick").includes(`'${name}'`)
+          )
+            n.classList.add("on");
+        });
+
+        // activate subnav
+        if (navEl) navEl.classList.add("on");
+        else {
+          document.querySelectorAll(".snav").forEach((n) => {
+            if (
+              n.getAttribute("onclick") &&
+              n.getAttribute("onclick").includes(`'${name}'`)
+            )
+              n.classList.add("on");
+          });
+        }
+
+        // lazy render
+        if (name === "notifications") renderNotifications();
+        if (name === "saved") renderSaved();
+        if (name === "progress") {
+          renderBadges();
+          renderPtsBreakdown();
+          renderTopTopics("top-topics-pg");
+          renderStreak("streak-row-full", 7);
+          setTimeout(() => {
+            document
+              .querySelectorAll(".pr-fill")
+              .forEach((el) => (el.style.width = el.dataset.pct + "%"));
+          }, 100);
+        }
+        if (name === "my-posts") renderMyPostsFull();
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        if (window.innerWidth <= 520) closeSidebar();
+      }
+
+      function navPick(el, name) {
+        switchSection(name, null);
+      }
+
+      /* ════════════════════════════
+   COUNTER ANIMATION
+════════════════════════════ */
+      function animateCounters() {
+        document.querySelectorAll(".sp-num[data-target]").forEach((el) => {
+          const target = parseInt(el.dataset.target);
+          const dur = 900;
+          const start = performance.now();
+          const step = (now) => {
+            const p = Math.min((now - start) / dur, 1);
+            const e = 1 - Math.pow(1 - p, 3);
+            el.textContent = Math.floor(e * target).toLocaleString();
+            if (p < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+        });
+      }
+
+      /* ════════════════════════════
+   SIDEBAR
+════════════════════════════ */
+      function toggleSidebar() {
+        const sb = document.getElementById("sidebar");
+        const open = sb.classList.toggle("open");
+        document.getElementById("overlay").classList.toggle("on", open);
+      }
+      function closeSidebar() {
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("overlay").classList.remove("on");
+      }
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 520) closeSidebar();
+      });
+
+      /* ════════════════════════════
+   TOAST
+════════════════════════════ */
+      let toastT;
+      function toast(msg) {
+        clearTimeout(toastT);
+        document.getElementById("toast-msg").textContent = msg;
+        document.getElementById("toast").classList.add("show");
+        toastT = setTimeout(
+          () => document.getElementById("toast").classList.remove("show"),
+          2400,
+        );
+      }
+
+      /* ════════════════════════════
+   INIT
+════════════════════════════ */
+      renderFeed();
+      renderSosPulse();
+      renderOpenPostsWidget();
+      renderStreak("streak-row", 7);
+      renderPeople();
+      renderChallenges();
+      animateCounters();
+    </script>
+  </body>
+</html>

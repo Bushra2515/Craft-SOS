@@ -1,0 +1,171 @@
+<!-- <!doctype html>
+<html>
+  <head>
+    <title>Register - CraftSOS</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Register</h2>
+
+      <input type="text" id="name" placeholder="Name" />
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+
+      <button onclick="register()">Register</button>
+
+      <div class="link">
+        <a href="login.html">Already have an account?</a>
+      </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+  </body>
+</html> -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Join Craft-SOS</title>
+    <link rel="stylesheet" href="../css/login.css" />
+  </head>
+  <body>
+    <div class="scene">
+      <div class="card">
+        <!-- Logo -->
+        <div class="logo-row">
+          <div class="logo-pill">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"
+              />
+            </svg>
+          </div>
+          <span class="logo-name">Craft-SOS</span>
+        </div>
+
+        <div class="card-head">
+          <div class="card-h">Join the community, <em>maker.</em></div>
+          <div class="card-sub">Create your free Craft-SOS account</div>
+        </div>
+
+        <!--
+        ✅ register-error div — shown by auth.js register() on failure.
+           auth.js reads getElementById("register-error") to display messages.
+      -->
+        <div
+          id="register-error"
+          style="
+            display: none;
+            background: #fce8e1;
+            color: #c0392b;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            margin-bottom: 14px;
+          "
+        ></div>
+
+        <div class="field">
+          <label><span>Full name</span></label>
+          <div class="input-wrap">
+            <svg class="fi" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <input
+              class="field-input"
+              type="text"
+              id="name"
+              placeholder="Your name"
+              autocomplete="name"
+              oninput="clearRegisterErr()"
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label><span>Email address</span></label>
+          <div class="input-wrap">
+            <svg class="fi" viewBox="0 0 24 24">
+              <path
+                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+              />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            <input
+              class="field-input"
+              type="email"
+              id="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+              oninput="clearRegisterErr()"
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label><span>Password</span></label>
+          <div class="input-wrap">
+            <svg class="fi" viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0110 0v4" />
+            </svg>
+            <input
+              class="field-input"
+              type="password"
+              id="password"
+              placeholder="At least 6 characters"
+              autocomplete="new-password"
+              oninput="clearRegisterErr()"
+            />
+          </div>
+        </div>
+
+        <!--
+        onclick="register()" → auth.js register() → POST /api/auth/register
+        On success: redirects to login.html (same pages/ folder — correct path)
+      -->
+        <button class="submit-btn" onclick="register()">
+          <span class="btn-text">Create Account</span>
+          <svg viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </button>
+
+        <div class="card-foot">
+          Already have an account? <a href="login.html">Sign in</a>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script>
+      // Helper only needed on this page — clears the register error div
+      function clearRegisterErr() {
+        const el = document.getElementById("register-error");
+        if (el) el.style.display = "none";
+      }
+
+      // Override auth.js register() to show the error div properly
+      // (auth.js sets textContent; we also need to toggle display)
+      const _origRegister = register;
+      // Patch: make the error div visible whenever auth.js writes to it
+      const observer = new MutationObserver(() => {
+        const el = document.getElementById("register-error");
+        if (el) el.style.display = el.textContent.trim() ? "block" : "none";
+      });
+      document.addEventListener("DOMContentLoaded", () => {
+        const el = document.getElementById("register-error");
+        if (el)
+          observer.observe(el, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+          });
+      });
+    </script>
+  </body>
+</html>

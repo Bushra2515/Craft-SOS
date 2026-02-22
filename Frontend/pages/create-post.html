@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Post — CraftSOS</title>
+    <link rel="stylesheet" href="../css/create-post.css" />
+    <!-- Add your main/global CSS here if you have one -->
+  </head>
+  <body>
+    <div id="overlay" onclick="closeSidebar()"></div>
+    <div id="toast">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+      <span id="toast-msg">Draft saved!</span>
+    </div>
+
+    <!-- ══ SUCCESS OVERLAY ══ -->
+    <div id="success-overlay">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+      </div>
+      <div class="success-title">Post published! 🌿</div>
+      <div class="success-sub" id="success-desc">
+        Your post is live and your community can now see it and respond.
+      </div>
+      <div class="success-btns">
+        <button class="suc-btn primary" onclick="viewPost()">View Post</button>
+        <button class="suc-btn secondary" onclick="createAnother()">
+          Create Another
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ TOPBAR ══ -->
+    <header id="topbar">
+      <button id="hamburger" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+      <div id="topbar-logo-zone">
+        <div class="logo-pill">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"
+            />
+          </svg>
+        </div>
+      </div>
+      <span id="mobile-title">New Post</span>
+      <nav id="desk-nav">
+        <span class="tnav" onclick="syncNav(this)">Friends</span>
+        <span class="tnav" onclick="syncNav(this)">Explore</span>
+        <span class="tnav" onclick="syncNav(this)">Bookmarked</span>
+      </nav>
+      <div id="topbar-right">
+        <button class="distress-btn">
+          <svg viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>Distress Call</span>
+        </button>
+        <div class="profile-av-btn"></div>
+      </div>
+    </header>
+
+    <nav id="subnav">
+      <span class="snav" onclick="syncNav(this)">Friends</span>
+      <span class="snav" onclick="syncNav(this)">Explore</span>
+      <span class="snav" onclick="syncNav(this)">Bookmarked</span>
+    </nav>
+
+    <!-- ══ SHELL ══ -->
+    <div id="shell">
+      <!-- SIDEBAR -->
+      <aside id="sidebar">
+        <div class="sb-prof">
+          <div class="sb-prof-av"></div>
+          <div class="sb-prof-info">
+            <div class="sb-prof-name">Pebble yarn Studio</div>
+            <div class="sb-prof-sub">@pebbleyarn</div>
+          </div>
+        </div>
+        <nav>
+          <a href="../index.html" class="nav-item-a">
+            <div class="nav-item" onclick="pickNav(this)">
+              <svg class="nav-icon" viewBox="0 0 24 24">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+              <span class="nav-label">Home</span>
+            </div>
+          </a>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <span class="nav-label">Explore</span>
+          </div>
+          <div class="nav-item active" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span class="nav-label">Create Post</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <span class="nav-label">Notifications</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path
+                d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+              />
+            </svg>
+            <span class="nav-label">Messages</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span class="nav-label">Profile</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+              />
+            </svg>
+            <span class="nav-label">Settings</span>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- ══ MAIN ══ -->
+      <main id="main">
+        <!-- Page header -->
+        <div class="page-header">
+          <div class="page-back" onclick="history.back()">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg>
+          </div>
+          <div class="page-header-text">
+            <div class="page-title">Create a new post</div>
+            <div class="page-sub">
+              Share your experience, knowledge, or ask for help from the
+              community
+            </div>
+          </div>
+          <div class="page-header-actions">
+            <!-- Saves to localStorage — Post model has no "draft" status -->
+            <button class="draft-btn" onclick="saveDraft()">
+              <svg viewBox="0 0 24 24">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+              </svg>
+              Save Draft
+            </button>
+          </div>
+        </div>
+
+        <!-- Progress steps -->
+        <div class="progress-steps" id="progress-steps">
+          <div class="step-item">
+            <div class="step-num active" id="sn-1">1</div>
+            <span class="step-label active" id="sl-1">Post Type</span>
+          </div>
+          <div class="step-connector" id="sc-1"></div>
+          <div class="step-item">
+            <div class="step-num pending" id="sn-2">2</div>
+            <span class="step-label pending" id="sl-2">Content</span>
+          </div>
+          <div class="step-connector" id="sc-2"></div>
+          <div class="step-item">
+            <div class="step-num pending" id="sn-3">3</div>
+            <span class="step-label pending" id="sl-3">Media & Tags</span>
+          </div>
+          <div class="step-connector" id="sc-3"></div>
+          <div class="step-item">
+            <div class="step-num pending" id="sn-4">4</div>
+            <span class="step-label pending" id="sl-4">Settings</span>
+          </div>
+          <div class="step-connector" id="sc-4"></div>
+          <div class="step-item">
+            <div class="step-num pending" id="sn-5">5</div>
+            <span class="step-label pending" id="sl-5">Publish</span>
+          </div>
+        </div>
+
+        <!-- Form + Aside row -->
+        <div class="form-row">
+          <!-- ════ FORM MAIN ════ -->
+          <div class="form-main">
+            <!-- SECTION 1: Post type -->
+            <div class="section">
+              <div class="section-head">
+                <div class="section-icon">
+                  <svg viewBox="0 0 24 24">
+                    <polyline points="9 11 12 14 22 4" />
+                    <path
+                      d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <div class="section-title">Post type</div>
+                  <div class="section-sub">
+                    What kind of post are you creating?
+                  </div>
+                </div>
+              </div>
+              <div class="section-body">
+                <div class="type-grid">
+                  <!-- data-type matches HTML → TYPE_MAP in create-post.js converts to model enum -->
+                  <div
+                    class="type-card type-sos"
+                    data-type="sos"
+                    onclick="selectType('sos', this)"
+                  >
+                    <div class="tc-icon">🆘</div>
+                    <div class="tc-label">Distress Call</div>
+                    <div class="tc-desc">
+                      Urgent help needed — business crisis, financial stress, or
+                      supplier emergency
+                    </div>
+                    <div class="tc-check">
+                      <svg viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div
+                    class="type-card type-tutorial"
+                    data-type="tutorial"
+                    onclick="selectType('tutorial', this)"
+                  >
+                    <div class="tc-icon">📚</div>
+                    <div class="tc-label">Tutorial</div>
+                    <div class="tc-desc">
+                      Share your craft knowledge, techniques, or business
+                      lessons with step-by-step guidance
+                    </div>
+                    <div class="tc-check">
+                      <svg viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div
+                    class="type-card type-community"
+                    data-type="community"
+                    onclick="selectType('community', this)"
+                  >
+                    <div class="tc-icon">💬</div>
+                    <div class="tc-label">Community Update</div>
+                    <div class="tc-desc">
+                      Share news, wins, questions, or start a discussion with
+                      your craft community
+                    </div>
+                    <div class="tc-check">
+                      <svg viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div
+                    class="type-card type-resource"
+                    data-type="resource"
+                    onclick="selectType('resource', this)"
+                  >
+                    <div class="tc-icon">🗂️</div>
+                    <div class="tc-label">Resource Share</div>
+                    <div class="tc-desc">
+                      Link to a useful tool, template, supplier, or external
+                      resource for other crafters
+                    </div>
+                    <div class="tc-check">
+                      <svg viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 2: Priority + Category -->
+            <div class="section">
+              <div class="section-head">
+                <div class="section-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"
+                    />
+                    <line x1="7" y1="7" x2="7.01" y2="7" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="section-title">Category</div>
+                  <div class="section-sub">Help others find your post</div>
+                </div>
+              </div>
+              <div class="section-body">
+                <div
+                  id="priority-row"
+                  style="margin-bottom: 14px; display: none"
+                >
+                  <div
+                    style="
+                      font-size: 0.8rem;
+                      font-weight: 600;
+                      color: var(--text-light);
+                      text-transform: uppercase;
+                      letter-spacing: 0.06em;
+                      margin-bottom: 8px;
+                    "
+                  >
+                    Urgency level
+                  </div>
+                  <div class="pill-row" id="priority-pills">
+                    <div
+                      class="pill-opt p-high"
+                      data-p="high"
+                      onclick="selectPriority('high', this)"
+                    >
+                      <div class="dot" style="background: #d35b3a"></div>
+                      High — I need help now
+                    </div>
+                    <div
+                      class="pill-opt p-med"
+                      data-p="med"
+                      onclick="selectPriority('med', this)"
+                    >
+                      <div class="dot" style="background: #9a6d1e"></div>
+                      Medium — Within a few days
+                    </div>
+                    <div
+                      class="pill-opt p-low"
+                      data-p="low"
+                      onclick="selectPriority('low', this)"
+                    >
+                      <div class="dot" style="background: #7a8f52"></div>
+                      Low — Whenever you can
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div
+                    style="
+                      font-size: 0.8rem;
+                      font-weight: 600;
+                      color: var(--text-light);
+                      text-transform: uppercase;
+                      letter-spacing: 0.06em;
+                      margin-bottom: 8px;
+                    "
+                  >
+                    Topic category
+                  </div>
+                  <div class="pill-row" id="cat-pills">
+                    <div class="cat-pill" onclick="toggleCat(this)">
+                      💰 Financial
+                    </div>
+                    <div class="cat-pill" onclick="toggleCat(this)">
+                      📦 Orders & Fulfilment
+                    </div>
+                    <div class="cat-pill" onclick="toggleCat(this)">
+                      🧵 Suppliers
+                    </div>
+                    <div class="cat-pill" onclick="toggleCat(this)">
+                      🏪 Marketplace
+                    </div>
+                    <div class="cat-pill" onclick="toggleCat(this)">
+                      📚 Tutorials
+                    </div>
+                    <div class="cat-pill" onclick="toggleCat(this)">
+                      🚚 Courier & Shipping
+                    </div>
+                    <div class="cat-pill" onclick="toggleCat(this)">
+                      💼 Business Strategy
+                    </div>
+                    <div class="cat-pill" onclick="toggleCat(this)">
+                      🎨 Craft Techniques
+                    </div>
+                    <div class="cat-pill" onclick="toggleCat(this)">
+                      💬 Community
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 3: Title + Body -->
+            <div class="section">
+              <div class="section-head">
+                <div class="section-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                    />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="section-title">Your post</div>
+                  <div class="section-sub">
+                    Write your title and main content
+                  </div>
+                </div>
+              </div>
+              <div class="section-body">
+                <input
+                  class="title-input"
+                  id="title-input"
+                  type="text"
+                  maxlength="140"
+                  placeholder="Write a clear, descriptive title…"
+                  oninput="updateTitle(this)"
+                />
+                <div class="char-hint" id="title-chars">0 / 140 characters</div>
+
+                <div style="height: 14px"></div>
+
+                <div class="editor-wrap">
+                  <div class="toolbar">
+                    <button class="tb-btn" title="Bold" onclick="fmt('bold')">
+                      <strong>B</strong>
+                    </button>
+                    <button
+                      class="tb-btn"
+                      title="Italic"
+                      onclick="fmt('italic')"
+                    >
+                      <em>I</em>
+                    </button>
+                    <button
+                      class="tb-btn"
+                      title="Underline"
+                      onclick="fmt('underline')"
+                    >
+                      <u>U</u>
+                    </button>
+                    <div class="tb-sep"></div>
+                    <button
+                      class="tb-btn"
+                      title="Bullet list"
+                      onclick="fmt('insertUnorderedList')"
+                    >
+                      <svg viewBox="0 0 24 24">
+                        <line x1="9" y1="6" x2="20" y2="6" />
+                        <line x1="9" y1="12" x2="20" y2="12" />
+                        <line x1="9" y1="18" x2="20" y2="18" />
+                        <circle cx="4" cy="6" r="1.5" fill="currentColor" />
+                        <circle cx="4" cy="12" r="1.5" fill="currentColor" />
+                        <circle cx="4" cy="18" r="1.5" fill="currentColor" />
+                      </svg>
+                    </button>
+                    <button
+                      class="tb-btn"
+                      title="Numbered list"
+                      onclick="fmt('insertOrderedList')"
+                    >
+                      <svg viewBox="0 0 24 24">
+                        <line x1="10" y1="6" x2="21" y2="6" />
+                        <line x1="10" y1="12" x2="21" y2="12" />
+                        <line x1="10" y1="18" x2="21" y2="18" />
+                        <path
+                          d="M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"
+                        />
+                      </svg>
+                    </button>
+                    <div class="tb-sep"></div>
+                    <button class="tb-btn" title="Link" onclick="insertLink()">
+                      <svg viewBox="0 0 24 24">
+                        <path
+                          d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"
+                        />
+                        <path
+                          d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      class="tb-btn"
+                      title="Remove formatting"
+                      onclick="fmt('removeFormat')"
+                    >
+                      <svg viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div
+                    class="editor-area"
+                    id="editor-area"
+                    contenteditable="true"
+                    data-placeholder="Write your post here… Be specific and clear. The more context you give, the more useful the community's responses will be."
+                    oninput="updateEditorStats()"
+                    onpaste="cleanPaste(event)"
+                  ></div>
+                  <div class="editor-footer">
+                    <div class="editor-stats">
+                      <span id="word-count">0 words</span>
+                      <span id="char-count-body">0 chars</span>
+                    </div>
+                    <div class="editor-tip">
+                      Ctrl+B Bold · Ctrl+I Italic · Ctrl+K Link
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 4: Tags -->
+            <div class="section">
+              <div class="section-head">
+                <div class="section-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"
+                    />
+                    <line x1="7" y1="7" x2="7.01" y2="7" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="section-title">Tags</div>
+                  <div class="section-sub">
+                    Help people find this post · up to 8 tags
+                  </div>
+                </div>
+              </div>
+              <div class="section-body">
+                <div
+                  class="tags-input-wrap"
+                  id="tags-wrap"
+                  onclick="focusTagInput()"
+                >
+                  <input
+                    class="tag-input"
+                    id="tag-input"
+                    type="text"
+                    maxlength="40"
+                    placeholder="Type a tag and press Enter or comma…"
+                    onkeydown="handleTagKey(event)"
+                    oninput="filterTagSugs(this.value)"
+                  />
+                </div>
+                <div class="tag-suggestions" id="tag-sug-row"></div>
+              </div>
+            </div>
+
+            <!-- SECTION 5: Settings -->
+            <div class="section">
+              <div class="section-head">
+                <div class="section-icon">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3" />
+                    <path
+                      d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <div class="section-title">Post settings</div>
+                  <div class="section-sub">
+                    Audience, visibility, and notifications
+                  </div>
+                </div>
+              </div>
+              <div class="section-body">
+                <div class="settings-row" style="margin-bottom: 16px">
+                  <div
+                    class="setting-card active"
+                    id="aud-friends"
+                    onclick="setAudience('friends', this)"
+                  >
+                    <div class="setting-card-label">Audience</div>
+                    <div class="setting-card-val">
+                      <svg viewBox="0 0 24 24">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                        <path d="M16 3.13a4 4 0 010 7.75" />
+                      </svg>
+                      Friends only
+                    </div>
+                  </div>
+                  <div
+                    class="setting-card"
+                    id="aud-community"
+                    onclick="setAudience('community', this)"
+                  >
+                    <div class="setting-card-label">Audience</div>
+                    <div class="setting-card-val">
+                      <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="2" y1="12" x2="22" y2="12" />
+                        <path
+                          d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"
+                        />
+                      </svg>
+                      Full community
+                    </div>
+                  </div>
+                </div>
+                <div class="toggle-wrap">
+                  <div>
+                    <div class="toggle-label">Allow responses</div>
+                    <div class="toggle-sub">
+                      Let community members reply to your post
+                    </div>
+                  </div>
+                  <div
+                    class="toggle on"
+                    id="t-replies"
+                    onclick="this.classList.toggle('on')"
+                  ></div>
+                </div>
+                <div class="toggle-wrap">
+                  <div>
+                    <div class="toggle-label">Notify when resolved</div>
+                    <div class="toggle-sub">
+                      Get notified when someone marks this as resolved
+                    </div>
+                  </div>
+                  <div
+                    class="toggle on"
+                    id="t-resolve"
+                    onclick="this.classList.toggle('on')"
+                  ></div>
+                </div>
+                <div class="toggle-wrap">
+                  <div>
+                    <div class="toggle-label">Send to your network</div>
+                    <div class="toggle-sub">
+                      Push notification to your followers about this post
+                    </div>
+                  </div>
+                  <div
+                    class="toggle"
+                    id="t-notify"
+                    onclick="this.classList.toggle('on')"
+                  ></div>
+                </div>
+                <div class="toggle-wrap">
+                  <div>
+                    <div class="toggle-label">Show in Explore feed</div>
+                    <div class="toggle-sub">
+                      Appear in the discovery section for wider reach
+                    </div>
+                  </div>
+                  <div
+                    class="toggle on"
+                    id="t-explore"
+                    onclick="this.classList.toggle('on')"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PUBLISH BAR -->
+            <div class="publish-bar">
+              <div class="publish-info">
+                <div class="publish-info-title" id="pub-status">
+                  Complete required fields
+                </div>
+                <div class="publish-info-sub" id="pub-sub">
+                  Fill in required fields to unlock publishing
+                </div>
+              </div>
+              <!-- Saves draft to localStorage -->
+              <button class="save-draft-btn" onclick="saveDraft()">
+                <svg viewBox="0 0 24 24">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                </svg>
+                Save Draft
+              </button>
+              <button class="preview-btn" onclick="previewPost()">
+                <svg viewBox="0 0 24 24">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                Preview
+              </button>
+              <!-- Calls publishPost() → POST /api/posts -->
+              <button
+                class="publish-btn"
+                id="publish-btn"
+                onclick="publishPost()"
+                disabled
+              >
+                <svg viewBox="0 0 24 24">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+                Publish Post
+              </button>
+            </div>
+          </div>
+          <!-- /form-main -->
+
+          <!-- ════ ASIDE ════ -->
+          <aside class="form-aside">
+            <div class="aside-widget">
+              <div class="aw-title">
+                <svg viewBox="0 0 24 24">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                Live preview
+              </div>
+              <div id="preview-card">
+                <div class="pc-empty">
+                  Your post preview will appear here as you fill in the form 🌿
+                </div>
+              </div>
+            </div>
+
+            <div class="aside-widget">
+              <div class="aw-title">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="9 11 12 14 22 4" />
+                  <path
+                    d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"
+                  />
+                </svg>
+                Publishing checklist
+              </div>
+              <div class="checklist">
+                <div class="check-item" id="chk-type">
+                  <div class="chk"></div>
+                  Post type selected
+                </div>
+                <div class="check-item" id="chk-cat">
+                  <div class="chk"></div>
+                  Category chosen
+                </div>
+                <div class="check-item" id="chk-title">
+                  <div class="chk"></div>
+                  Title added (min 10 chars)
+                </div>
+                <div class="check-item" id="chk-body">
+                  <div class="chk"></div>
+                  Body written (min 30 chars)
+                </div>
+                <div class="check-item" id="chk-tags">
+                  <div class="chk"></div>
+                  At least 1 tag added
+                </div>
+              </div>
+            </div>
+
+            <div class="aside-widget" id="tips-widget">
+              <div class="aw-title">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                Writing tips
+              </div>
+              <div class="tip-list" id="tips-list">
+                <div class="tip-item">
+                  <span class="tip-icon">📝</span>Choose a post type above and
+                  tips tailored to that format will appear here.
+                </div>
+              </div>
+            </div>
+
+            <div class="aside-widget">
+              <div class="aw-title">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                Guidelines
+              </div>
+              <div class="tip-list">
+                <div class="tip-item">
+                  <span class="tip-icon">✅</span>Be specific — include amounts,
+                  timelines, platform names.
+                </div>
+                <div class="tip-item">
+                  <span class="tip-icon">✅</span>Respond to helpers who take
+                  the time to reply.
+                </div>
+                <div class="tip-item">
+                  <span class="tip-icon">✅</span>Mark posts resolved when your
+                  issue is solved.
+                </div>
+                <div class="tip-item">
+                  <span class="tip-icon">🚫</span>No spam, promotion, or
+                  off-topic content.
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+        <!-- /form-row -->
+      </main>
+    </div>
+
+    <!-- ✅ All JS in its own file — no inline script -->
+    <script src="../js/create-post.js"></script>
+  </body>
+</html>

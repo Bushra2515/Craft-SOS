@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Craft-SOS Home</title>
+    <link rel="stylesheet" href="../css/index.css" />
+  </head>
+  <body>
+    <!-- Single overlay (was duplicated before) -->
+    <div id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- ══ TOPBAR ══ (only one — was duplicated before) -->
+    <header id="topbar">
+      <button id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+        <svg viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+
+      <div id="topbar-logo-zone">
+        <div class="logo-pill">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <span id="mobile-title">Craft-SOS</span>
+
+      <nav id="desk-nav">
+        <span class="tnav active" onclick="syncNav(this)">Friends</span>
+        <span class="tnav" onclick="syncNav(this)">Explore</span>
+        <span class="tnav" onclick="syncNav(this)">Bookmarked</span>
+      </nav>
+
+      <div id="topbar-right">
+        <button class="distress-btn" onclick="distressCall()">
+          <svg viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>Distress Call</span>
+        </button>
+        <button class="icon-btn" onclick="logout()" title="Logout">
+          Sign out
+        </button>
+        <div class="profile-avatar"></div>
+      </div>
+    </header>
+
+    <!-- Sub-nav strip -->
+    <nav id="subnav">
+      <span class="snav active" onclick="syncNav(this)">Friends</span>
+      <span class="snav" onclick="syncNav(this)">Explore</span>
+      <span class="snav" onclick="syncNav(this)">Bookmarked</span>
+    </nav>
+
+    <!-- ══ SHELL ══ (only one — was duplicated before) -->
+    <div id="shell">
+      <!-- SIDEBAR -->
+      <aside id="sidebar">
+        <div class="sb-prof">
+          <div class="sb-prof-av"></div>
+          <div class="sb-prof-info">
+            <div class="sb-prof-name">Pebble yarn Studio</div>
+            <div class="sb-prof-sub">@pebbleyarn</div>
+          </div>
+        </div>
+        <nav>
+          <div class="nav-item active" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <span class="nav-label">Home</span>
+          </div>
+          <a href="pages/explore.html" class="nav-item-a">
+            <div class="nav-item" onclick="pickNav(this)">
+              <svg class="nav-icon" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+              <span class="nav-label">Explore</span>
+            </div>
+          </a>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span class="nav-label">Search</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <span class="nav-label">Notifications</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path
+                d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+              />
+            </svg>
+            <span class="nav-label">Messages</span>
+          </div>
+          <a href="pages/profile.html" class="nav-item-a">
+            <div class="nav-item" onclick="pickNav(this)">
+              <svg class="nav-icon" viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <span class="nav-label">Profile</span>
+            </div>
+          </a>
+          <a href="pages/dashboard.html" class="nav-item-a">
+            <div class="nav-item" onclick="pickNav(this)">
+              <svg class="nav-icon" viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <span class="nav-label">dashboard</span>
+            </div>
+          </a>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+              />
+            </svg>
+            <span class="nav-label">Settings</span>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- ══ MAIN ══ -->
+      <main id="main">
+        <!-- Posts injected here by loadFeed() in index.js -->
+        <div id="feed"></div>
+        <!-- <aside id="right-panel">
+          <div class="sugg-box">
+            <div class="sugg-title">Suggestions</div>
+            <div id="sugg-list"></div>
+          </div>
+        </aside> -->
+      </main>
+      <aside id="right-panel">
+        <div class="sugg-box">
+          <div class="sugg-title">Suggestions</div>
+          <div id="sugg-list"></div>
+        </div>
+      </aside>
+    </div>
+    <!-- /#shell -->
+
+    <script src="../js/index.js"></script>
+  </body>
+</html>

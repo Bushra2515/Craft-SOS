@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Craft-SOS — Create Post</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #eef0e8;
+      --panel:        #d4dbbf;
+      --sidebar-bg:   #c9d3af;
+      --card:         #c5cf9e;
+      --accent:       #7a8f52;
+      --accent-dark:  #5e6e3b;
+      --accent-light: #e6ecda;
+      --text-dark:    #2e3520;
+      --text-mid:     #4a5730;
+      --text-light:   #6b7a50;
+      --high:         #d35b3a;
+      --high-bg:      #fce8e1;
+      --med:          #9a6d1e;
+      --med-bg:       #fdf3e0;
+      --low-bg:       #e5ecda;
+      --sb-collapsed: 64px;
+      --sb-expanded:  220px;
+      --topbar-h:     60px;
+      --subnav-h:     44px;
+      --ease:         0.3s cubic-bezier(.4,0,.2,1);
+      --white-glass:  rgba(255,255,255,0.55);
+    }
+
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-dark); min-height: 100vh; overflow-x: hidden; }
+
+    body::before {
+      content: ''; position: fixed; inset: 0; opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Ccircle cx='70' cy='70' r='30' fill='none' stroke='%237a8f52' stroke-width='2'/%3E%3Cpath d='M50 92 Q70 58 90 92' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cellipse cx='420' cy='130' rx='24' ry='34' fill='none' stroke='%237a8f52' stroke-width='2' transform='rotate(-20 420 130)'/%3E%3Cpath d='M390 145 Q420 100 450 145' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Crect x='195' y='28' width='70' height='12' rx='6' fill='none' stroke='%237a8f52' stroke-width='1.5' transform='rotate(30 230 34)'/%3E%3Ccircle cx='230' cy='18' r='7' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cpath d='M90 360 L114 334 L138 360 L114 386 Z' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Crect x='338' y='318' width='46' height='62' rx='5' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cline x1='338' y1='354' x2='384' y2='354' stroke='%237a8f52' stroke-width='1'/%3E%3Ccircle cx='240' cy='400' r='40' fill='none' stroke='%237a8f52' stroke-width='2'/%3E%3Cpath d='M216 400 Q240 366 264 400' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cpath d='M216 412 Q240 448 264 412' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ══ TOPBAR ══ */
+    #topbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--topbar-h); background: var(--bg);
+      display: flex; align-items: center;
+      padding: 0 18px 0 0; z-index: 200;
+      border-bottom: 1.5px solid rgba(122,143,82,0.13);
+    }
+    #topbar-logo-zone { width: var(--sb-collapsed); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .logo-pill { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; }
+    .logo-pill svg { width: 18px; height: 18px; fill: white; }
+    #desk-nav { flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .tnav { font-size: .94rem; font-weight: 500; color: var(--text-light); padding: 7px 18px; border-radius: 22px; cursor: pointer; user-select: none; transition: background .18s, color .18s; position: relative; white-space: nowrap; }
+    .tnav.active { color: var(--text-dark); font-weight: 700; }
+    .tnav.active::after { content:''; position:absolute; bottom:2px; left:50%; transform:translateX(-50%); width:20px; height:2.5px; background:var(--accent); border-radius:2px; }
+    .tnav:hover:not(.active) { background: rgba(122,143,82,.11); color: var(--text-dark); }
+    #topbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .distress-btn { display:flex; align-items:center; gap:7px; background:var(--accent); color:#fff; border:none; border-radius:22px; padding:9px 16px; font-family:'DM Sans',sans-serif; font-size:.87rem; font-weight:600; cursor:pointer; transition:background .2s,transform .15s; white-space:nowrap; }
+    .distress-btn:hover { background:var(--accent-dark); transform:scale(1.04); }
+    .distress-btn svg { width:14px; height:14px; stroke:white; fill:none; stroke-width:2.5; stroke-linecap:round; }
+    .profile-av-btn { width:34px; height:34px; border-radius:50%; background:var(--panel); border:2px solid var(--accent); cursor:pointer; flex-shrink:0; }
+    #hamburger { display:none; background:none; border:none; cursor:pointer; padding:8px; color:var(--text-dark); flex-shrink:0; }
+    #hamburger svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
+    #mobile-title { display:none; flex:1; font-family:'Lora',serif; font-weight:700; font-size:1.1rem; color:var(--text-dark); }
+    #subnav { display:none; position:fixed; top:var(--topbar-h); left:0; right:0; height:var(--subnav-h); background:var(--bg); border-bottom:1.5px solid rgba(122,143,82,.11); z-index:190; align-items:center; padding:0 14px; gap:4px; overflow-x:auto; scrollbar-width:none; }
+    #subnav::-webkit-scrollbar { display:none; }
+    .snav { font-size:.86rem; font-weight:500; color:var(--text-light); padding:5px 14px; border-radius:20px; cursor:pointer; white-space:nowrap; user-select:none; transition:background .18s,color .18s; }
+    .snav.active { background:var(--accent); color:#fff; font-weight:600; }
+
+    /* ══ SHELL ══ */
+    #shell { display:flex; margin-top:var(--topbar-h); min-height:calc(100vh - var(--topbar-h)); position:relative; z-index:1; }
+
+    /* ══ SIDEBAR ══ */
+    #sidebar { width:var(--sb-collapsed); flex-shrink:0; transition:width var(--ease); position:sticky; top:var(--topbar-h); height:calc(100vh - var(--topbar-h)); align-self:flex-start; background:var(--sidebar-bg); border-radius:0 18px 18px 0; overflow:hidden; display:flex; flex-direction:column; padding:16px 0; box-shadow:2px 0 14px rgba(46,53,32,.07); z-index:10; }
+    #sidebar:hover { width:var(--sb-expanded); }
+    #sidebar.open  { width:var(--sb-expanded); }
+    .sb-prof { display:flex; align-items:center; gap:10px; padding:0 12px 16px 12px; border-bottom:1.5px solid rgba(122,143,82,.17); margin-bottom:8px; overflow:hidden; }
+    .sb-prof-av { width:38px; height:38px; border-radius:50%; background:var(--panel); border:2px solid var(--accent); flex-shrink:0; }
+    .sb-prof-info { opacity:0; transition:opacity var(--ease); white-space:nowrap; overflow:hidden; }
+    #sidebar:hover .sb-prof-info, #sidebar.open .sb-prof-info { opacity:1; }
+    .sb-prof-name { font-family:'Lora',serif; font-weight:600; font-size:.9rem; color:var(--text-dark); }
+    .sb-prof-sub  { font-size:.74rem; color:var(--text-light); }
+    .nav-item { display:flex; align-items:center; gap:14px; padding:10px 20px; cursor:pointer; user-select:none; border-radius:0 14px 14px 0; margin:1px 8px 1px 0; color:var(--text-mid); font-size:.91rem; font-weight:500; white-space:nowrap; overflow:hidden; transition:background .18s,color .18s; position:relative; }
+    .nav-item:hover { background:rgba(122,143,82,.17); color:var(--text-dark); }
+    .nav-item.active { background:rgba(122,143,82,.27); color:var(--text-dark); font-weight:600; }
+    .nav-item.active::before { content:''; position:absolute; left:0; top:22%; bottom:22%; width:3.5px; background:var(--accent); border-radius:0 3px 3px 0; }
+    .nav-icon { width:21px; height:21px; flex-shrink:0; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+    .nav-label { opacity:0; transition:opacity var(--ease); }
+    #sidebar:hover .nav-label, #sidebar.open .nav-label { opacity:1; }
+
+    /* ══ MAIN ══ */
+    #main { flex:1; min-width:0; padding:28px 22px 60px 22px; display:flex; flex-direction:column; gap:0; }
+
+    /* ══ PAGE HEADER ══ */
+    .page-header { display:flex; align-items:center; gap:14px; margin-bottom:24px; animation:fadeUp .35s ease both; }
+    .page-back { width:36px; height:36px; border-radius:50%; background:var(--white-glass); border:1.5px solid rgba(122,143,82,.2); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background .16s,transform .14s; flex-shrink:0; }
+    .page-back:hover { background:var(--panel); transform:scale(1.06); }
+    .page-back svg { width:16px; height:16px; stroke:var(--text-mid); fill:none; stroke-width:2; stroke-linecap:round; }
+    .page-header-text { flex:1; }
+    .page-title { font-family:'Lora',serif; font-weight:700; font-size:1.5rem; color:var(--text-dark); }
+    .page-sub { font-size:.84rem; color:var(--text-light); margin-top:2px; }
+    .page-header-actions { display:flex; gap:8px; }
+    .draft-btn { display:flex; align-items:center; gap:6px; background:var(--white-glass); border:1.5px solid rgba(122,143,82,.22); border-radius:18px; padding:8px 16px; font-family:'DM Sans',sans-serif; font-size:.84rem; font-weight:600; color:var(--text-mid); cursor:pointer; transition:background .16s; }
+    .draft-btn:hover { background:var(--panel); color:var(--text-dark); }
+    .draft-btn svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; }
+
+    /* ══ PROGRESS STEPS ══ */
+    .progress-steps { display:flex; align-items:center; gap:0; margin-bottom:28px; animation:fadeUp .4s ease both; }
+    .step-item { display:flex; align-items:center; gap:8px; flex:1; }
+    .step-item:last-child { flex:0; }
+    .step-num { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Lora',serif; font-weight:700; font-size:.84rem; flex-shrink:0; transition:background var(--ease), color var(--ease), box-shadow var(--ease); }
+    .step-num.done  { background:var(--accent); color:white; box-shadow:0 2px 10px rgba(122,143,82,.35); }
+    .step-num.active { background:var(--accent); color:white; box-shadow:0 2px 14px rgba(122,143,82,.45); }
+    .step-num.pending { background:var(--white-glass); color:var(--text-light); border:1.5px solid rgba(122,143,82,.22); }
+    .step-label { font-size:.78rem; font-weight:600; color:var(--text-mid); white-space:nowrap; transition:color var(--ease); }
+    .step-label.active { color:var(--text-dark); }
+    .step-label.done { color:var(--accent); }
+    .step-label.pending { color:var(--text-light); }
+    .step-connector { flex:1; height:2px; background:rgba(122,143,82,.18); margin:0 10px; border-radius:2px; transition:background var(--ease); }
+    .step-connector.done { background:var(--accent); }
+
+    /* ══ FORM LAYOUT ══ */
+    .form-row { display:flex; gap:22px; align-items:flex-start; }
+    .form-main { flex:1; min-width:0; display:flex; flex-direction:column; gap:16px; }
+    .form-aside { width:276px; flex-shrink:0; display:flex; flex-direction:column; gap:14px; position:sticky; top:calc(var(--topbar-h) + 20px); }
+
+    /* ══ SECTIONS ══ */
+    .section {
+      background:var(--card); border-radius:20px;
+      box-shadow:0 2px 14px rgba(46,53,32,.08);
+      overflow:hidden;
+      animation:fadeUp .4s ease both;
+    }
+    .section:nth-child(2) { animation-delay:.05s; }
+    .section:nth-child(3) { animation-delay:.1s; }
+    .section:nth-child(4) { animation-delay:.15s; }
+
+    .section-head { padding:18px 22px 14px 22px; border-bottom:1.5px solid rgba(122,143,82,.15); display:flex; align-items:center; gap:10px; }
+    .section-icon { width:32px; height:32px; border-radius:10px; background:var(--accent-light); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .section-icon svg { width:16px; height:16px; stroke:var(--accent); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+    .section-title { font-family:'Lora',serif; font-weight:700; font-size:.97rem; color:var(--text-dark); }
+    .section-sub { font-size:.76rem; color:var(--text-light); margin-top:1px; }
+    .section-body { padding:18px 22px; }
+
+    /* ══ TYPE CARDS ══ */
+    .type-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .type-card {
+      background:var(--white-glass); border:2px solid transparent;
+      border-radius:16px; padding:16px; cursor:pointer;
+      transition:border-color .2s, background .2s, transform .15s, box-shadow .2s;
+      position:relative; overflow:hidden;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .type-card::before { content:''; position:absolute; inset:0; opacity:0; transition:opacity .2s; }
+    .type-card:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(46,53,32,.1); }
+    .type-card.selected { border-color:var(--accent); background:var(--accent-light); }
+    .type-card.selected .tc-label { color:var(--accent-dark); }
+    .type-card.type-sos { --tc: #d35b3a; --tc-bg: #fce8e1; }
+    .type-card.type-tutorial { --tc: var(--accent); --tc-bg: var(--accent-light); }
+    .type-card.type-community { --tc: #9a6d1e; --tc-bg: #fdf3e0; }
+    .type-card.type-resource { --tc: #3a7d2c; --tc-bg: #e5f5e0; }
+    .type-card.selected.type-sos { border-color:var(--tc); background:var(--tc-bg); }
+    .type-card.selected.type-tutorial { border-color:var(--accent); background:var(--accent-light); }
+    .type-card.selected.type-community { border-color:var(--tc); background:var(--tc-bg); }
+    .type-card.selected.type-resource { border-color:var(--tc); background:var(--tc-bg); }
+    .tc-icon { font-size:1.6rem; line-height:1; }
+    .tc-label { font-family:'Lora',serif; font-weight:700; font-size:.93rem; color:var(--text-dark); transition:color .2s; }
+    .tc-desc { font-size:.76rem; color:var(--text-light); line-height:1.5; }
+    .tc-check { position:absolute; top:10px; right:10px; width:20px; height:20px; border-radius:50%; background:var(--accent); display:none; align-items:center; justify-content:center; }
+    .tc-check svg { width:11px; height:11px; stroke:white; fill:none; stroke-width:2.5; stroke-linecap:round; }
+    .type-card.selected .tc-check { display:flex; }
+    .type-card.selected.type-sos .tc-check { background:#d35b3a; }
+    .type-card.selected.type-community .tc-check { background:#9a6d1e; }
+    .type-card.selected.type-resource .tc-check { background:#3a7d2c; }
+
+    /* ══ PRIORITY & CATEGORY ══ */
+    .pill-row { display:flex; gap:8px; flex-wrap:wrap; }
+    .pill-opt {
+      display:flex; align-items:center; gap:5px;
+      padding:6px 14px; border-radius:22px; cursor:pointer;
+      font-size:.83rem; font-weight:600; user-select:none;
+      border:1.5px solid transparent; transition:all .18s;
+    }
+    .pill-opt .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .pill-opt.p-high { background:var(--high-bg); color:var(--high); border-color:rgba(211,91,58,.25); }
+    .pill-opt.p-high.on { background:var(--high); color:white; border-color:var(--high); }
+    .pill-opt.p-med  { background:var(--med-bg);  color:var(--med);  border-color:rgba(154,109,30,.25); }
+    .pill-opt.p-med.on  { background:var(--med);  color:white; border-color:var(--med); }
+    .pill-opt.p-low  { background:var(--low-bg);  color:var(--text-mid); border-color:rgba(122,143,82,.25); }
+    .pill-opt.p-low.on  { background:var(--accent); color:white; border-color:var(--accent); }
+    .cat-pill { background:var(--white-glass); color:var(--text-mid); border:1.5px solid rgba(122,143,82,.2); border-radius:22px; padding:6px 14px; font-size:.82rem; font-weight:500; cursor:pointer; transition:all .16s; user-select:none; }
+    .cat-pill.on { background:var(--accent); color:white; border-color:var(--accent); font-weight:600; }
+    .cat-pill:hover:not(.on) { background:var(--accent-light); border-color:var(--accent); }
+    #priority-row { display:none; }
+
+    /* ══ TITLE INPUT ══ */
+    .title-input {
+      width:100%; background:var(--white-glass);
+      border:1.5px solid rgba(122,143,82,.2); border-radius:14px;
+      padding:14px 16px; font-family:'Lora',serif; font-weight:700;
+      font-size:1.15rem; color:var(--text-dark); outline:none;
+      transition:border-color .2s,box-shadow .2s;
+    }
+    .title-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(122,143,82,.1); }
+    .title-input::placeholder { color:var(--text-light); font-weight:400; }
+    .char-hint { font-size:.73rem; color:var(--text-light); margin-top:5px; text-align:right; }
+    .char-hint.warn { color:var(--med); }
+    .char-hint.over { color:var(--high); }
+
+    /* ══ TOOLBAR ══ */
+    .editor-wrap { border:1.5px solid rgba(122,143,82,.2); border-radius:16px; overflow:hidden; transition:border-color .2s,box-shadow .2s; }
+    .editor-wrap:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px rgba(122,143,82,.1); }
+
+    .toolbar { display:flex; align-items:center; gap:2px; padding:8px 10px; background:rgba(255,255,255,.45); border-bottom:1.5px solid rgba(122,143,82,.14); flex-wrap:wrap; }
+    .tb-btn {
+      width:30px; height:30px; border-radius:8px; border:none; cursor:pointer;
+      background:none; color:var(--text-mid);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Lora',serif; font-size:.85rem; font-weight:700;
+      transition:background .14s,color .14s;
+    }
+    .tb-btn:hover { background:var(--panel); color:var(--text-dark); }
+    .tb-btn.active { background:var(--accent-light); color:var(--accent); }
+    .tb-btn svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; pointer-events:none; }
+    .tb-sep { width:1px; height:20px; background:rgba(122,143,82,.2); margin:0 4px; flex-shrink:0; }
+    .tb-select { border:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:.78rem; color:var(--text-mid); cursor:pointer; outline:none; padding:4px; border-radius:6px; }
+    .tb-select:hover { background:var(--panel); }
+
+    .editor-area {
+      width:100%; background:var(--white-glass);
+      padding:16px 18px; resize:none;
+      font-family:'DM Sans',sans-serif; font-size:.92rem; color:var(--text-dark);
+      line-height:1.8; outline:none; border:none; min-height:220px;
+      display:block;
+    }
+    .editor-area::placeholder { color:var(--text-light); }
+    .editor-footer { display:flex; align-items:center; justify-content:space-between; padding:8px 14px; background:rgba(255,255,255,.35); border-top:1.5px solid rgba(122,143,82,.1); }
+    .editor-stats { font-size:.74rem; color:var(--text-light); display:flex; gap:14px; }
+    .editor-tip { font-size:.72rem; color:var(--text-light); }
+
+    /* ══ MEDIA UPLOAD ══ */
+    .media-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:10px; margin-top:4px; }
+    .media-add {
+      height:90px; border:2px dashed rgba(122,143,82,.3); border-radius:14px;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:5px; cursor:pointer; transition:background .16s,border-color .16s;
+      background:rgba(255,255,255,.3);
+    }
+    .media-add:hover { background:var(--accent-light); border-color:var(--accent); }
+    .media-add svg { width:22px; height:22px; stroke:var(--text-light); fill:none; stroke-width:1.5; stroke-linecap:round; }
+    .media-add:hover svg { stroke:var(--accent); }
+    .media-add span { font-size:.73rem; color:var(--text-light); font-weight:500; }
+    .media-add:hover span { color:var(--accent); }
+    .media-thumb {
+      height:90px; border-radius:14px; background:var(--panel);
+      display:flex; align-items:center; justify-content:center;
+      position:relative; overflow:hidden; cursor:pointer;
+      transition:box-shadow .16s;
+    }
+    .media-thumb:hover { box-shadow:0 4px 14px rgba(46,53,32,.15); }
+    .media-thumb-icon { font-size:1.4rem; }
+    .media-thumb-label { position:absolute; bottom:0; left:0; right:0; background:rgba(46,53,32,.55); color:white; font-size:.64rem; padding:3px 6px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .media-thumb-remove { position:absolute; top:4px; right:4px; width:18px; height:18px; border-radius:50%; background:rgba(211,91,58,.85); color:white; font-size:.65rem; cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .15s; }
+    .media-thumb:hover .media-thumb-remove { opacity:1; }
+
+    /* ══ TAGS INPUT ══ */
+    .tags-input-wrap { background:var(--white-glass); border:1.5px solid rgba(122,143,82,.2); border-radius:14px; padding:10px 12px; display:flex; flex-wrap:wrap; gap:6px; cursor:text; transition:border-color .2s,box-shadow .2s; min-height:48px; }
+    .tags-input-wrap:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px rgba(122,143,82,.1); }
+    .tag-chip { display:flex; align-items:center; gap:4px; background:var(--accent); color:white; border-radius:14px; padding:3px 10px 3px 10px; font-size:.78rem; font-weight:600; }
+    .tag-chip button { background:none; border:none; color:white; font-size:.8rem; cursor:pointer; padding:0; line-height:1; opacity:.75; transition:opacity .12s; }
+    .tag-chip button:hover { opacity:1; }
+    .tag-input { border:none; background:none; outline:none; font-family:'DM Sans',sans-serif; font-size:.86rem; color:var(--text-dark); flex:1; min-width:120px; padding:2px 4px; }
+    .tag-input::placeholder { color:var(--text-light); }
+    .tag-suggestions { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+    .tag-sug { font-size:.76rem; color:var(--text-light); background:var(--white-glass); border:1.5px solid rgba(122,143,82,.16); border-radius:12px; padding:3px 9px; cursor:pointer; transition:all .15s; }
+    .tag-sug:hover { background:var(--accent-light); color:var(--accent); border-color:var(--accent); }
+
+    /* ══ SETTINGS ROW ══ */
+    .settings-row { display:flex; gap:12px; flex-wrap:wrap; }
+    .setting-card {
+      flex:1; min-width:140px; background:var(--white-glass);
+      border:1.5px solid rgba(122,143,82,.18); border-radius:14px; padding:14px;
+      cursor:pointer; transition:border-color .16s,background .16s;
+    }
+    .setting-card.active { border-color:var(--accent); background:var(--accent-light); }
+    .setting-card-label { font-size:.74rem; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-light); margin-bottom:4px; }
+    .setting-card-val { font-size:.88rem; font-weight:600; color:var(--text-dark); display:flex; align-items:center; gap:5px; }
+    .setting-card-val svg { width:14px; height:14px; stroke:var(--accent); fill:none; stroke-width:2; stroke-linecap:round; }
+    .toggle-wrap { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(122,143,82,.12); }
+    .toggle-wrap:last-child { border-bottom:none; }
+    .toggle-label { font-size:.86rem; color:var(--text-mid); }
+    .toggle-sub { font-size:.74rem; color:var(--text-light); }
+    .toggle { width:38px; height:21px; border-radius:12px; background:rgba(122,143,82,.25); position:relative; cursor:pointer; transition:background .2s; flex-shrink:0; }
+    .toggle.on { background:var(--accent); }
+    .toggle::after { content:''; position:absolute; top:2.5px; left:2.5px; width:16px; height:16px; border-radius:50%; background:white; transition:transform .2s; box-shadow:0 1px 4px rgba(0,0,0,.15); }
+    .toggle.on::after { transform:translateX(17px); }
+
+    /* ══ ASIDE WIDGETS ══ */
+    .aside-widget { background:var(--sidebar-bg); border-radius:18px; padding:16px 16px; box-shadow:0 2px 12px rgba(46,53,32,.07); animation:fadeUp .4s ease both; }
+    .aside-widget:nth-child(2) { animation-delay:.08s; }
+    .aside-widget:nth-child(3) { animation-delay:.14s; }
+    .aw-title { font-family:'Lora',serif; font-weight:700; font-size:.92rem; color:var(--text-dark); margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid rgba(122,143,82,.2); display:flex; align-items:center; gap:7px; }
+    .aw-title svg { width:15px; height:15px; stroke:var(--accent); fill:none; stroke-width:1.8; stroke-linecap:round; }
+
+    /* Checklist */
+    .checklist { display:flex; flex-direction:column; gap:7px; }
+    .check-item { display:flex; align-items:center; gap:8px; font-size:.82rem; color:var(--text-mid); transition:color .2s; }
+    .check-item.done { color:var(--accent-dark); }
+    .check-item.done .chk { background:var(--accent); border-color:var(--accent); }
+    .check-item.done .chk::after { content:''; width:6px; height:3px; border-left:2px solid white; border-bottom:2px solid white; transform:rotate(-45deg) translate(1px, -1px); display:block; }
+    .chk { width:16px; height:16px; border-radius:4px; border:1.5px solid rgba(122,143,82,.35); flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+
+    /* Tips */
+    .tip-list { display:flex; flex-direction:column; gap:9px; }
+    .tip-item { display:flex; gap:8px; font-size:.8rem; color:var(--text-mid); line-height:1.5; }
+    .tip-icon { flex-shrink:0; font-size:.9rem; margin-top:1px; }
+
+    /* Preview card */
+    #preview-card { background:var(--card); border-radius:16px; padding:14px; box-shadow:0 2px 12px rgba(46,53,32,.1); font-size:.85rem; }
+    .pc-header { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+    .pc-av { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#b5c98a,#7a8f52); display:flex; align-items:center; justify-content:center; font-family:'Lora',serif; font-weight:700; font-size:.78rem; color:white; flex-shrink:0; }
+    .pc-name { font-weight:700; font-size:.84rem; color:var(--text-dark); }
+    .pc-time { font-size:.7rem; color:var(--text-light); }
+    .pc-badges { display:flex; gap:4px; margin-left:auto; flex-wrap:wrap; justify-content:flex-end; }
+    .pc-badge { font-size:.66rem; font-weight:700; border-radius:14px; padding:2px 8px; }
+    .pc-title { font-family:'Lora',serif; font-weight:700; font-size:.92rem; color:var(--text-dark); margin-bottom:6px; line-height:1.35; }
+    .pc-body { font-size:.8rem; color:var(--text-mid); line-height:1.6; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+    .pc-tags { display:flex; gap:4px; flex-wrap:wrap; margin-top:8px; }
+    .pc-tag { font-size:.67rem; color:var(--accent); background:var(--accent-light); border-radius:8px; padding:2px 7px; font-weight:600; }
+    .pc-empty { color:var(--text-light); font-size:.8rem; text-align:center; padding:18px 0; font-style:italic; }
+
+    /* ══ PUBLISH BAR ══ */
+    .publish-bar {
+      display:flex; align-items:center; gap:12px; padding:18px 22px;
+      background:var(--card); border-radius:20px;
+      box-shadow:0 2px 16px rgba(46,53,32,.1);
+      animation:fadeUp .45s .2s ease both; flex-wrap:wrap;
+    }
+    .publish-info { flex:1; min-width:160px; }
+    .publish-info-title { font-family:'Lora',serif; font-weight:700; font-size:.92rem; color:var(--text-dark); }
+    .publish-info-sub { font-size:.76rem; color:var(--text-light); margin-top:2px; }
+    .save-draft-btn { display:flex; align-items:center; gap:6px; background:var(--white-glass); border:1.5px solid rgba(122,143,82,.25); border-radius:20px; padding:9px 18px; font-family:'DM Sans',sans-serif; font-size:.84rem; font-weight:600; color:var(--text-mid); cursor:pointer; transition:background .16s; }
+    .save-draft-btn:hover { background:var(--panel); color:var(--text-dark); }
+    .save-draft-btn svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
+    .preview-btn { display:flex; align-items:center; gap:6px; background:var(--accent-light); border:1.5px solid rgba(122,143,82,.3); border-radius:20px; padding:9px 18px; font-family:'DM Sans',sans-serif; font-size:.84rem; font-weight:600; color:var(--accent); cursor:pointer; transition:background .16s; }
+    .preview-btn:hover { background:var(--panel); color:var(--text-dark); }
+    .preview-btn svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
+    .publish-btn {
+      display:flex; align-items:center; gap:8px;
+      background:linear-gradient(135deg, #8da05e, var(--accent));
+      color:white; border:none; border-radius:20px; padding:10px 24px;
+      font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:700;
+      cursor:pointer; transition:transform .15s,box-shadow .15s;
+      box-shadow:0 3px 14px rgba(122,143,82,.35);
+    }
+    .publish-btn:hover { transform:scale(1.04); box-shadow:0 5px 20px rgba(122,143,82,.45); }
+    .publish-btn:disabled { background:rgba(122,143,82,.3); box-shadow:none; transform:none; cursor:not-allowed; }
+    .publish-btn svg { width:15px; height:15px; stroke:white; fill:none; stroke-width:2.2; stroke-linecap:round; }
+
+    /* ══ TOAST ══ */
+    #toast {
+      position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px);
+      background:var(--text-dark); color:white; border-radius:22px; padding:11px 22px;
+      font-size:.86rem; font-weight:600; opacity:0; transition:opacity .3s,transform .3s;
+      z-index:500; display:flex; align-items:center; gap:8px; white-space:nowrap;
+    }
+    #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    #toast svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2.2; stroke-linecap:round; }
+
+    /* ══ SUCCESS OVERLAY ══ */
+    #success-overlay {
+      position:fixed; inset:0; background:rgba(238,240,232,.92); backdrop-filter:blur(10px);
+      z-index:400; display:none; align-items:center; justify-content:center;
+      flex-direction:column; gap:18px; animation:fadeIn .4s ease;
+    }
+    #success-overlay.show { display:flex; }
+    .success-icon { width:72px; height:72px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 24px rgba(122,143,82,.4); animation:popIn .5s cubic-bezier(.34,1.56,.64,1) both; }
+    .success-icon svg { width:34px; height:34px; stroke:white; fill:none; stroke-width:2.5; stroke-linecap:round; }
+    .success-title { font-family:'Lora',serif; font-weight:700; font-size:1.6rem; color:var(--text-dark); text-align:center; }
+    .success-sub { font-size:.9rem; color:var(--text-light); text-align:center; max-width:320px; }
+    .success-btns { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+    .suc-btn { border:none; border-radius:20px; padding:10px 22px; font-family:'DM Sans',sans-serif; font-size:.87rem; font-weight:600; cursor:pointer; transition:transform .15s; }
+    .suc-btn:hover { transform:scale(1.04); }
+    .suc-btn.primary { background:var(--accent); color:white; box-shadow:0 3px 12px rgba(122,143,82,.3); }
+    .suc-btn.secondary { background:var(--white-glass); color:var(--text-mid); border:1.5px solid rgba(122,143,82,.25); }
+
+    /* Overlay/drawer */
+    #overlay { display:none; position:fixed; inset:0; background:rgba(46,53,32,.2); z-index:150; backdrop-filter:blur(2px); }
+    #overlay.on { display:block; }
+
+    @keyframes fadeUp  { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn  { from { opacity:0; } to { opacity:1; } }
+    @keyframes popIn   { from { opacity:0; transform:scale(.4); } to { opacity:1; transform:scale(1); } }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width:900px) { .form-aside { display:none; } }
+    @media (max-width:680px) {
+      #desk-nav { display:none; } #subnav { display:flex; }
+      #shell { margin-top:calc(var(--topbar-h) + var(--subnav-h)); }
+      #sidebar { top:calc(var(--topbar-h) + var(--subnav-h)); height:calc(100vh - var(--topbar-h) - var(--subnav-h)); }
+    }
+    @media (max-width:580px) {
+      #main { padding:14px 12px 48px 12px; }
+      .type-grid { grid-template-columns:1fr; }
+      .settings-row { flex-direction:column; }
+      .progress-steps .step-label { display:none; }
+      .page-header-actions { display:none; }
+      .publish-bar { gap:10px; }
+    }
+    @media (max-width:520px) {
+      #hamburger { display:flex; } #topbar-logo-zone { display:none; } #mobile-title { display:block; }
+      #topbar { padding:0 14px; gap:8px; }
+      #sidebar { position:fixed; top:calc(var(--topbar-h) + var(--subnav-h)); left:0; bottom:0; width:0; border-radius:0 18px 18px 0; z-index:160; box-shadow:none; }
+      #sidebar.open { width:var(--sb-expanded); box-shadow:6px 0 28px rgba(46,53,32,.18); }
+      .distress-btn span { display:none; } .distress-btn { padding:9px 11px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="overlay" onclick="closeSidebar()"></div>
+<div id="toast"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span id="toast-msg">Draft saved!</span></div>
+
+<!-- SUCCESS OVERLAY -->
+<div id="success-overlay">
+  <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+  <div class="success-title">Post published! 🌿</div>
+  <div class="success-sub" id="success-desc">Your post is live and your community can now see it and respond.</div>
+  <div class="success-btns">
+    <button class="suc-btn primary" onclick="viewPost()">View Post</button>
+    <button class="suc-btn secondary" onclick="createAnother()">Create Another</button>
+  </div>
+</div>
+
+<!-- ══ TOPBAR ══ -->
+<header id="topbar">
+  <button id="hamburger" onclick="toggleSidebar()">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div id="topbar-logo-zone"><div class="logo-pill"><svg viewBox="0 0 24 24"><path d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"/></svg></div></div>
+  <span id="mobile-title">New Post</span>
+  <nav id="desk-nav">
+    <span class="tnav" onclick="syncNav(this)">Friends</span>
+    <span class="tnav" onclick="syncNav(this)">Explore</span>
+    <span class="tnav" onclick="syncNav(this)">Bookmarked</span>
+  </nav>
+  <div id="topbar-right">
+    <button class="distress-btn"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Distress Call</span></button>
+    <div class="profile-av-btn"></div>
+  </div>
+</header>
+<nav id="subnav">
+  <span class="snav" onclick="syncNav(this)">Friends</span>
+  <span class="snav" onclick="syncNav(this)">Explore</span>
+  <span class="snav" onclick="syncNav(this)">Bookmarked</span>
+</nav>
+
+<!-- ══ SHELL ══ -->
+<div id="shell">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sb-prof"><div class="sb-prof-av"></div><div class="sb-prof-info"><div class="sb-prof-name">Pebble yarn Studio</div><div class="sb-prof-sub">@pebbleyarn</div></div></div>
+    <nav>
+      <div class="nav-item" onclick="pickNav(this)"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="nav-label">Home</span></div>
+      <div class="nav-item" onclick="pickNav(this)"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label">Explore</span></div>
+      <div class="nav-item active" onclick="pickNav(this)"><svg class="nav-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span class="nav-label">Create Post</span></div>
+      <div class="nav-item" onclick="pickNav(this)"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="nav-label">Notifications</span></div>
+      <div class="nav-item" onclick="pickNav(this)"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span class="nav-label">Messages</span></div>
+      <div class="nav-item" onclick="pickNav(this)"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="nav-label">Profile</span></div>
+      <div class="nav-item" onclick="pickNav(this)"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="nav-label">Settings</span></div>
+    </nav>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main id="main">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div class="page-back" onclick="history.back()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+      <div class="page-header-text">
+        <div class="page-title">Create a new post</div>
+        <div class="page-sub">Share your experience, knowledge, or ask for help from the community</div>
+      </div>
+      <div class="page-header-actions">
+        <button class="draft-btn" onclick="saveDraft()"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>Save Draft</button>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-steps" id="progress-steps">
+      <div class="step-item">
+        <div class="step-num active" id="sn-1">1</div>
+        <span class="step-label active" id="sl-1">Post Type</span>
+      </div>
+      <div class="step-connector" id="sc-1"></div>
+      <div class="step-item">
+        <div class="step-num pending" id="sn-2">2</div>
+        <span class="step-label pending" id="sl-2">Content</span>
+      </div>
+      <div class="step-connector" id="sc-2"></div>
+      <div class="step-item">
+        <div class="step-num pending" id="sn-3">3</div>
+        <span class="step-label pending" id="sl-3">Media & Tags</span>
+      </div>
+      <div class="step-connector" id="sc-3"></div>
+      <div class="step-item">
+        <div class="step-num pending" id="sn-4">4</div>
+        <span class="step-label pending" id="sl-4">Settings</span>
+      </div>
+      <div class="step-connector" id="sc-4"></div>
+      <div class="step-item">
+        <div class="step-num pending" id="sn-5">5</div>
+        <span class="step-label pending" id="sl-5">Publish</span>
+      </div>
+    </div>
+
+    <!-- Form + Aside row -->
+    <div class="form-row">
+
+      <!-- ════ FORM MAIN ════ -->
+      <div class="form-main">
+
+        <!-- SECTION 1: Post type -->
+        <div class="section">
+          <div class="section-head">
+            <div class="section-icon"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+            <div>
+              <div class="section-title">Post type</div>
+              <div class="section-sub">What kind of post are you creating?</div>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="type-grid">
+              <div class="type-card type-sos" data-type="sos" onclick="selectType('sos',this)">
+                <div class="tc-icon">🆘</div>
+                <div class="tc-label">Distress Call</div>
+                <div class="tc-desc">Urgent help needed — business crisis, financial stress, or supplier emergency</div>
+                <div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              </div>
+              <div class="type-card type-tutorial" data-type="tutorial" onclick="selectType('tutorial',this)">
+                <div class="tc-icon">📚</div>
+                <div class="tc-label">Tutorial</div>
+                <div class="tc-desc">Share your craft knowledge, techniques, or business lessons with step-by-step guidance</div>
+                <div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              </div>
+              <div class="type-card type-community" data-type="community" onclick="selectType('community',this)">
+                <div class="tc-icon">💬</div>
+                <div class="tc-label">Community Update</div>
+                <div class="tc-desc">Share news, wins, questions, or start a discussion with your craft community</div>
+                <div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              </div>
+              <div class="type-card type-resource" data-type="resource" onclick="selectType('resource',this)">
+                <div class="tc-icon">🗂️</div>
+                <div class="tc-label">Resource Share</div>
+                <div class="tc-desc">Link to a useful tool, template, supplier, or external resource for other crafters</div>
+                <div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: Priority + Category -->
+        <div class="section">
+          <div class="section-head">
+            <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div>
+            <div>
+              <div class="section-title">Category</div>
+              <div class="section-sub">Help others find your post</div>
+            </div>
+          </div>
+          <div class="section-body">
+            <div id="priority-row" style="margin-bottom:14px;">
+              <div style="font-size:.8rem;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Urgency level</div>
+              <div class="pill-row" id="priority-pills">
+                <div class="pill-opt p-high" data-p="high" onclick="selectPriority('high',this)"><div class="dot" style="background:#d35b3a"></div>High — I need help now</div>
+                <div class="pill-opt p-med"  data-p="med"  onclick="selectPriority('med',this)"><div class="dot" style="background:#9a6d1e"></div>Medium — Within a few days</div>
+                <div class="pill-opt p-low"  data-p="low"  onclick="selectPriority('low',this)"><div class="dot" style="background:#7a8f52"></div>Low — Whenever you can</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:.8rem;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Topic category</div>
+              <div class="pill-row" id="cat-pills">
+                <div class="cat-pill" onclick="toggleCat(this)">💰 Financial</div>
+                <div class="cat-pill" onclick="toggleCat(this)">📦 Orders & Fulfilment</div>
+                <div class="cat-pill" onclick="toggleCat(this)">🧵 Suppliers</div>
+                <div class="cat-pill" onclick="toggleCat(this)">🏪 Marketplace</div>
+                <div class="cat-pill" onclick="toggleCat(this)">📚 Tutorials</div>
+                <div class="cat-pill" onclick="toggleCat(this)">🚚 Courier & Shipping</div>
+                <div class="cat-pill" onclick="toggleCat(this)">💼 Business Strategy</div>
+                <div class="cat-pill" onclick="toggleCat(this)">🎨 Craft Techniques</div>
+                <div class="cat-pill" onclick="toggleCat(this)">💬 Community</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3: Title + Body -->
+        <div class="section">
+          <div class="section-head">
+            <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+            <div>
+              <div class="section-title">Your post</div>
+              <div class="section-sub">Write your title and main content</div>
+            </div>
+          </div>
+          <div class="section-body">
+            <input
+              class="title-input" id="title-input" type="text" maxlength="140"
+              placeholder="Write a clear, descriptive title…"
+              oninput="updateTitle(this)" />
+            <div class="char-hint" id="title-chars">0 / 140 characters</div>
+
+            <div style="height:14px"></div>
+
+            <!-- Toolbar -->
+            <div class="editor-wrap">
+              <div class="toolbar">
+                <button class="tb-btn" title="Bold" onclick="fmt('bold')"><strong>B</strong></button>
+                <button class="tb-btn" title="Italic" onclick="fmt('italic')"><em>I</em></button>
+                <button class="tb-btn" title="Underline" onclick="fmt('underline')"><u>U</u></button>
+                <div class="tb-sep"></div>
+                <button class="tb-btn" title="Bullet list" onclick="fmt('insertUnorderedList')"><svg viewBox="0 0 24 24"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg></button>
+                <button class="tb-btn" title="Numbered list" onclick="fmt('insertOrderedList')"><svg viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button>
+                <div class="tb-sep"></div>
+                <button class="tb-btn" title="Quote" onclick="fmt('formatBlock','blockquote')"><svg viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg></button>
+                <button class="tb-btn" title="Highlight" onclick="fmt('backColor','#e6ecda')"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+                <div class="tb-sep"></div>
+                <button class="tb-btn" title="Link" onclick="insertLink()"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></button>
+                <button class="tb-btn" title="Remove formatting" onclick="fmt('removeFormat')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+              </div>
+              <div
+                class="editor-area" id="editor-area" contenteditable="true"
+                data-placeholder="Write your post here… Be specific and clear. The more context you give, the more useful the community's responses will be. You can use formatting to highlight key information."
+                oninput="updateEditorStats()"
+                onpaste="cleanPaste(event)"
+              ></div>
+              <div class="editor-footer">
+                <div class="editor-stats">
+                  <span id="word-count">0 words</span>
+                  <span id="char-count-body">0 chars</span>
+                </div>
+                <div class="editor-tip">Ctrl+B Bold · Ctrl+I Italic · Ctrl+K Link</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 4: Media -->
+        <div class="section">
+          <div class="section-head">
+            <div class="section-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+            <div>
+              <div class="section-title">Media &amp; attachments</div>
+              <div class="section-sub">Add images, screenshots, or documents (optional)</div>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="media-grid" id="media-grid">
+              <div class="media-add" onclick="addMedia()">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Add image</span>
+              </div>
+              <div class="media-add" onclick="addDoc()">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Add file</span>
+              </div>
+            </div>
+            <div style="font-size:.75rem;color:var(--text-light);margin-top:10px;">Supported: JPG, PNG, GIF, WebP, PDF · Max 10MB each · Up to 6 files</div>
+          </div>
+        </div>
+
+        <!-- SECTION 5: Tags -->
+        <div class="section">
+          <div class="section-head">
+            <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div>
+            <div>
+              <div class="section-title">Tags</div>
+              <div class="section-sub">Help people find this post · up to 8 tags</div>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="tags-input-wrap" id="tags-wrap" onclick="focusTagInput()">
+              <input
+                class="tag-input" id="tag-input" type="text" maxlength="40"
+                placeholder="Type a tag and press Enter or comma…"
+                onkeydown="handleTagKey(event)" oninput="filterTagSugs(this.value)" />
+            </div>
+            <div class="tag-suggestions" id="tag-sug-row"></div>
+          </div>
+        </div>
+
+        <!-- SECTION 6: Settings -->
+        <div class="section">
+          <div class="section-head">
+            <div class="section-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+            <div>
+              <div class="section-title">Post settings</div>
+              <div class="section-sub">Audience, visibility, and notifications</div>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="settings-row" style="margin-bottom:16px;">
+              <div class="setting-card active" id="aud-friends" onclick="setAudience('friends',this)">
+                <div class="setting-card-label">Audience</div>
+                <div class="setting-card-val"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Friends only</div>
+              </div>
+              <div class="setting-card" id="aud-community" onclick="setAudience('community',this)">
+                <div class="setting-card-label">Audience</div>
+                <div class="setting-card-val"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>Full community</div>
+              </div>
+            </div>
+            <div class="toggle-wrap">
+              <div><div class="toggle-label">Allow responses</div><div class="toggle-sub">Let community members reply to your post</div></div>
+              <div class="toggle on" id="t-replies" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="toggle-wrap">
+              <div><div class="toggle-label">Notify when resolved</div><div class="toggle-sub">Get notified when someone marks this as resolved</div></div>
+              <div class="toggle on" id="t-resolve" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="toggle-wrap">
+              <div><div class="toggle-label">Send to your network</div><div class="toggle-sub">Push notification to your followers about this post</div></div>
+              <div class="toggle" id="t-notify" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="toggle-wrap">
+              <div><div class="toggle-label">Show in Explore feed</div><div class="toggle-sub">Appear in the discovery section for wider reach</div></div>
+              <div class="toggle on" id="t-explore" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PUBLISH BAR -->
+        <div class="publish-bar">
+          <div class="publish-info">
+            <div class="publish-info-title" id="pub-status">Ready to publish</div>
+            <div class="publish-info-sub" id="pub-sub">Fill in required fields to unlock publishing</div>
+          </div>
+          <button class="save-draft-btn" onclick="saveDraft()"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>Save Draft</button>
+          <button class="preview-btn" onclick="previewPost()"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Preview</button>
+          <button class="publish-btn" id="publish-btn" onclick="publishPost()" disabled>
+            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Publish Post
+          </button>
+        </div>
+
+      </div><!-- /form-main -->
+
+      <!-- ════ ASIDE ════ -->
+      <aside class="form-aside">
+
+        <!-- Live preview -->
+        <div class="aside-widget">
+          <div class="aw-title"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Live preview</div>
+          <div id="preview-card">
+            <div class="pc-empty">Your post preview will appear here as you fill in the form 🌿</div>
+          </div>
+        </div>
+
+        <!-- Checklist -->
+        <div class="aside-widget">
+          <div class="aw-title"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Publishing checklist</div>
+          <div class="checklist">
+            <div class="check-item" id="chk-type"><div class="chk"></div>Post type selected</div>
+            <div class="check-item" id="chk-cat"><div class="chk"></div>Category chosen</div>
+            <div class="check-item" id="chk-title"><div class="chk"></div>Title added (min 10 chars)</div>
+            <div class="check-item" id="chk-body"><div class="chk"></div>Body written (min 30 chars)</div>
+            <div class="check-item" id="chk-tags"><div class="chk"></div>At least 1 tag added</div>
+          </div>
+        </div>
+
+        <!-- Tips by post type -->
+        <div class="aside-widget" id="tips-widget">
+          <div class="aw-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Writing tips</div>
+          <div class="tip-list" id="tips-list">
+            <div class="tip-item"><span class="tip-icon">📝</span>Choose a post type above and tips tailored to that format will appear here.</div>
+          </div>
+        </div>
+
+        <!-- Community guidelines -->
+        <div class="aside-widget">
+          <div class="aw-title"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Guidelines</div>
+          <div class="tip-list">
+            <div class="tip-item"><span class="tip-icon">✅</span>Be specific — include amounts, timelines, platform names.</div>
+            <div class="tip-item"><span class="tip-icon">✅</span>Respond to helpers who take the time to reply.</div>
+            <div class="tip-item"><span class="tip-icon">✅</span>Mark posts resolved when your issue is solved.</div>
+            <div class="tip-item"><span class="tip-icon">🚫</span>No spam, promotion, or off-topic content.</div>
+          </div>
+        </div>
+
+      </aside>
+
+    </div><!-- /form-row -->
+  </main>
+</div>
+
+<script>
+/* ═══════════════════════════════════
+   STATE
+═══════════════════════════════════ */
+let postType     = null;
+let priority     = null;
+let category     = null;
+let tags         = [];
+let mediaItems   = [];
+let audience     = 'friends';
+const MAX_TAGS   = 8;
+
+const tagSuggestions = [
+  '#pricing','#wholesale','#courier','#etsy','#financial','#supplier','#tutorial',
+  '#hand-dyed','#wool','#knitting','#crochet','#dyeing','#pattern','#small-biz',
+  '#uk-crafts','#slow-fashion','#natural-fibres','#urgent','#resolved','#community'
+];
+
+const tipsByType = {
+  sos: [
+    { icon:'🆘', text:'State the problem clearly in your first sentence — date, platform, amounts.' },
+    { icon:'💰', text:'Include specific figures (order count, money involved) — it helps others assess urgency.' },
+    { icon:'📸', text:'Screenshots of error messages or letters are extremely helpful.' },
+    { icon:'⏱', text:'Mention your timeline — are you hours, days or weeks from a deadline?' }
+  ],
+  tutorial: [
+    { icon:'🔢', text:'Break content into numbered steps — easier to follow and reference back to.' },
+    { icon:'💡', text:'Include a quick "Who is this for?" intro so readers know if it applies to them.' },
+    { icon:'📊', text:'Real numbers and examples are worth 10x more than general advice.' },
+    { icon:'📎', text:'Attach a template or spreadsheet if you can — it earns a lot of community points.' }
+  ],
+  community: [
+    { icon:'💬', text:'Ask a single, clear question if you\'re looking for input or discussion.' },
+    { icon:'🎉', text:'Sharing a win? Tell the community what changed — inspire with the "how".' },
+    { icon:'🤝', text:'Tag relevant community members who might want to weigh in.' },
+    { icon:'📅', text:'Include dates and context so the post ages well.' }
+  ],
+  resource: [
+    { icon:'🔗', text:'Include a direct link and a brief description of why it\'s useful.' },
+    { icon:'🧪', text:'Note whether you\'ve personally used it, and what the outcome was.' },
+    { icon:'💸', text:'State if it\'s free, freemium, or paid — people appreciate the transparency.' },
+    { icon:'🎯', text:'Explain who it\'s best suited to — saves people time evaluating.' }
+  ]
+};
+
+/* ═══════════════════════════════════
+   POST TYPE
+═══════════════════════════════════ */
+function selectType(type, card) {
+  postType = type;
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('priority-row').style.display = type === 'sos' ? 'block' : 'none';
+  renderTips(type);
+  updateChecklist();
+  updatePreview();
+  updateProgress(1, true);
+  updateProgress(2, false, true);
+}
+
+function renderTips(type) {
+  const tips = tipsByType[type] || [];
+  document.getElementById('tips-list').innerHTML = tips.map(t =>
+    `<div class="tip-item"><span class="tip-icon">${t.icon}</span>${t.text}</div>`
+  ).join('');
+}
+
+/* ═══════════════════════════════════
+   PRIORITY & CATEGORY
+═══════════════════════════════════ */
+function selectPriority(p, el) {
+  priority = p;
+  document.querySelectorAll('.pill-opt').forEach(x => x.classList.remove('on'));
+  el.classList.add('on');
+  updatePreview();
+}
+
+function toggleCat(el) {
+  el.classList.toggle('on');
+  const active = [...document.querySelectorAll('.cat-pill.on')];
+  category = active.length ? active.map(a => a.textContent.trim()).join(', ') : null;
+  updateChecklist();
+  updatePreview();
+  updateProgress(2, category !== null);
+}
+
+/* ═══════════════════════════════════
+   TITLE & BODY
+═══════════════════════════════════ */
+function updateTitle(input) {
+  const len = input.value.length;
+  const el  = document.getElementById('title-chars');
+  el.textContent = `${len} / 140 characters`;
+  el.className = 'char-hint' + (len > 130 ? ' warn' : '') + (len >= 140 ? ' over' : '');
+  updateChecklist();
+  updatePreview();
+  updateProgress(3, len >= 10);
+}
+
+function updateEditorStats() {
+  const text = document.getElementById('editor-area').innerText || '';
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  document.getElementById('word-count').textContent = `${words} word${words !== 1 ? 's' : ''}`;
+  document.getElementById('char-count-body').textContent = `${text.length} chars`;
+  updateChecklist();
+  updatePreview();
+}
+
+function fmt(cmd, val) {
+  document.getElementById('editor-area').focus();
+  document.execCommand(cmd, false, val || null);
+}
+
+function insertLink() {
+  const url = prompt('Enter URL:');
+  if (url) { document.getElementById('editor-area').focus(); document.execCommand('createLink', false, url); }
+}
+
+function cleanPaste(e) {
+  e.preventDefault();
+  const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+  document.execCommand('insertText', false, text);
+}
+
+/* Placeholder behaviour for contenteditable */
+document.addEventListener('DOMContentLoaded', () => {
+  const ed = document.getElementById('editor-area');
+  function updatePlaceholder() {
+    ed.classList.toggle('empty', !ed.innerText.trim());
+  }
+  ed.addEventListener('input', updatePlaceholder);
+  ed.addEventListener('focus', updatePlaceholder);
+  ed.addEventListener('blur', updatePlaceholder);
+  updatePlaceholder();
+});
+
+/* Editor placeholder via CSS */
+const edStyle = document.createElement('style');
+edStyle.textContent = `
+  .editor-area:empty:before, .editor-area.empty:before {
+    content: attr(data-placeholder);
+    color: var(--text-light);
+    pointer-events: none;
+  }
+`;
+document.head.appendChild(edStyle);
+
+/* ═══════════════════════════════════
+   MEDIA
+═══════════════════════════════════ */
+const mediaTypes = [
+  { label:'Screenshot.jpg', icon:'🖼️' },
+  { label:'Invoice.pdf',    icon:'📄' },
+  { label:'Sample-photo.jpg', icon:'🖼️' },
+  { label:'Template.xlsx',  icon:'📊' },
+  { label:'Diagram.png',    icon:'🖼️' },
+];
+let mediaIndex = 0;
+
+function addMedia() {
+  if (mediaItems.length >= 6) { showToast('Maximum 6 files allowed'); return; }
+  const m = mediaTypes[mediaIndex % mediaTypes.length];
+  mediaIndex++;
+  mediaItems.push(m);
+  renderMedia();
+  updateProgress(4, true);
+}
+
+function addDoc() {
+  if (mediaItems.length >= 6) { showToast('Maximum 6 files allowed'); return; }
+  const m = { label:'Document.pdf', icon:'📄' };
+  mediaItems.push(m);
+  renderMedia();
+  updateProgress(4, true);
+}
+
+function removeMedia(i) {
+  mediaItems.splice(i, 1);
+  renderMedia();
+}
+
+function renderMedia() {
+  const grid = document.getElementById('media-grid');
+  const thumbs = mediaItems.map((m,i) => `
+    <div class="media-thumb">
+      <div class="media-thumb-icon">${m.icon}</div>
+      <div class="media-thumb-label">${m.label}</div>
+      <div class="media-thumb-remove" onclick="removeMedia(${i})">✕</div>
+    </div>`).join('');
+  const adds = mediaItems.length < 6 ? `
+    <div class="media-add" onclick="addMedia()">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span>Add image</span>
+    </div>
+    <div class="media-add" onclick="addDoc()">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>Add file</span>
+    </div>` : '';
+  grid.innerHTML = thumbs + adds;
+}
+
+/* ═══════════════════════════════════
+   TAGS
+═══════════════════════════════════ */
+function renderTagChips() {
+  const wrap = document.getElementById('tags-wrap');
+  const input = document.getElementById('tag-input');
+  wrap.innerHTML = '';
+  tags.forEach((t, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.innerHTML = `${t}<button onclick="removeTag(${i})">✕</button>`;
+    wrap.appendChild(chip);
+  });
+  wrap.appendChild(input);
+  updateChecklist();
+  updatePreview();
+  updateProgress(5, tags.length > 0);
+}
+
+function removeTag(i) { tags.splice(i,1); renderTagChips(); }
+
+function handleTagKey(e) {
+  if ((e.key === 'Enter' || e.key === ',') && e.target.value.trim()) {
+    e.preventDefault();
+    addTag(e.target.value.trim().replace(/,$/,''));
+    e.target.value = '';
+    filterTagSugs('');
+  } else if (e.key === 'Backspace' && !e.target.value && tags.length) {
+    tags.pop(); renderTagChips();
+  }
+}
+
+function addTag(raw) {
+  if (tags.length >= MAX_TAGS) { showToast('Max 8 tags allowed'); return; }
+  const tag = (raw.startsWith('#') ? raw : '#' + raw).toLowerCase().replace(/\s+/g,'-');
+  if (!tags.includes(tag)) { tags.push(tag); renderTagChips(); }
+}
+
+function focusTagInput() { document.getElementById('tag-input').focus(); }
+
+function filterTagSugs(val) {
+  const q = val.toLowerCase().replace('#','');
+  const row = document.getElementById('tag-sug-row');
+  const available = tagSuggestions.filter(t => !tags.includes(t) && (q === '' || t.includes(q))).slice(0,8);
+  row.innerHTML = available.map(t => `<span class="tag-sug" onclick="addTag('${t}');document.getElementById('tag-input').value='';filterTagSugs('')">${t}</span>`).join('');
+}
+
+/* ═══════════════════════════════════
+   SETTINGS
+═══════════════════════════════════ */
+function setAudience(val, card) {
+  audience = val;
+  document.querySelectorAll('.setting-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+}
+
+/* ═══════════════════════════════════
+   CHECKLIST
+═══════════════════════════════════ */
+function updateChecklist() {
+  const title  = document.getElementById('title-input').value;
+  const body   = document.getElementById('editor-area').innerText || '';
+  const catOk  = !!document.querySelector('.cat-pill.on');
+
+  setCheck('chk-type',  !!postType);
+  setCheck('chk-cat',   catOk);
+  setCheck('chk-title', title.length >= 10);
+  setCheck('chk-body',  body.trim().length >= 30);
+  setCheck('chk-tags',  tags.length >= 1);
+
+  const allDone = !!postType && catOk && title.length >= 10 && body.trim().length >= 30 && tags.length >= 1;
+  const btn = document.getElementById('publish-btn');
+  btn.disabled = !allDone;
+
+  const pubStatus = document.getElementById('pub-status');
+  const pubSub    = document.getElementById('pub-sub');
+  if (allDone) {
+    pubStatus.textContent = '✅ Ready to publish!';
+    pubSub.textContent    = 'All required fields are complete.';
+  } else {
+    const missing = [];
+    if (!postType) missing.push('post type');
+    if (!catOk)   missing.push('category');
+    if (title.length < 10) missing.push('title');
+    if (body.trim().length < 30) missing.push('body');
+    if (!tags.length) missing.push('at least 1 tag');
+    pubStatus.textContent = 'Complete required fields';
+    pubSub.textContent    = `Still needed: ${missing.join(', ')}`;
+  }
+}
+
+function setCheck(id, done) {
+  const el = document.getElementById(id);
+  el.classList.toggle('done', done);
+  el.querySelector('.chk').style.background = done ? 'var(--accent)' : '';
+  el.querySelector('.chk').style.borderColor = done ? 'var(--accent)' : '';
+}
+
+/* ═══════════════════════════════════
+   PROGRESS STEPS
+═══════════════════════════════════ */
+const stepCompleted = [false,false,false,false,false];
+
+function updateProgress(step, done, activateNext) {
+  stepCompleted[step-1] = done;
+  const sn = document.getElementById(`sn-${step}`);
+  const sl = document.getElementById(`sl-${step}`);
+  const sc = document.getElementById(`sc-${step}`);
+  if (done) {
+    sn.className = 'step-num done'; sn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    sl.className = 'step-label done';
+    if (sc) sc.classList.add('done');
+    if (activateNext) {
+      const ns = document.getElementById(`sn-${step+1}`);
+      const nsl = document.getElementById(`sl-${step+1}`);
+      if (ns) { ns.className = 'step-num active'; nsl.className = 'step-label active'; }
+    }
+  }
+}
+
+/* ═══════════════════════════════════
+   LIVE PREVIEW
+═══════════════════════════════════ */
+const typeLabels = { sos:'🆘 Distress Call', tutorial:'📚 Tutorial', community:'💬 Community', resource:'🗂️ Resource' };
+const typeBadgeColors = { sos:'background:#fce8e1;color:#d35b3a', tutorial:'background:var(--accent-light);color:var(--accent)', community:'background:#fdf3e0;color:#9a6d1e', resource:'background:#e5f5e0;color:#3a7d2c' };
+const priorityBadge = { high:'<span class="pc-badge" style="background:#fce8e1;color:#d35b3a">High</span>', med:'<span class="pc-badge" style="background:#fdf3e0;color:#9a6d1e">Medium</span>', low:'<span class="pc-badge" style="background:var(--low-bg);color:var(--text-mid)">Low</span>' };
+
+function updatePreview() {
+  const card = document.getElementById('preview-card');
+  const title = document.getElementById('title-input').value.trim();
+  const body  = (document.getElementById('editor-area').innerText || '').trim();
+
+  if (!postType && !title && !body) {
+    card.innerHTML = `<div class="pc-empty">Your post preview will appear here as you fill in the form 🌿</div>`;
+    return;
+  }
+
+  const catEl = document.querySelector('.cat-pill.on');
+  const catLabel = catEl ? catEl.textContent.trim() : '';
+  const tagsHTML = tags.slice(0,4).map(t => `<span class="pc-tag">${t}</span>`).join('');
+
+  card.innerHTML = `
+    <div class="pc-header">
+      <div class="pc-av">P</div>
+      <div style="flex:1;">
+        <div class="pc-name">Pebble yarn Studio</div>
+        <div class="pc-time">Just now</div>
+      </div>
+      <div class="pc-badges">
+        ${priority ? priorityBadge[priority] : ''}
+        ${postType ? `<span class="pc-badge" style="${typeBadgeColors[postType] || ''}">${typeLabels[postType] || ''}</span>` : ''}
+        ${catLabel ? `<span class="pc-badge" style="background:var(--accent-light);color:var(--accent)">${catLabel}</span>` : ''}
+      </div>
+    </div>
+    <div class="pc-title">${title || '<span style="color:var(--text-light);font-style:italic">Add a title…</span>'}</div>
+    <div class="pc-body">${body || '<span style="color:var(--text-light);font-style:italic">Start writing your post…</span>'}</div>
+    ${tags.length ? `<div class="pc-tags">${tagsHTML}${tags.length > 4 ? `<span class="pc-tag">+${tags.length-4} more</span>` : ''}</div>` : ''}
+  `;
+}
+
+/* ═══════════════════════════════════
+   ACTIONS
+═══════════════════════════════════ */
+function saveDraft() {
+  showToast('Draft saved successfully');
+}
+
+function previewPost() {
+  showToast('Preview mode — opening full preview…');
+}
+
+function publishPost() {
+  const overlay = document.getElementById('success-overlay');
+  overlay.classList.add('show');
+  const title = document.getElementById('title-input').value.trim();
+  document.getElementById('success-desc').textContent =
+    `"${title.substring(0,55)}${title.length > 55 ? '…' : ''}" is now live for your community.`;
+}
+
+function viewPost() {
+  document.getElementById('success-overlay').classList.remove('show');
+  showToast('Opening your post…');
+}
+
+function createAnother() {
+  document.getElementById('success-overlay').classList.remove('show');
+  location.reload();
+}
+
+/* ═══════════════════════════════════
+   TOAST
+═══════════════════════════════════ */
+let toastTimer;
+function showToast(msg, icon) {
+  clearTimeout(toastTimer);
+  document.getElementById('toast-msg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ═══════════════════════════════════
+   NAV
+═══════════════════════════════════ */
+function syncNav(el) {
+  const label = el.textContent.trim();
+  document.querySelectorAll('.tnav').forEach(l => l.classList.toggle('active', l.textContent.trim() === label));
+  document.querySelectorAll('.snav').forEach(l => l.classList.toggle('active', l.textContent.trim() === label));
+}
+function pickNav(el) {
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  if (window.innerWidth <= 520) closeSidebar();
+}
+function toggleSidebar() {
+  const open = document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('on', open);
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('on');
+}
+window.addEventListener('resize', () => { if (window.innerWidth > 520) closeSidebar(); });
+
+/* ═══════════════════════════════════
+   INIT
+═══════════════════════════════════ */
+filterTagSugs('');
+updateChecklist();
+</script>
+</body>
+</html>

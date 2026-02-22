@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Craft-SOS — Explore</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #eef0e8;
+      --panel:        #d4dbbf;
+      --sidebar-bg:   #c9d3af;
+      --card:         #c5cf9e;
+      --accent:       #7a8f52;
+      --accent-dark:  #5e6e3b;
+      --accent-light: #e6ecda;
+      --text-dark:    #2e3520;
+      --text-mid:     #4a5730;
+      --text-light:   #6b7a50;
+      --high:         #d35b3a;
+      --high-bg:      #fce8e1;
+      --low-bg:       #e5ecda;
+      --med-bg:       #fdf3e0;
+      --med:          #9a6d1e;
+      --sb-collapsed: 64px;
+      --sb-expanded:  220px;
+      --topbar-h:     60px;
+      --subnav-h:     44px;
+      --ease:         0.3s cubic-bezier(.4,0,.2,1);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg); color: var(--text-dark);
+      min-height: 100vh; overflow-x: hidden;
+    }
+
+    body::before {
+      content: ''; position: fixed; inset: 0; opacity: 0.05;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Ccircle cx='70' cy='70' r='30' fill='none' stroke='%237a8f52' stroke-width='2'/%3E%3Cpath d='M50 92 Q70 58 90 92' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cellipse cx='420' cy='130' rx='24' ry='34' fill='none' stroke='%237a8f52' stroke-width='2' transform='rotate(-20 420 130)'/%3E%3Cpath d='M390 145 Q420 100 450 145' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Crect x='195' y='28' width='70' height='12' rx='6' fill='none' stroke='%237a8f52' stroke-width='1.5' transform='rotate(30 230 34)'/%3E%3Ccircle cx='230' cy='18' r='7' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cpath d='M90 360 L114 334 L138 360 L114 386 Z' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Crect x='338' y='318' width='46' height='62' rx='5' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cline x1='338' y1='354' x2='384' y2='354' stroke='%237a8f52' stroke-width='1'/%3E%3Ccircle cx='240' cy='400' r='40' fill='none' stroke='%237a8f52' stroke-width='2'/%3E%3Cpath d='M216 400 Q240 366 264 400' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cpath d='M216 412 Q240 448 264 412' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ══════════════════════════════
+       TOPBAR
+    ══════════════════════════════ */
+    #topbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--topbar-h); background: var(--bg);
+      display: flex; align-items: center;
+      padding: 0 18px 0 0; z-index: 200;
+      border-bottom: 1.5px solid rgba(122,143,82,0.13);
+    }
+    #topbar-logo-zone {
+      width: var(--sb-collapsed); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-pill {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-pill svg { width: 18px; height: 18px; fill: white; }
+    #desk-nav { flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .tnav {
+      font-size: 0.94rem; font-weight: 500; color: var(--text-light);
+      padding: 7px 18px; border-radius: 22px;
+      cursor: pointer; user-select: none;
+      transition: background .18s, color .18s;
+      position: relative; white-space: nowrap;
+    }
+    .tnav.active { color: var(--text-dark); font-weight: 700; }
+    .tnav.active::after {
+      content: ''; position: absolute; bottom: 2px; left: 50%;
+      transform: translateX(-50%);
+      width: 20px; height: 2.5px; background: var(--accent); border-radius: 2px;
+    }
+    .tnav:hover:not(.active) { background: rgba(122,143,82,0.11); color: var(--text-dark); }
+    #topbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .distress-btn {
+      display: flex; align-items: center; gap: 7px;
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 22px; padding: 9px 16px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.87rem; font-weight: 600;
+      cursor: pointer; transition: background .2s, transform .15s; white-space: nowrap;
+    }
+    .distress-btn:hover { background: var(--accent-dark); transform: scale(1.04); }
+    .distress-btn svg { width: 14px; height: 14px; stroke: white; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+    .profile-av-btn {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--panel); border: 2px solid var(--accent);
+      cursor: pointer; flex-shrink: 0;
+    }
+    #hamburger {
+      display: none; background: none; border: none;
+      cursor: pointer; padding: 8px; color: var(--text-dark); flex-shrink: 0;
+    }
+    #hamburger svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+    #mobile-title { display: none; flex: 1; font-family: 'Lora', serif; font-weight: 700; font-size: 1.1rem; color: var(--text-dark); }
+
+    /* Sub-nav */
+    #subnav {
+      display: none; position: fixed;
+      top: var(--topbar-h); left: 0; right: 0;
+      height: var(--subnav-h); background: var(--bg);
+      border-bottom: 1.5px solid rgba(122,143,82,0.11);
+      z-index: 190; align-items: center;
+      padding: 0 14px; gap: 4px;
+      overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    }
+    #subnav::-webkit-scrollbar { display: none; }
+    .snav {
+      font-size: 0.86rem; font-weight: 500; color: var(--text-light);
+      padding: 5px 14px; border-radius: 20px;
+      cursor: pointer; white-space: nowrap; user-select: none;
+      transition: background .18s, color .18s;
+    }
+    .snav.active { background: var(--accent); color: #fff; font-weight: 600; }
+    .snav:hover:not(.active) { background: rgba(122,143,82,0.14); color: var(--text-dark); }
+
+    /* ══════════════════════════════
+       SHELL
+    ══════════════════════════════ */
+    #shell { display: flex; margin-top: var(--topbar-h); min-height: calc(100vh - var(--topbar-h)); position: relative; z-index: 1; }
+
+    /* ══════════════════════════════
+       SIDEBAR
+    ══════════════════════════════ */
+    #sidebar {
+      width: var(--sb-collapsed); flex-shrink: 0;
+      transition: width var(--ease);
+      position: sticky; top: var(--topbar-h);
+      height: calc(100vh - var(--topbar-h)); align-self: flex-start;
+      background: var(--sidebar-bg); border-radius: 0 18px 18px 0;
+      overflow: hidden; display: flex; flex-direction: column;
+      padding: 16px 0; box-shadow: 2px 0 14px rgba(46,53,32,0.07); z-index: 10;
+    }
+    #sidebar:hover { width: var(--sb-expanded); }
+    #sidebar.open  { width: var(--sb-expanded); }
+    .sb-prof { display: flex; align-items: center; gap: 10px; padding: 0 12px 16px 12px; border-bottom: 1.5px solid rgba(122,143,82,0.17); margin-bottom: 8px; overflow: hidden; }
+    .sb-prof-av { width: 38px; height: 38px; border-radius: 50%; background: var(--panel); border: 2px solid var(--accent); flex-shrink: 0; }
+    .sb-prof-info { opacity: 0; transition: opacity var(--ease); white-space: nowrap; overflow: hidden; }
+    #sidebar:hover .sb-prof-info, #sidebar.open .sb-prof-info { opacity: 1; }
+    .sb-prof-name { font-family: 'Lora', serif; font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
+    .sb-prof-sub  { font-size: 0.74rem; color: var(--text-light); }
+    .nav-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 10px 20px; cursor: pointer; user-select: none;
+      border-radius: 0 14px 14px 0; margin: 1px 8px 1px 0;
+      color: var(--text-mid); font-size: 0.91rem; font-weight: 500;
+      white-space: nowrap; overflow: hidden;
+      transition: background .18s, color .18s; position: relative;
+    }
+    .nav-item:hover { background: rgba(122,143,82,0.17); color: var(--text-dark); }
+    .nav-item.active { background: rgba(122,143,82,0.27); color: var(--text-dark); font-weight: 600; }
+    .nav-item.active::before { content: ''; position: absolute; left: 0; top: 22%; bottom: 22%; width: 3.5px; background: var(--accent); border-radius: 0 3px 3px 0; }
+    .nav-icon { width: 21px; height: 21px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-label { opacity: 0; transition: opacity var(--ease); }
+    #sidebar:hover .nav-label, #sidebar.open .nav-label { opacity: 1; }
+
+    /* ══════════════════════════════
+       MAIN
+    ══════════════════════════════ */
+    #main { flex: 1; min-width: 0; padding: 28px 22px 48px 22px; display: flex; gap: 22px; align-items: flex-start; }
+
+    /* ══════════════════════════════
+       FEED COLUMN
+    ══════════════════════════════ */
+    #feed-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+
+    /* ── Search Hero ── */
+    .search-hero {
+      background: linear-gradient(135deg, #a8ba7e 0%, #7a8f52 55%, #5e6e3b 100%);
+      border-radius: 20px; padding: 28px 24px;
+      position: relative; overflow: hidden;
+      animation: fadeUp .4s ease both;
+      box-shadow: 0 4px 20px rgba(46,53,32,0.14);
+    }
+    .search-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='160' opacity='0.12'%3E%3Ccircle cx='360' cy='30' r='28' fill='none' stroke='white' stroke-width='2'/%3E%3Cpath d='M340 46 Q360 16 380 46' fill='none' stroke='white' stroke-width='1.5'/%3E%3Ccircle cx='50' cy='130' r='22' fill='none' stroke='white' stroke-width='1.5'/%3E%3Cpath d='M36 142 Q50 116 64 142' fill='none' stroke='white' stroke-width='1'/%3E%3Crect x='170' y='10' width='50' height='8' rx='4' fill='none' stroke='white' stroke-width='1' transform='rotate(20 195 14)'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .search-hero-label {
+      font-family: 'Lora', serif; font-weight: 700; font-size: 1.4rem; color: white;
+      margin-bottom: 4px; position: relative;
+    }
+    .search-hero-sub { font-size: 0.88rem; color: rgba(255,255,255,0.8); margin-bottom: 18px; position: relative; }
+    .search-bar-wrap { position: relative; max-width: 560px; }
+    .search-bar-wrap svg {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      width: 18px; height: 18px; stroke: var(--text-light); fill: none; stroke-width: 1.8; stroke-linecap: round;
+      pointer-events: none;
+    }
+    #global-search {
+      width: 100%; padding: 13px 14px 13px 44px;
+      border-radius: 24px; border: none; outline: none;
+      font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+      color: var(--text-dark); background: rgba(255,255,255,0.95);
+      box-shadow: 0 4px 18px rgba(46,53,32,0.15);
+      transition: box-shadow .2s;
+    }
+    #global-search:focus { box-shadow: 0 4px 24px rgba(46,53,32,0.22); }
+    #global-search::placeholder { color: var(--text-light); }
+
+    /* ── Category Pills ── */
+    .cat-row {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      animation: fadeUp .4s .05s ease both;
+    }
+    .cat-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: 22px;
+      font-size: 0.84rem; font-weight: 500; cursor: pointer; user-select: none;
+      border: 1.5px solid rgba(122,143,82,0.22);
+      background: var(--card); color: var(--text-dark);
+      transition: background .18s, border-color .18s, color .18s, transform .14s;
+    }
+    .cat-pill:hover { background: var(--panel); border-color: var(--accent); transform: translateY(-1px); }
+    .cat-pill.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .cat-pill .cp-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Section heading ── */
+    .section-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .section-head-title {
+      font-family: 'Lora', serif; font-weight: 700; font-size: 1.05rem;
+      color: var(--text-dark); display: flex; align-items: center; gap: 8px;
+    }
+    .section-head-title svg { width: 17px; height: 17px; stroke: var(--accent); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .see-all-link { font-size: 0.82rem; font-weight: 600; color: var(--accent); cursor: pointer; transition: color .16s; }
+    .see-all-link:hover { color: var(--accent-dark); }
+
+    /* ── Featured Crafters Carousel ── */
+    .crafters-strip {
+      display: flex; gap: 12px; overflow-x: auto;
+      padding-bottom: 6px; scrollbar-width: none;
+      animation: fadeUp .4s .1s ease both;
+    }
+    .crafters-strip::-webkit-scrollbar { display: none; }
+
+    .crafter-card {
+      flex-shrink: 0; width: 160px;
+      background: var(--card); border-radius: 18px; overflow: hidden;
+      box-shadow: 0 2px 12px rgba(46,53,32,0.08);
+      transition: transform .18s, box-shadow .18s; cursor: pointer;
+    }
+    .crafter-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(46,53,32,0.14); }
+
+    .crafter-banner {
+      height: 54px;
+      display: flex; align-items: flex-end; justify-content: center;
+      padding-bottom: 0; position: relative;
+    }
+    .crafter-av {
+      width: 52px; height: 52px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Lora', serif; font-weight: 700; font-size: 1.1rem; color: white;
+      border: 3px solid var(--card);
+      position: absolute; bottom: -26px;
+      box-shadow: 0 2px 10px rgba(46,53,32,0.14);
+    }
+    .crafter-body { padding: 30px 12px 14px 12px; text-align: center; }
+    .crafter-name { font-family: 'Lora', serif; font-weight: 700; font-size: 0.88rem; color: var(--text-dark); }
+    .crafter-handle { font-size: 0.74rem; color: var(--text-light); margin-top: 1px; }
+    .crafter-tags { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin-top: 7px; }
+    .crafter-tag {
+      font-size: 0.67rem; font-weight: 600; padding: 2px 7px; border-radius: 10px;
+      background: var(--accent-light); color: var(--accent);
+    }
+    .crafter-stats {
+      display: flex; justify-content: center; gap: 12px; margin-top: 8px;
+      font-size: 0.74rem; color: var(--text-light);
+    }
+    .crafter-stat { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+    .crafter-stat strong { font-size: 0.86rem; color: var(--text-dark); font-weight: 700; }
+    .follow-btn {
+      margin-top: 10px; width: 100%;
+      background: var(--accent); color: white; border: none;
+      border-radius: 14px; padding: 6px 0;
+      font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: background .18s;
+    }
+    .follow-btn:hover { background: var(--accent-dark); }
+    .follow-btn.following {
+      background: var(--accent-light); color: var(--accent);
+    }
+
+    /* ── Trending Topics ── */
+    .trends-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      animation: fadeUp .4s .15s ease both;
+    }
+    .trend-chip {
+      background: var(--card); border-radius: 14px; padding: 12px 14px;
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer; transition: transform .16s, box-shadow .16s;
+      border: 1.5px solid rgba(122,143,82,0.15);
+    }
+    .trend-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(46,53,32,0.1); }
+    .trend-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .trend-text { min-width: 0; }
+    .trend-name { font-size: 0.86rem; font-weight: 600; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .trend-count { font-size: 0.72rem; color: var(--text-light); margin-top: 1px; }
+
+    /* ── Sort bar ── */
+    .sort-bar {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .sort-label { font-size: 0.82rem; color: var(--text-light); font-weight: 500; }
+    .sort-btn {
+      font-size: 0.82rem; font-weight: 600; color: var(--text-mid);
+      background: var(--card); border: 1.5px solid rgba(122,143,82,0.18);
+      border-radius: 18px; padding: 5px 13px; cursor: pointer;
+      transition: background .16s, color .16s;
+    }
+    .sort-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .sort-btn:hover:not(.active) { background: var(--panel); }
+    .results-count { margin-left: auto; font-size: 0.8rem; color: var(--text-light); }
+
+    /* ── Post Cards Grid ── */
+    .posts-grid {
+      display: grid; grid-template-columns: 1fr;
+      gap: 14px;
+      animation: fadeUp .4s .2s ease both;
+    }
+
+    .explore-card {
+      background: var(--card); border-radius: 18px;
+      padding: 18px 18px 14px 18px;
+      box-shadow: 0 2px 12px rgba(46,53,32,0.08);
+      transition: transform .18s, box-shadow .18s; cursor: pointer;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .explore-card:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(46,53,32,0.13); }
+
+    .ec-header { display: flex; align-items: flex-start; gap: 10px; }
+    .ec-av {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Lora', serif; font-weight: 700; font-size: 0.95rem; color: white;
+    }
+    .ec-meta { flex: 1; min-width: 0; }
+    .ec-name { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
+    .ec-time { font-size: 0.74rem; color: var(--text-light); margin-top: 1px; }
+    .ec-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 3px; }
+
+    .badge { font-size: 0.71rem; font-weight: 600; border-radius: 20px; padding: 3px 9px; }
+    .b-high { background: var(--high-bg); color: var(--high); }
+    .b-low  { background: var(--low-bg); color: var(--text-light); }
+    .b-med  { background: var(--med-bg); color: var(--med); }
+    .b-cat  { background: var(--accent-light); color: var(--accent); border: 1px solid rgba(122,143,82,0.2); }
+    .b-resolved { background: #e5f5e0; color: #3a7d2c; }
+
+    .ec-body {}
+    .ec-title {
+      font-family: 'Lora', serif; font-weight: 700; font-size: 1.02rem;
+      color: var(--text-dark); margin-bottom: 5px; line-height: 1.35;
+    }
+    .ec-para { font-size: 0.86rem; color: var(--text-mid); line-height: 1.6; }
+
+    .ec-img {
+      background: rgba(122,143,82,0.12); border-radius: 12px; height: 120px;
+      display: flex; align-items: center; justify-content: center; color: var(--text-light);
+    }
+    .ec-img svg { width: 26px; height: 26px; stroke: currentColor; fill: none; stroke-width: 1.3; }
+
+    .ec-footer {
+      display: flex; align-items: center; gap: 8px;
+      border-top: 1.5px solid rgba(122,143,82,0.18); padding-top: 11px;
+    }
+    .ec-foot-av { width: 28px; height: 28px; border-radius: 50%; background: var(--panel); flex-shrink: 0; }
+    .ec-msg-input {
+      flex: 1; background: rgba(255,255,255,0.5); border: 1.5px solid rgba(122,143,82,0.2);
+      border-radius: 18px; padding: 6px 13px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.84rem; color: var(--text-dark); outline: none;
+      transition: border-color .2s;
+    }
+    .ec-msg-input:focus { border-color: var(--accent); }
+    .ec-msg-input::placeholder { color: var(--text-light); }
+    .ec-actions { display: flex; gap: 4px; }
+    .icon-btn {
+      width: 31px; height: 31px; border-radius: 50%; border: none;
+      background: rgba(255,255,255,0.44); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-mid); transition: background .16s, transform .13s;
+    }
+    .icon-btn:hover { background: rgba(122,143,82,0.24); transform: scale(1.1); }
+    .icon-btn.bookmarked { color: var(--accent); background: var(--accent-light); }
+    .icon-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .ec-engage { display: flex; align-items: center; gap: 14px; font-size: 0.78rem; color: var(--text-light); }
+    .engage-stat { display: flex; align-items: center; gap: 3px; }
+    .engage-stat svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; }
+
+    /* Load more */
+    .load-more-wrap { text-align: center; padding: 8px 0 4px 0; }
+    .load-more-btn {
+      background: var(--card); border: 1.5px solid rgba(122,143,82,0.22);
+      color: var(--accent); border-radius: 22px; padding: 10px 28px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; transition: background .18s, transform .14s;
+    }
+    .load-more-btn:hover { background: var(--panel); transform: scale(1.02); }
+
+    /* ══════════════════════════════
+       RIGHT COLUMN
+    ══════════════════════════════ */
+    #right-col {
+      width: 264px; flex-shrink: 0;
+      display: flex; flex-direction: column; gap: 18px;
+    }
+
+    .panel-card {
+      background: var(--sidebar-bg); border-radius: 18px; padding: 18px 16px;
+      box-shadow: 0 2px 12px rgba(46,53,32,0.07);
+      position: sticky; top: calc(var(--topbar-h) + 22px);
+      animation: fadeUp .4s .1s ease both;
+    }
+
+    .panel-title {
+      font-family: 'Lora', serif; font-weight: 700; font-size: 0.97rem;
+      color: var(--text-dark); margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 2px solid rgba(122,143,82,0.22);
+      display: flex; align-items: center; gap: 7px;
+    }
+    .panel-title svg { width: 16px; height: 16px; stroke: var(--accent); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Location filter */
+    .location-list { display: flex; flex-direction: column; gap: 6px; }
+    .loc-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 10px; border-radius: 10px; cursor: pointer;
+      transition: background .16s; font-size: 0.84rem;
+    }
+    .loc-item:hover { background: rgba(122,143,82,0.12); }
+    .loc-item.active { background: rgba(122,143,82,0.2); font-weight: 600; color: var(--text-dark); }
+    .loc-left { display: flex; align-items: center; gap: 8px; }
+    .loc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+    .loc-count { font-size: 0.74rem; color: var(--text-light); background: var(--panel); padding: 2px 7px; border-radius: 10px; }
+
+    /* Active help requests */
+    .live-item {
+      display: flex; align-items: flex-start; gap: 9px;
+      padding: 9px 0; border-bottom: 1px solid rgba(122,143,82,0.13);
+    }
+    .live-item:last-child { border-bottom: none; }
+    .live-av {
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Lora', serif; font-weight: 700; font-size: 0.82rem; color: white;
+    }
+    .live-body { flex: 1; min-width: 0; }
+    .live-name { font-size: 0.82rem; font-weight: 600; color: var(--text-dark); }
+    .live-preview { font-size: 0.76rem; color: var(--text-light); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .live-badge {
+      font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 10px;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .lb-high { background: var(--high-bg); color: var(--high); }
+    .lb-med  { background: var(--med-bg); color: var(--med); }
+    .lb-low  { background: var(--low-bg); color: var(--text-light); }
+
+    /* Leaderboard */
+    .leader-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 7px 0; border-bottom: 1px solid rgba(122,143,82,0.12);
+    }
+    .leader-item:last-child { border-bottom: none; }
+    .leader-rank { font-family: 'Lora', serif; font-weight: 700; font-size: 0.9rem; color: var(--text-light); width: 18px; text-align: center; flex-shrink: 0; }
+    .leader-rank.gold   { color: #c9a227; }
+    .leader-rank.silver { color: #8e9eab; }
+    .leader-rank.bronze { color: #a0673a; }
+    .leader-av {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Lora', serif; font-weight: 700; font-size: 0.8rem; color: white;
+    }
+    .leader-info { flex: 1; min-width: 0; }
+    .leader-name { font-size: 0.84rem; font-weight: 600; color: var(--text-dark); }
+    .leader-pts  { font-size: 0.72rem; color: var(--text-light); }
+    .leader-badge-icon { font-size: 0.9rem; }
+
+    /* Overlay */
+    #overlay { display: none; position: fixed; inset: 0; background: rgba(46,53,32,0.2); z-index: 150; backdrop-filter: blur(2px); }
+    #overlay.on { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ══════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════ */
+    @media (max-width: 1060px) { #right-col { width: 230px; } }
+    @media (max-width: 900px)  { #right-col { display: none; } }
+    @media (max-width: 680px) {
+      #desk-nav { display: none; }
+      #subnav   { display: flex; }
+      #shell    { margin-top: calc(var(--topbar-h) + var(--subnav-h)); min-height: calc(100vh - var(--topbar-h) - var(--subnav-h)); }
+      #sidebar  { top: calc(var(--topbar-h) + var(--subnav-h)); height: calc(100vh - var(--topbar-h) - var(--subnav-h)); }
+    }
+    @media (max-width: 600px) {
+      .trends-grid { grid-template-columns: repeat(2, 1fr); }
+      #main { padding: 16px 12px 32px 12px; gap: 14px; }
+    }
+    @media (max-width: 520px) {
+      #hamburger { display: flex; }
+      #topbar-logo-zone { display: none; }
+      #mobile-title { display: block; }
+      #topbar { padding: 0 14px; gap: 8px; }
+      #sidebar { position: fixed; top: calc(var(--topbar-h) + var(--subnav-h)); left: 0; bottom: 0; width: 0; border-radius: 0 18px 18px 0; z-index: 160; box-shadow: none; }
+      #sidebar.open { width: var(--sb-expanded); box-shadow: 6px 0 28px rgba(46,53,32,0.18); }
+      .distress-btn span { display: none; }
+      .distress-btn { padding: 9px 11px; }
+      .trends-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="overlay" onclick="closeSidebar()"></div>
+
+<!-- ══ TOPBAR ══ -->
+<header id="topbar">
+  <button id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div id="topbar-logo-zone">
+    <div class="logo-pill">
+      <svg viewBox="0 0 24 24"><path d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"/></svg>
+    </div>
+  </div>
+  <span id="mobile-title">Craft-SOS</span>
+  <nav id="desk-nav">
+    <span class="tnav" onclick="syncNav(this)">Friends</span>
+    <span class="tnav active" onclick="syncNav(this)">Explore</span>
+    <span class="tnav" onclick="syncNav(this)">Bookmarked</span>
+  </nav>
+  <div id="topbar-right">
+    <button class="distress-btn">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>Distress Call</span>
+    </button>
+    <div class="profile-av-btn"></div>
+  </div>
+</header>
+
+<nav id="subnav">
+  <span class="snav" onclick="syncNav(this)">Friends</span>
+  <span class="snav active" onclick="syncNav(this)">Explore</span>
+  <span class="snav" onclick="syncNav(this)">Bookmarked</span>
+</nav>
+
+<!-- ══ SHELL ══ -->
+<div id="shell">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside id="sidebar">
+    <div class="sb-prof">
+      <div class="sb-prof-av"></div>
+      <div class="sb-prof-info">
+        <div class="sb-prof-name">Pebble yarn Studio</div>
+        <div class="sb-prof-sub">@pebbleyarn</div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-item" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-label">Home</span>
+      </div>
+      <div class="nav-item active" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span class="nav-label">Explore</span>
+      </div>
+      <div class="nav-item" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span class="nav-label">Search</span>
+      </div>
+      <div class="nav-item" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="nav-label">Notifications</span>
+      </div>
+      <div class="nav-item" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span class="nav-label">Messages</span>
+      </div>
+      <div class="nav-item" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-label">Profile</span>
+      </div>
+      <div class="nav-item" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span class="nav-label">Settings</span>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main id="main">
+    <div id="feed-col">
+
+      <!-- Search Hero -->
+      <div class="search-hero">
+        <div class="search-hero-label">Explore the Craft Community</div>
+        <div class="search-hero-sub">Discover distress calls, tutorials, crafters, and resources near you</div>
+        <div class="search-bar-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="global-search" type="text" placeholder="Search posts, crafters, topics…" oninput="applyFilters()" />
+        </div>
+      </div>
+
+      <!-- Category Pills -->
+      <div class="cat-row" id="cat-row"></div>
+
+      <!-- Featured Crafters -->
+      <div>
+        <div class="section-head">
+          <div class="section-head-title">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            Featured Crafters
+          </div>
+          <span class="see-all-link">See all →</span>
+        </div>
+        <div class="crafters-strip" id="crafters-strip"></div>
+      </div>
+
+      <!-- Trending Topics -->
+      <div>
+        <div class="section-head">
+          <div class="section-head-title">
+            <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            Trending Topics
+          </div>
+        </div>
+        <div class="trends-grid" id="trends-grid"></div>
+      </div>
+
+      <!-- Posts -->
+      <div>
+        <div class="section-head">
+          <div class="section-head-title">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            <span id="posts-section-title">All Posts</span>
+          </div>
+          <div class="sort-bar">
+            <span class="sort-label">Sort:</span>
+            <button class="sort-btn active" onclick="setSort(this,'recent')">Recent</button>
+            <button class="sort-btn" onclick="setSort(this,'urgent')">Urgent</button>
+            <button class="sort-btn" onclick="setSort(this,'popular')">Popular</button>
+          </div>
+        </div>
+        <div class="posts-grid" id="posts-grid"></div>
+        <div class="load-more-wrap" id="load-more-wrap" style="margin-top:16px">
+          <button class="load-more-btn" onclick="loadMore()">Load more posts</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ RIGHT COL ══ -->
+    <aside id="right-col">
+
+      <!-- Location filter -->
+      <div class="panel-card">
+        <div class="panel-title">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Browse by Region
+        </div>
+        <div class="location-list" id="location-list"></div>
+      </div>
+
+      <!-- Active requests -->
+      <div class="panel-card" style="position:sticky;top:calc(var(--topbar-h) + 22px + 260px)">
+        <div class="panel-title">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Active Help Needed
+        </div>
+        <div id="live-list"></div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="panel-card" style="position:sticky;top:calc(var(--topbar-h) + 22px + 560px)">
+        <div class="panel-title">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Top Helpers This Month
+        </div>
+        <div id="leaderboard"></div>
+      </div>
+
+    </aside>
+  </main>
+</div>
+
+<script>
+/* ════════════════════════════════
+   DATA
+════════════════════════════════ */
+const categories = [
+  { label: 'All',               dot: '#7a8f52', filter: 'all' },
+  { label: '🆘 Distress',       dot: '#d35b3a', filter: 'distress' },
+  { label: '💰 Financial',      dot: '#c9a227', filter: 'financial' },
+  { label: '📦 Order Issues',   dot: '#5b8dd3', filter: 'order' },
+  { label: '🧵 Supplier',       dot: '#9e6bb5', filter: 'supplier' },
+  { label: '📚 Tutorials',      dot: '#6ab04c', filter: 'tutorial' },
+  { label: '✅ Resolved',       dot: '#3a7d2c', filter: 'resolved' },
+  { label: '💬 Community',      dot: '#c87d3a', filter: 'community' },
+];
+
+const crafters = [
+  { name: 'WoolCraft Co',   handle: '@woolcraft',  init: 'W', color: '#b5c98a', tags: ['Knitting','Dyeing'],    friends: 142, pts: 2100 },
+  { name: 'KnitQueen',      handle: '@knitqueen',  init: 'K', color: '#a8c4d8', tags: ['Knitwear','Patterns'],  friends: 98,  pts: 1640 },
+  { name: 'YarnWitch',      handle: '@yarnwitch',  init: 'Y', color: '#d4b8e0', tags: ['Hand Dyeing','Fibre'],  friends: 203, pts: 3210 },
+  { name: 'LoopNeedle',     handle: '@loopneedle', init: 'L', color: '#f0c07a', tags: ['Crochet','Weaving'],    friends: 76,  pts: 890  },
+  { name: 'FiberArts Jo',   handle: '@fiberjo',    init: 'F', color: '#c8a98a', tags: ['Macramé','Spinning'],   friends: 154, pts: 1380 },
+  { name: 'StitchWorks',    handle: '@stitchwks',  init: 'S', color: '#9ec4a0', tags: ['Embroidery','Sewing'],  friends: 87,  pts: 1050 },
+];
+
+const trends = [
+  { emoji: '💸', name: 'Wholesale Pricing',   count: '142 posts this week' },
+  { emoji: '🧶', name: 'Natural Dyeing',      count: '98 posts this week' },
+  { emoji: '📦', name: 'Courier Problems',    count: '74 posts this week' },
+  { emoji: '🤝', name: 'Supplier Networks',   count: '61 posts this week' },
+  { emoji: '🌿', name: 'Slow Fashion',        count: '55 posts this week' },
+  { emoji: '📐', name: 'Pattern Licensing',   count: '48 posts this week' },
+];
+
+const allPosts = [
+  { id:1, name:'YarnWitch', init:'Y', color:'#d4b8e0', time:'4 minutes ago', sev:'High', cat:'Financial Distress',
+    title:'Marketplace platform suspended my shop without warning — 3 months of sales gone',
+    para:'I woke up this morning to find my entire Etsy shop suspended with no explanation. I have pending orders worth over £1,400 and no way to contact buyers.',
+    comments:28, helps:14, bookmarked:false, resolved:false, filter:['distress','financial'], img:true },
+  { id:2, name:'LoopNeedle', init:'L', color:'#f0c07a', time:'22 minutes ago', sev:'Medium', cat:'Supplier Issue',
+    title:'Primary mohair supplier increasing prices by 40% — looking for UK alternatives',
+    para:'Just received notice that my main supplier is raising prices significantly from next month. Does anyone work with quality UK-based mohair producers?',
+    comments:19, helps:11, bookmarked:true, resolved:false, filter:['distress','supplier'], img:false },
+  { id:3, name:'StitchWorks', init:'S', color:'#9ec4a0', time:'1 hour ago', sev:null, cat:'Tutorial',
+    title:'Complete guide to natural indigo dyeing at home — everything I wish I knew',
+    para:'After two years of trial and error, I\'ve compiled everything about setting up an indigo vat safely at home, from sourcing to aftercare.',
+    comments:44, helps:0, bookmarked:false, resolved:false, filter:['tutorial','community'], img:true },
+  { id:4, name:'KnitQueen', init:'K', color:'#a8c4d8', time:'2 hours ago', sev:'Low', cat:'Order Fulfilment',
+    title:'Bulk order of 80 hats — courier lost the entire parcel and won\'t respond',
+    para:'A wholesale order I shipped last week has gone missing and the courier\'s customer service keeps closing my tickets without resolution.',
+    comments:12, helps:7, bookmarked:false, resolved:true, filter:['distress','order'], img:false },
+  { id:5, name:'WoolCraft Co', init:'W', color:'#b5c98a', time:'3 hours ago', sev:null, cat:'Community',
+    title:'Free resource: UK craft business grant database — updated for 2026',
+    para:'I\'ve spent the past month compiling every grant, fund, and support scheme available for independent craft businesses in the UK. Sharing it here freely.',
+    comments:67, helps:0, bookmarked:false, resolved:false, filter:['community','tutorial'], img:true },
+  { id:6, name:'FiberArts Jo', init:'F', color:'#c8a98a', time:'5 hours ago', sev:'High', cat:'Financial Distress',
+    title:'VAT threshold hit unexpectedly — accountant says I\'m now liable for backdated VAT',
+    para:'I crossed the VAT threshold mid-year without realising and I\'ve just been told I may owe backdated VAT. Has anyone navigated this and how?',
+    comments:31, helps:18, bookmarked:false, resolved:false, filter:['distress','financial'], img:false },
+  { id:7, name:'WoolCraft Co', init:'W', color:'#b5c98a', time:'Yesterday', sev:null, cat:'Tutorial',
+    title:'How I priced my hand-dyed yarn to actually make a living wage',
+    para:'Pricing is the topic I get asked about most. This is my full cost-plus-margin formula, including time, overheads, platform fees, and a fair wage.',
+    comments:89, helps:0, bookmarked:true, resolved:false, filter:['tutorial','community'], img:true },
+  { id:8, name:'YarnWitch', init:'Y', color:'#d4b8e0', time:'Yesterday', sev:'Medium', cat:'Supplier Issue',
+    title:'Anyone else seeing long delays from Nordic wool suppliers post-winter?',
+    para:'Three of my go-to Scandinavian wool suppliers are showing 8–12 week lead times. Is this seasonal or something more structural?',
+    comments:24, helps:9, bookmarked:false, resolved:false, filter:['distress','supplier'], img:false },
+];
+
+const locations = [
+  { name: 'All Regions', count: 847, active: true },
+  { name: 'South West',  count: 142 },
+  { name: 'Scotland',    count: 118 },
+  { name: 'North West',  count: 97  },
+  { name: 'Yorkshire',   count: 84  },
+  { name: 'London',      count: 76  },
+  { name: 'Midlands',    count: 69  },
+];
+
+const liveRequests = [
+  { name: 'YarnWitch', init: 'Y', color: '#d4b8e0', preview: 'Platform suspended my shop…', sev: 'High' },
+  { name: 'FiberArts Jo', init: 'F', color: '#c8a98a', preview: 'VAT backdated liability…', sev: 'High' },
+  { name: 'LoopNeedle', init: 'L', color: '#f0c07a', preview: 'Mohair supplier price hike…', sev: 'Medium' },
+  { name: 'StitchWorks', init: 'S', color: '#9ec4a0', preview: 'Courier lost bulk order…', sev: 'Low' },
+];
+
+const leaderboard = [
+  { rank: 1,  name: 'YarnWitch',   init: 'Y', color: '#d4b8e0', pts: '3,210', badge: '🌟', rankClass: 'gold'   },
+  { rank: 2,  name: 'WoolCraft',   init: 'W', color: '#b5c98a', pts: '2,100', badge: '🏆', rankClass: 'silver' },
+  { rank: 3,  name: 'KnitQueen',   init: 'K', color: '#a8c4d8', pts: '1,640', badge: '🥉', rankClass: 'bronze' },
+  { rank: 4,  name: 'FiberArts',   init: 'F', color: '#c8a98a', pts: '1,380', badge: '🌿', rankClass: '' },
+  { rank: 5,  name: 'Pebble Yarn', init: 'P', color: '#7a8f52', pts: '1,280', badge: '🌿', rankClass: '' },
+];
+
+/* ════════════════════════════════
+   STATE
+════════════════════════════════ */
+let activeFilter  = 'all';
+let activeSort    = 'recent';
+let visibleCount  = 5;
+let bookmarks     = new Set(allPosts.filter(p => p.bookmarked).map(p => p.id));
+
+/* ════════════════════════════════
+   RENDER
+════════════════════════════════ */
+function renderCats() {
+  document.getElementById('cat-row').innerHTML = categories.map(c => `
+    <div class="cat-pill ${c.filter === activeFilter ? 'active' : ''}" onclick="setFilter('${c.filter}',this)">
+      <span class="cp-dot" style="background:${c.dot}"></span>${c.label}
+    </div>`).join('');
+}
+
+function renderCrafters() {
+  document.getElementById('crafters-strip').innerHTML = crafters.map(c => `
+    <div class="crafter-card">
+      <div class="crafter-banner" style="background:linear-gradient(135deg,${c.color}aa,${c.color})">
+        <div class="crafter-av" style="background:${c.color}">${c.init}</div>
+      </div>
+      <div class="crafter-body">
+        <div class="crafter-name">${c.name}</div>
+        <div class="crafter-handle">${c.handle}</div>
+        <div class="crafter-tags">${c.tags.map(t=>`<span class="crafter-tag">${t}</span>`).join('')}</div>
+        <div class="crafter-stats">
+          <div class="crafter-stat"><strong>${c.friends}</strong>friends</div>
+          <div class="crafter-stat"><strong>${c.pts}</strong>pts</div>
+        </div>
+        <button class="follow-btn" onclick="toggleFollow(this)">+ Follow</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderTrends() {
+  document.getElementById('trends-grid').innerHTML = trends.map(t => `
+    <div class="trend-chip" onclick="setFilter('all',null,'${t.name}')">
+      <span class="trend-icon">${t.emoji}</span>
+      <div class="trend-text">
+        <div class="trend-name">${t.name}</div>
+        <div class="trend-count">${t.count}</div>
+      </div>
+    </div>`).join('');
+}
+
+function getFilteredPosts() {
+  const query = document.getElementById('global-search').value.toLowerCase();
+  return allPosts.filter(p => {
+    const matchCat = activeFilter === 'all' ||
+                     (activeFilter === 'distress'  && p.sev) ||
+                     (activeFilter === 'resolved'  && p.resolved) ||
+                     (activeFilter === 'tutorial'  && p.filter.includes('tutorial')) ||
+                     (activeFilter === 'community' && p.filter.includes('community')) ||
+                     (activeFilter === 'financial' && p.filter.includes('financial')) ||
+                     (activeFilter === 'order'     && p.filter.includes('order')) ||
+                     (activeFilter === 'supplier'  && p.filter.includes('supplier'));
+    const matchQ = !query || p.title.toLowerCase().includes(query) || p.para.toLowerCase().includes(query) || p.name.toLowerCase().includes(query) || p.cat.toLowerCase().includes(query);
+    return matchCat && matchQ;
+  }).sort((a,b) => {
+    if (activeSort === 'urgent')  return (b.sev==='High'?2:b.sev==='Medium'?1:0)-(a.sev==='High'?2:a.sev==='Medium'?1:0);
+    if (activeSort === 'popular') return (b.comments+b.helps)-(a.comments+a.helps);
+    return 0;
+  });
+}
+
+function renderPosts() {
+  const posts = getFilteredPosts();
+  const visible = posts.slice(0, visibleCount);
+  const grid = document.getElementById('posts-grid');
+
+  const count = posts.length;
+  document.querySelector('.results-count') && (document.querySelector('.results-count').textContent = `${count} posts`);
+
+  if (!visible.length) {
+    grid.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-light);font-size:.88rem;background:var(--card);border-radius:18px;">No posts found for this filter.</div>`;
+    document.getElementById('load-more-wrap').style.display = 'none';
+    return;
+  }
+
+  grid.innerHTML = visible.map(p => {
+    const sevClass = p.sev === 'High' ? 'b-high' : p.sev === 'Medium' ? 'b-med' : 'b-low';
+    const bkmk = bookmarks.has(p.id);
+    return `
+    <div class="explore-card" id="post-${p.id}">
+      <div class="ec-header">
+        <div class="ec-av" style="background:${p.color}">${p.init}</div>
+        <div class="ec-meta">
+          <div class="ec-name">${p.name}</div>
+          <div class="ec-time">${p.time}</div>
+          <div class="ec-badges">
+            ${p.sev ? `<span class="badge ${sevClass}">${p.sev}</span>` : ''}
+            ${p.resolved ? `<span class="badge b-resolved">✓ Resolved</span>` : ''}
+            <span class="badge b-cat">${p.cat}</span>
+          </div>
+        </div>
+      </div>
+      <div class="ec-body">
+        <div class="ec-title">${p.title}</div>
+        <div class="ec-para">${p.para}</div>
+        ${p.img ? `<div class="ec-img"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>` : ''}
+      </div>
+      <div class="ec-footer">
+        <div class="ec-foot-av"></div>
+        <input class="ec-msg-input" type="text" placeholder="Offer support…" />
+        <div class="ec-actions">
+          <button class="icon-btn" title="Share"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+          <button class="icon-btn" title="Comment"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></button>
+          <button class="icon-btn ${bkmk?'bookmarked':''}" title="Bookmark" onclick="toggleBookmark(${p.id},this)"><svg viewBox="0 0 24 24" ${bkmk?'style="fill:var(--accent);stroke:var(--accent)"':''}><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></button>
+          <button class="icon-btn" title="More"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="19" r="1" fill="currentColor"/></svg></button>
+        </div>
+      </div>
+      <div class="ec-engage">
+        <span class="engage-stat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${p.comments} responses</span>
+        ${p.helps ? `<span class="engage-stat"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>${p.helps} helped</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('load-more-wrap').style.display = visibleCount >= posts.length ? 'none' : 'block';
+}
+
+function renderLocations() {
+  document.getElementById('location-list').innerHTML = locations.map(l => `
+    <div class="loc-item ${l.active?'active':''}" onclick="pickLocation(this)">
+      <div class="loc-left"><span class="loc-dot"></span>${l.name}</div>
+      <span class="loc-count">${l.count}</span>
+    </div>`).join('');
+}
+
+function renderLive() {
+  document.getElementById('live-list').innerHTML = liveRequests.map(r => {
+    const cls = r.sev==='High'?'lb-high':r.sev==='Medium'?'lb-med':'lb-low';
+    return `<div class="live-item">
+      <div class="live-av" style="background:${r.color}">${r.init}</div>
+      <div class="live-body">
+        <div class="live-name">${r.name}</div>
+        <div class="live-preview">${r.preview}</div>
+      </div>
+      <span class="live-badge ${cls}">${r.sev}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderLeaderboard() {
+  document.getElementById('leaderboard').innerHTML = leaderboard.map(l => `
+    <div class="leader-item">
+      <div class="leader-rank ${l.rankClass}">${l.rank}</div>
+      <div class="leader-av" style="background:${l.color}">${l.init}</div>
+      <div class="leader-info">
+        <div class="leader-name">${l.name}</div>
+        <div class="leader-pts">${l.pts} pts</div>
+      </div>
+      <span class="leader-badge-icon">${l.badge}</span>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════
+   INTERACTIONS
+════════════════════════════════ */
+function setFilter(filter, el, searchTerm) {
+  activeFilter  = filter;
+  visibleCount  = 5;
+  if (searchTerm) document.getElementById('global-search').value = searchTerm;
+  renderCats();
+  renderPosts();
+  const titleMap = { all:'All Posts', distress:'Distress Calls', financial:'Financial Distress', order:'Order Issues', supplier:'Supplier Issues', tutorial:'Tutorials', resolved:'Resolved Posts', community:'Community Posts' };
+  document.getElementById('posts-section-title').textContent = titleMap[filter] || 'All Posts';
+}
+
+function applyFilters() {
+  visibleCount = 5;
+  renderPosts();
+}
+
+function setSort(el, sort) {
+  activeSort = sort;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderPosts();
+}
+
+function loadMore() {
+  visibleCount += 4;
+  renderPosts();
+}
+
+function toggleBookmark(id, btn) {
+  if (bookmarks.has(id)) {
+    bookmarks.delete(id);
+    btn.classList.remove('bookmarked');
+    btn.querySelector('svg').removeAttribute('style');
+  } else {
+    bookmarks.add(id);
+    btn.classList.add('bookmarked');
+    btn.querySelector('svg').style.cssText = 'fill:var(--accent);stroke:var(--accent)';
+  }
+}
+
+function toggleFollow(btn) {
+  if (btn.classList.contains('following')) {
+    btn.classList.remove('following');
+    btn.textContent = '+ Follow';
+  } else {
+    btn.classList.add('following');
+    btn.textContent = '✓ Following';
+  }
+}
+
+function pickLocation(el) {
+  document.querySelectorAll('.loc-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ════════════════════════════════
+   NAV
+════════════════════════════════ */
+function syncNav(el) {
+  const label = el.textContent.trim();
+  document.querySelectorAll('.tnav').forEach(l => l.classList.toggle('active', l.textContent.trim() === label));
+  document.querySelectorAll('.snav').forEach(l => l.classList.toggle('active', l.textContent.trim() === label));
+}
+function pickNav(el) {
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  if (window.innerWidth <= 520) closeSidebar();
+}
+function toggleSidebar() {
+  const open = document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('on', open);
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('on');
+}
+window.addEventListener('resize', () => { if (window.innerWidth > 520) closeSidebar(); });
+
+/* ════════════════════════════════
+   INIT
+════════════════════════════════ */
+renderCats();
+renderCrafters();
+renderTrends();
+renderPosts();
+renderLocations();
+renderLive();
+renderLeaderboard();
+</script>
+</body>
+</html>

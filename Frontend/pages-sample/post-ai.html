@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Create Post - CraftSOS</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Create Help Post</h2>
+
+      <input type="text" id="title" placeholder="Title" />
+      <textarea id="description" placeholder="Describe your issue"></textarea>
+
+      <button>Create Post</button>
+    </div>
+
+    <script>
+      if (!localStorage.getItem("token")) {
+        window.location.href = "login.html";
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — Craft-SOS</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+  </head>
+  <body>
+    <div id="overlay" onclick="closeSidebar()"></div>
+    <div id="toast">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+      <span id="toast-msg"></span>
+    </div>
+
+    <!-- ══════════════ TOPBAR ══════════════ -->
+    <header id="topbar">
+      <button id="hamburger" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+      <div class="tb-logo-zone">
+        <div class="tb-logo">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"
+            />
+          </svg>
+        </div>
+      </div>
+      <span class="tb-title">Craft-SOS</span>
+      <div class="tb-search">
+        <svg viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search posts, people, topics…"
+          oninput="toast('Search coming soon')"
+        />
+      </div>
+      <div class="tb-right">
+        <button
+          class="distress-btn"
+          onclick="window.location.href = 'create-post.html'"
+        >
+          <svg viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>Distress Call</span>
+        </button>
+        <!-- Bell — onclick loads notifications via dashboard.js -->
+        <button class="tb-icon" onclick="switchSection('notifications', null)">
+          <svg viewBox="0 0 24 24">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 01-3.46 0" />
+          </svg>
+          <div class="tb-notif-dot"></div>
+        </button>
+        <!-- Avatar initial populated by dashboard.js -->
+        <div class="tb-av" onclick="toast('Opening profile…')">W</div>
+      </div>
+    </header>
+
+    <!-- ══════════════ SUBNAV (mobile) ══════════════ -->
+    <nav id="subnav">
+      <!-- onclick calls switchSection() defined in dashboard.js -->
+      <span class="snav on" onclick="switchSection('home', this)">Home</span>
+      <span class="snav" onclick="switchSection('my-posts', this)"
+        >My Posts</span
+      >
+      <span class="snav" onclick="switchSection('notifications', this)"
+        >Notifications</span
+      >
+      <span class="snav" onclick="switchSection('saved', this)">Saved</span>
+      <span class="snav" onclick="switchSection('progress', this)"
+        >Progress</span
+      >
+    </nav>
+
+    <!-- ══════════════ SHELL ══════════════ -->
+    <div id="shell">
+      <!-- SIDEBAR -->
+      <aside id="sidebar">
+        <div class="sb-me">
+          <!-- Avatar + name populated by dashboard.js from GET /api/dashboard -->
+          <div class="sb-av">W</div>
+          <div class="sb-me-info">
+            <div class="sb-me-name">WoolCraft Co</div>
+            <div class="sb-me-pts">🏆 2,100 pts · Mentor</div>
+          </div>
+        </div>
+        <nav>
+          <div class="nav-item on" onclick="navPick(this, 'home')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <span class="ni-label">Dashboard</span>
+          </div>
+          <a href="../index.html" style="text-decoration: none">
+            <div class="nav-item">
+              <svg class="ni-icon" viewBox="0 0 24 24">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+              <span class="ni-label">Home Feed</span>
+            </div>
+          </a>
+          <div class="nav-item" onclick="navPick(this, 'my-posts')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            <span class="ni-label">My Posts</span>
+            <span class="ni-badge">3</span>
+          </div>
+          <!-- data-section used by dashboard.js to update the notification badge -->
+          <div
+            class="nav-item"
+            data-section="notifications"
+            onclick="navPick(this, 'notifications')"
+          >
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <span class="ni-label">Notifications</span>
+            <span class="ni-badge">5</span>
+          </div>
+          <div class="nav-item" onclick="navPick(this, 'saved')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+            </svg>
+            <span class="ni-label">Saved Posts</span>
+          </div>
+          <div class="nav-item" onclick="navPick(this, 'progress')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            <span class="ni-label">My Progress</span>
+          </div>
+          <div class="nav-item" onclick="toast('Opening your profile…')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span class="ni-label">My Profile</span>
+          </div>
+          <div class="nav-item" onclick="toast('Opening messages…')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <path
+                d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+              />
+            </svg>
+            <span class="ni-label">Messages</span>
+            <span class="ni-badge">2</span>
+          </div>
+          <div class="nav-item" onclick="toast('Opening settings…')">
+            <svg class="ni-icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+              />
+            </svg>
+            <span class="ni-label">Settings</span>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- ══════════════ PAGE ══════════════ -->
+      <div id="page">
+        <!-- ════════ HOME DASHBOARD ════════ -->
+        <section class="dash-section on" id="sec-home">
+          <!-- Greeting hero -->
+          <div class="greeting-hero">
+            <svg
+              class="gh-svg"
+              viewBox="0 0 900 200"
+              preserveAspectRatio="xMidYMid slice"
+            >
+              <circle
+                cx="50"
+                cy="60"
+                r="44"
+                fill="none"
+                stroke="white"
+                stroke-width="1.4"
+              />
+              <path
+                d="M22 80 Q50 20 78 80"
+                fill="none"
+                stroke="white"
+                stroke-width="1"
+              />
+              <circle
+                cx="840"
+                cy="140"
+                r="36"
+                fill="none"
+                stroke="white"
+                stroke-width="1.4"
+              />
+              <path
+                d="M816 152 Q840 100 864 152"
+                fill="none"
+                stroke="white"
+                stroke-width="1"
+              />
+              <rect
+                x="350"
+                y="22"
+                width="80"
+                height="13"
+                rx="6.5"
+                fill="none"
+                stroke="white"
+                stroke-width="1.2"
+                transform="rotate(14 390 28)"
+              />
+              <circle
+                cx="394"
+                cy="14"
+                r="8"
+                fill="none"
+                stroke="white"
+                stroke-width="1.2"
+              />
+              <path
+                d="M720 160 L740 134 L760 160 L740 186Z"
+                fill="none"
+                stroke="white"
+                stroke-width="1.2"
+              />
+              <path
+                d="M130 170 L150 144 L170 170 L150 196Z"
+                fill="none"
+                stroke="white"
+                stroke-width="1"
+              />
+            </svg>
+            <div class="gh-fade"></div>
+            <div class="gh-left">
+              <div class="gh-eyebrow">
+                <div class="gh-dot"></div>
+                You're online
+              </div>
+              <!-- gh-name inner text updated by dashboard.js -->
+              <div class="gh-name">
+                Good morning,<br /><em class="gh-name-em">WoolCraft Co</em> 🌿
+              </div>
+              <div class="gh-sub" id="gh-sub">
+                3 new replies on your posts · 1 distress call matching your
+                skills
+              </div>
+            </div>
+            <div class="gh-actions">
+              <button
+                class="gh-btn prim"
+                onclick="switchSection('my-posts', null)"
+              >
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                  />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+                My Posts
+              </button>
+              <button
+                class="gh-btn sec"
+                onclick="window.location.href = '../index.html'"
+              >
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                  />
+                </svg>
+                See Feed
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats strip
+             .sp-num data-domain attributes read by dashboard.js animateCounter() -->
+          <div class="stats-strip">
+            <div
+              class="stat-pill c-accent"
+              style="animation-delay: 0.07s"
+              onclick="switchSection('progress', null)"
+            >
+              <div class="sp-icon accent">
+                <svg viewBox="0 0 24 24">
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  />
+                </svg>
+              </div>
+              <div class="sp-num" data-domain="points">0</div>
+              <div class="sp-label">Points</div>
+              <div class="sp-delta">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="18 15 12 9 6 15" />
+                </svg>
+                +180 this month
+              </div>
+            </div>
+            <div class="stat-pill c-green" style="animation-delay: 0.12s">
+              <div class="sp-icon green">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div class="sp-num" data-domain="helped">0</div>
+              <div class="sp-label">People Helped</div>
+              <div class="sp-delta">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="18 15 12 9 6 15" />
+                </svg>
+                +18 this month
+              </div>
+            </div>
+            <div
+              class="stat-pill c-blue"
+              style="animation-delay: 0.17s"
+              onclick="switchSection('my-posts', null)"
+            >
+              <div class="sp-icon blue">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                  />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+              </div>
+              <div class="sp-num" data-domain="posts">0</div>
+              <div class="sp-label">Posts</div>
+              <div class="sp-delta neutral">3 need replies</div>
+            </div>
+            <div class="stat-pill c-amber" style="animation-delay: 0.22s">
+              <div class="sp-icon amber">
+                <svg viewBox="0 0 24 24">
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                  <path d="M16 3.13a4 4 0 010 7.75" />
+                </svg>
+              </div>
+              <div class="sp-num" data-domain="friends">0</div>
+              <div class="sp-label">Friends</div>
+              <div class="sp-delta">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="18 15 12 9 6 15" />
+                </svg>
+                +4 this week
+              </div>
+            </div>
+            <div class="stat-pill c-red" style="animation-delay: 0.27s">
+              <div class="sp-icon red">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              </div>
+              <div class="sp-num">1.8h</div>
+              <div class="sp-label">Avg Response</div>
+              <div class="sp-delta">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="18 15 12 9 6 15" />
+                </svg>
+                Faster than 82%
+              </div>
+            </div>
+          </div>
+
+          <!-- Main grid -->
+          <div class="main-grid">
+            <!-- LEFT COL -->
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <!-- Quick actions -->
+              <div class="widget" style="animation-delay: 0.1s">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Quick Actions
+                  </div>
+                </div>
+                <div class="w-body">
+                  <div class="qa-grid">
+                    <div
+                      class="qa-card sos"
+                      onclick="window.location.href = 'create-post.html'"
+                    >
+                      <div
+                        class="qa-icon"
+                        style="background: rgba(200, 72, 48, 0.1)"
+                      >
+                        🆘
+                      </div>
+                      <div class="qa-title">Post Distress Call</div>
+                      <div class="qa-desc">
+                        Something's gone wrong — get help fast from the
+                        community
+                      </div>
+                    </div>
+                    <div
+                      class="qa-card"
+                      onclick="window.location.href = 'create-post.html'"
+                    >
+                      <div
+                        class="qa-icon"
+                        style="background: var(--accent-light)"
+                      >
+                        📚
+                      </div>
+                      <div class="qa-title">Write a Tutorial</div>
+                      <div class="qa-desc">
+                        Share your knowledge — earn points and help others
+                      </div>
+                    </div>
+                    <div
+                      class="qa-card"
+                      onclick="window.location.href = 'create-post.html'"
+                    >
+                      <div
+                        class="qa-icon"
+                        style="background: rgba(184, 146, 14, 0.1)"
+                      >
+                        💬
+                      </div>
+                      <div class="qa-title">Community Post</div>
+                      <div class="qa-desc">
+                        Start a discussion, ask a question, share a win
+                      </div>
+                    </div>
+                    <div
+                      class="qa-card"
+                      onclick="window.location.href = '../index.html'"
+                    >
+                      <div
+                        class="qa-icon"
+                        style="background: rgba(74, 140, 66, 0.1)"
+                      >
+                        🤝
+                      </div>
+                      <div class="qa-title">Help Someone</div>
+                      <div class="qa-desc">
+                        Browse open distress calls matching your skills
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Live distress calls — populated by dashboard.js renderSosPulse() -->
+              <div class="widget" style="animation-delay: 0.14s">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                      />
+                      <line x1="12" y1="9" x2="12" y2="13" />
+                      <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                    Needs Your Help
+                  </div>
+                  <span
+                    class="w-link"
+                    onclick="window.location.href = '../index.html'"
+                    >Browse all →</span
+                  >
+                </div>
+                <div class="w-body">
+                  <div class="sos-pulse-wrap" id="sos-pulse">
+                    <div class="loading-placeholder">Loading…</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Community feed — populated by dashboard.js renderFeed() -->
+              <div class="widget" style="animation-delay: 0.18s">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                      />
+                    </svg>
+                    Community Feed
+                  </div>
+                  <span
+                    class="w-link"
+                    onclick="window.location.href = '../index.html'"
+                    >View all →</span
+                  >
+                </div>
+                <div class="w-body" id="feed-list">
+                  <div class="loading-placeholder">Loading…</div>
+                </div>
+              </div>
+            </div>
+            <!-- /left col -->
+
+            <!-- RIGHT COL -->
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <!-- My open posts — populated by dashboard.js renderOpenPostsWidget() -->
+              <div class="widget" style="animation-delay: 0.1s">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                      />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    My Open Posts
+                  </div>
+                  <span class="w-link" onclick="switchSection('my-posts', null)"
+                    >All →</span
+                  >
+                </div>
+                <div class="w-body" id="open-posts-widget">
+                  <div class="loading-placeholder">Loading…</div>
+                </div>
+              </div>
+
+              <!-- Activity streak — populated by dashboard.js renderStreak() -->
+              <div class="widget" style="animation-delay: 0.15s">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                    Activity Streak
+                  </div>
+                </div>
+                <div class="w-body">
+                  <div class="streak-row" id="streak-row"></div>
+                  <div class="streak-info">
+                    <span class="streak-fire">🔥</span>You're on a
+                    <strong>7-day streak!</strong> Keep it up.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Suggested friends — populated by dashboard.js renderPeople() -->
+              <div class="widget" style="animation-delay: 0.2s">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                      <path d="M16 3.13a4 4 0 010 7.75" />
+                    </svg>
+                    Suggested Friends
+                  </div>
+                </div>
+                <div class="w-body" id="people-list">
+                  <div class="loading-placeholder">Loading…</div>
+                </div>
+              </div>
+
+              <!-- Challenges — populated by dashboard.js renderChallenges() -->
+              <div class="widget" style="animation-delay: 0.25s">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <circle cx="12" cy="8" r="6" />
+                      <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+                    </svg>
+                    Challenges
+                  </div>
+                </div>
+                <div class="w-body" id="challenges-list">
+                  <div class="loading-placeholder">Loading…</div>
+                </div>
+              </div>
+            </div>
+            <!-- /right col -->
+          </div>
+          <!-- /main-grid -->
+        </section>
+
+        <!-- ════════ MY POSTS ════════ -->
+        <section class="dash-section" id="sec-my-posts">
+          <div class="page-head">
+            <h2>My Posts</h2>
+            <p>Your posts, tutorials, and distress calls — all in one place</p>
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 10px;
+              margin-bottom: 18px;
+              flex-wrap: wrap;
+            "
+          >
+            <button
+              class="btn prim"
+              onclick="window.location.href = 'create-post.html'"
+            >
+              <svg viewBox="0 0 24 24">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              New Post
+            </button>
+            <button class="btn ghost">All</button>
+            <button class="btn ghost">Distress Calls</button>
+            <button class="btn ghost">Tutorials</button>
+            <button class="btn ghost">Resolved</button>
+          </div>
+          <!-- populated by dashboard.js renderMyPostsFull() -->
+          <div id="my-posts-full"></div>
+        </section>
+
+        <!-- ════════ NOTIFICATIONS ════════ -->
+        <section class="dash-section" id="sec-notifications">
+          <div class="page-head">
+            <h2>Notifications</h2>
+            <!-- subtitle updated by dashboard.js loadNotifications() -->
+            <p id="notif-subtitle">Loading…</p>
+          </div>
+          <div class="widget">
+            <div class="w-head">
+              <div class="w-title">Recent</div>
+              <!-- calls markAllRead() in dashboard.js → PATCH /api/dashboard/notifications/read-all -->
+              <span class="w-link" onclick="markAllRead()">Mark all read</span>
+            </div>
+            <!-- populated by dashboard.js renderNotifications() -->
+            <div class="w-body" id="notif-full">
+              <div class="loading-placeholder">Loading…</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ════════ SAVED ════════ -->
+        <section class="dash-section" id="sec-saved">
+          <div class="page-head">
+            <h2>Saved Posts</h2>
+            <p>Things you bookmarked to come back to</p>
+          </div>
+          <!-- populated by dashboard.js renderSaved() -->
+          <div id="saved-list">
+            <div class="loading-placeholder">Loading…</div>
+          </div>
+        </section>
+
+        <!-- ════════ PROGRESS ════════ -->
+        <section class="dash-section" id="sec-progress">
+          <div class="page-head">
+            <h2>My Progress</h2>
+            <p>Your journey in the Craft-SOS community</p>
+          </div>
+          <div class="main-grid">
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <div class="widget">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                      />
+                    </svg>
+                    Rank Progress
+                  </div>
+                </div>
+                <div class="w-body">
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 16px;
+                      margin-bottom: 20px;
+                    "
+                  >
+                    <div
+                      style="
+                        width: 64px;
+                        height: 64px;
+                        border-radius: 50%;
+                        background: linear-gradient(135deg, #e8c94e, #c0980e);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.8rem;
+                        box-shadow: 0 4px 18px rgba(192, 152, 14, 0.3);
+                        flex-shrink: 0;
+                      "
+                    >
+                      🏆
+                    </div>
+                    <div>
+                      <div
+                        style="
+                          font-family: &quot;Lora&quot;, serif;
+                          font-weight: 700;
+                          font-size: 1.2rem;
+                          color: var(--text-dark);
+                        "
+                      >
+                        Mentor Rank
+                      </div>
+                      <div
+                        style="
+                          font-size: 0.82rem;
+                          color: var(--text-light);
+                          margin-top: 2px;
+                        "
+                      >
+                        2,100 of 5,000 points to Diamond
+                      </div>
+                      <div
+                        style="
+                          font-size: 0.76rem;
+                          color: var(--accent-dark);
+                          font-weight: 700;
+                          margin-top: 4px;
+                        "
+                      >
+                        Top 3% of all contributors
+                      </div>
+                    </div>
+                  </div>
+                  <div class="progress-item">
+                    <div class="pr-top">
+                      <span class="pr-label">🏆 Mentor → 💎 Diamond</span
+                      ><span class="pr-val">2,100 / 5,000</span>
+                    </div>
+                    <div class="pr-bar">
+                      <div
+                        class="pr-fill"
+                        data-pct="42"
+                        style="
+                          background: linear-gradient(
+                            90deg,
+                            var(--accent),
+                            var(--accent-mid)
+                          );
+                        "
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="progress-item">
+                    <div class="pr-top">
+                      <span class="pr-label">🎓 25 Tutorials (22 done)</span
+                      ><span class="pr-val">22 / 25</span>
+                    </div>
+                    <div class="pr-bar">
+                      <div
+                        class="pr-fill"
+                        data-pct="88"
+                        style="
+                          background: linear-gradient(90deg, #5cb85c, #8fe88f);
+                        "
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="progress-item">
+                    <div class="pr-top">
+                      <span class="pr-label">🤝 500 Helped (312 done)</span
+                      ><span class="pr-val">312 / 500</span>
+                    </div>
+                    <div class="pr-bar">
+                      <div
+                        class="pr-fill"
+                        data-pct="62"
+                        style="
+                          background: linear-gradient(90deg, #3a7ab8, #70b0e8);
+                        "
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="progress-item">
+                    <div class="pr-top">
+                      <span class="pr-label"
+                        >🌍 Global Reach (14 countries)</span
+                      ><span class="pr-val">14 / 20</span>
+                    </div>
+                    <div class="pr-bar">
+                      <div
+                        class="pr-fill"
+                        data-pct="70"
+                        style="
+                          background: linear-gradient(90deg, #c8a21a, #e8d060);
+                        "
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="widget">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <line x1="12" y1="1" x2="12" y2="23" />
+                      <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                    </svg>
+                    Points Breakdown
+                  </div>
+                </div>
+                <!-- populated by dashboard.js renderPtsBreakdown() -->
+                <div class="w-body"><div id="pts-breakdown"></div></div>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <div class="widget">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <circle cx="12" cy="8" r="6" />
+                      <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+                    </svg>
+                    Badges Earned
+                  </div>
+                </div>
+                <!-- populated by dashboard.js renderBadges() -->
+                <div class="w-body">
+                  <div class="badge-shelf" id="badge-shelf"></div>
+                </div>
+              </div>
+
+              <div class="widget">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M18 20V10" />
+                      <path d="M12 20V4" />
+                      <path d="M6 20v-6" />
+                    </svg>
+                    Top Topics
+                  </div>
+                </div>
+                <!-- populated by dashboard.js renderTopTopics() -->
+                <div class="w-body" id="top-topics-pg"></div>
+              </div>
+
+              <div class="widget">
+                <div class="w-head">
+                  <div class="w-title">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                    30-Day Streak
+                  </div>
+                </div>
+                <div class="w-body">
+                  <div
+                    style="
+                      font-family: &quot;Lora&quot;, serif;
+                      font-weight: 700;
+                      font-size: 2.2rem;
+                      color: var(--text-dark);
+                      margin-bottom: 4px;
+                    "
+                  >
+                    🔥 7 days
+                  </div>
+                  <div
+                    style="
+                      font-size: 0.82rem;
+                      color: var(--text-light);
+                      margin-bottom: 14px;
+                    "
+                  >
+                    Current streak · Best: 14 days in October
+                  </div>
+                  <!-- populated by dashboard.js renderStreak() -->
+                  <div class="streak-row" id="streak-row-full"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <!-- /page -->
+    </div>
+    <!-- /shell -->
+
+    <!--
+    ✅ ALL JAVASCRIPT in dashboard.js — no inline script.
+       dashboard.js:
+         • Guards with localStorage token → redirects to login.html if absent
+         • Calls GET /api/dashboard on load (user stats, feed, SOS, posts, challenges, friends)
+         • Lazy-loads notifications, saved, progress on tab switch
+         • Handles follow, challenge join, mark-all-read, unsave via API calls
+  -->
+    <script src="../js/dashboard.js"></script>
+  </body>
+</html>
