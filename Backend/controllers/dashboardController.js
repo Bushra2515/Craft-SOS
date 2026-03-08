@@ -26,7 +26,7 @@ const getDashboard = async (req, res) => {
     ] = await Promise.all([
       // Current user (stats + points)
       User.findById(userId).select(
-        "name handle avatar points helpedCount friendCount",
+        "name handle avatar points helpedCount friends",
       ),
 
       // Community feed (newest 4, any type)
@@ -69,7 +69,7 @@ const getDashboard = async (req, res) => {
               avatar: user.avatar,
               points: user.points || 0,
               helpedCount: user.helpedCount || 0,
-              friendCount: user.friendCount || 0,
+              friendCount: (user.friends || []).length,
               postCount: myOpenPosts.length,
             }
           : null,
@@ -82,9 +82,9 @@ const getDashboard = async (req, res) => {
         challenges: challenges.map((c) => ({
           id: c._id,
           title: c.title,
-          description: c.description,
+          description: c.description, // Challenge schema field
           icon: c.icon,
-          iconBg: c.iconBg,
+          iconBg: c.iconBg, // Challenge schema field
           participantCount: c.participants.length,
           endsAt: c.endsAt,
           isJoined: c.participants.some(
@@ -280,12 +280,21 @@ const toggleFollow = async (req, res) => {
       (id) => id.toString() === currentUserId.toString(),
     );
 
-    await User.findByIdAndUpdate(
-      targetId,
-      isFollowing
-        ? { $pull: { followers: currentUserId } }
-        : { $addToSet: { followers: currentUserId } },
-    );
+    // Update BOTH sides — target gets/loses a follower, viewer gets/loses a friend
+    await Promise.all([
+      User.findByIdAndUpdate(
+        targetId,
+        isFollowing
+          ? { $pull: { followers: currentUserId } }
+          : { $addToSet: { followers: currentUserId } },
+      ),
+      User.findByIdAndUpdate(
+        currentUserId,
+        isFollowing
+          ? { $pull: { friends: targetId } }
+          : { $addToSet: { friends: targetId } },
+      ),
+    ]);
 
     return res.status(200).json({
       success: true,

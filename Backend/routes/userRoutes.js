@@ -3,13 +3,13 @@ const protect = require("../Middleware/authMiddleware");
 const {
   getMyProfile,
   updateProfile,
-  // getUserById,
+  getUserById,
 } = require("../controllers/userController");
 
 const router = express.Router();
 
 router.get("/me", protect, getMyProfile);
 router.put("/me", protect, updateProfile);
-// router.get("/:id", getUserById);
+router.get("/:id", getUserById);
 
 module.exports = router;
