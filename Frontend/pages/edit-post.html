@@ -3,37 +3,50 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create Post — CraftSOS</title>
+    <title>Edit Post — Krafify</title>
     <link rel="stylesheet" href="../css/common.css" />
-    <link rel="stylesheet" href="../css/create-post.css" />
-    <!-- Add your main/global CSS here if you have one -->
+    <link rel="stylesheet" href="../css/edit-post.css" />
   </head>
-  <!-- create-post.html -->
+  <!-- edit-post.html -->
   <body>
-    <div id="overlay" onclick="closeSidebar()"></div>
     <div id="toast">
-      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
-      <span id="toast-msg">Draft saved!</span>
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg
+      ><span id="toast-msg">Saved!</span>
     </div>
 
-    <!-- ══ SUCCESS OVERLAY ══ -->
     <div id="success-overlay">
       <div class="success-icon">
         <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
       </div>
-      <div class="success-title">Post published! 🌿</div>
-      <div class="success-sub" id="success-desc">
-        Your post is live and your community can now see it and respond.
+      <div class="success-title">Post updated! 🌿</div>
+      <div class="success-sub">
+        Your changes are live and visible to the community.
       </div>
       <div class="success-btns">
-        <button class="suc-btn primary" onclick="viewPost()">View Post</button>
-        <button class="suc-btn secondary" onclick="createAnother()">
-          Create Another
+        <button
+          class="suc-btn primary"
+          onclick="
+            window.location.href =
+              'post-detail.html?id=' +
+              new URLSearchParams(window.location.search).get('id')
+          "
+        >
+          View Post
+        </button>
+        <button
+          class="suc-btn secondary"
+          onclick="
+            document.getElementById('success-overlay').classList.remove('on')
+          "
+        >
+          Keep Editing
         </button>
       </div>
     </div>
 
-    <!-- ══ TOPBAR ══ -->
+    <div id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- TOPBAR -->
     <header id="topbar">
       <button id="hamburger" onclick="toggleSidebar()">
         <svg viewBox="0 0 24 24">
@@ -51,31 +64,36 @@
           </svg>
         </div>
       </div>
-      <span id="mobile-title">New Post</span>
+      <span id="mobile-title">Edit Post</span>
       <nav id="desk-nav">
-        <span class="tnav" onclick="syncNav(this)">Friends</span>
-        <span class="tnav" onclick="syncNav(this)">Explore</span>
-        <span class="tnav" onclick="syncNav(this)">Bookmarked</span>
+        <span class="tnav" onclick="window.location.href = 'dashboard.html'"
+          >Friends</span
+        >
+        <span class="tnav" onclick="window.location.href = 'explore.html'"
+          >Explore</span
+        >
+        <span class="tnav">Bookmarked</span>
       </nav>
       <div id="topbar-right">
         <button class="distress-btn">
           <svg viewBox="0 0 24 24">
             <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-          <span>Distress Call</span>
+            <line x1="5" y1="12" x2="19" y2="12" /></svg
+          ><span>Distress Call</span>
         </button>
-        <div class="profile-av-btn"></div>
+        <!-- Avatar populated by JS from localStorage -->
+        <div
+          class="profile-av-btn"
+          onclick="window.location.href = 'profile.html'"
+        ></div>
       </div>
     </header>
 
     <nav id="subnav">
-      <span class="snav" onclick="syncNav(this)">Friends</span>
-      <span class="snav" onclick="syncNav(this)">Explore</span>
-      <span class="snav" onclick="syncNav(this)">Bookmarked</span>
+      <span class="snav">Friends</span><span class="snav">Explore</span
+      ><span class="snav">Bookmarked</span>
     </nav>
 
-    <!-- ══ SHELL ══ -->
     <div id="shell">
       <!-- SIDEBAR -->
       <aside id="sidebar">
@@ -204,64 +222,82 @@
         </nav>
       </aside>
 
-      <!-- ══ MAIN ══ -->
+      <!-- MAIN -->
       <main id="main">
-        <!-- Page header -->
         <div class="page-header">
           <div class="page-back" onclick="history.back()">
             <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg>
           </div>
           <div class="page-header-text">
-            <div class="page-title">Create a new post</div>
+            <div class="page-title">
+              Edit post
+              <span class="change-badge" id="change-badge" style="display: none"
+                >● Unsaved changes</span
+              >
+            </div>
             <div class="page-sub">
-              Share your experience, knowledge, or ask for help from the
-              community
+              Update your post — changes are visible to the community
+              immediately
             </div>
           </div>
           <div class="page-header-actions">
-            <!-- Saves to localStorage — Post model has no "draft" status -->
             <button class="draft-btn" onclick="saveDraft()">
               <svg viewBox="0 0 24 24">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
-              </svg>
-              Save Draft
+                <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" /></svg
+              >Save Draft
             </button>
           </div>
         </div>
 
+        <!-- Edit notice -->
+        <div class="edit-notice">
+          <div class="en-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+          </div>
+          <div class="en-text">
+            <div class="en-title">You are editing a published post</div>
+            <div class="en-sub">
+              Respondents who already replied may be notified of major changes.
+              Editing does not reset response count or votes.
+            </div>
+          </div>
+          <div class="en-meta" id="post-date">Posted —</div>
+        </div>
+
         <!-- Progress steps -->
-        <div class="progress-steps" id="progress-steps">
+        <div class="progress-steps">
           <div class="step-item">
-            <div class="step-num active" id="sn-1">1</div>
-            <span class="step-label active" id="sl-1">Post Type</span>
+            <div class="step-num done">✓</div>
+            <span class="step-label done">Post Type</span>
           </div>
-          <div class="step-connector" id="sc-1"></div>
+          <div class="step-connector done"></div>
           <div class="step-item">
-            <div class="step-num pending" id="sn-2">2</div>
-            <span class="step-label pending" id="sl-2">Content</span>
+            <div class="step-num active">2</div>
+            <span class="step-label active">Content</span>
           </div>
-          <div class="step-connector" id="sc-2"></div>
+          <div class="step-connector"></div>
           <div class="step-item">
-            <div class="step-num pending" id="sn-3">3</div>
-            <span class="step-label pending" id="sl-3">Media & Tags</span>
+            <div class="step-num pending">3</div>
+            <span class="step-label pending">Media & Tags</span>
           </div>
-          <div class="step-connector" id="sc-3"></div>
+          <div class="step-connector"></div>
           <div class="step-item">
-            <div class="step-num pending" id="sn-4">4</div>
-            <span class="step-label pending" id="sl-4">Settings</span>
+            <div class="step-num pending">4</div>
+            <span class="step-label pending">Settings</span>
           </div>
-          <div class="step-connector" id="sc-4"></div>
+          <div class="step-connector"></div>
           <div class="step-item">
-            <div class="step-num pending" id="sn-5">5</div>
-            <span class="step-label pending" id="sl-5">Publish</span>
+            <div class="step-num pending">5</div>
+            <span class="step-label pending">Update</span>
           </div>
         </div>
 
-        <!-- Form + Aside row -->
         <div class="form-row">
-          <!-- ════ FORM MAIN ════ -->
           <div class="form-main">
-            <!-- SECTION 1: Post type -->
+            <!-- § 1 Post Type -->
             <div class="section">
               <div class="section-head">
                 <div class="section-icon">
@@ -274,14 +310,11 @@
                 </div>
                 <div>
                   <div class="section-title">Post type</div>
-                  <div class="section-sub">
-                    What kind of post are you creating?
-                  </div>
+                  <div class="section-sub">What kind of post is this?</div>
                 </div>
               </div>
               <div class="section-body">
                 <div class="type-grid">
-                  <!-- data-type matches HTML → TYPE_MAP in create-post.js converts to model enum -->
                   <div
                     class="type-card type-sos"
                     data-type="sos"
@@ -307,8 +340,8 @@
                     <div class="tc-icon">📚</div>
                     <div class="tc-label">Tutorial</div>
                     <div class="tc-desc">
-                      Share your craft knowledge, techniques, or business
-                      lessons with step-by-step guidance
+                      Share craft knowledge, techniques, or business lessons
+                      with step-by-step guidance
                     </div>
                     <div class="tc-check">
                       <svg viewBox="0 0 24 24">
@@ -354,7 +387,7 @@
               </div>
             </div>
 
-            <!-- SECTION 2: Priority + Category -->
+            <!-- § 2 Category -->
             <div class="section">
               <div class="section-head">
                 <div class="section-icon">
@@ -371,15 +404,12 @@
                 </div>
               </div>
               <div class="section-body">
-                <div
-                  id="priority-row"
-                  style="margin-bottom: 14px; display: none"
-                >
+                <div id="priority-row" style="margin-bottom: 14px">
                   <div
                     style="
                       font-size: 0.8rem;
                       font-weight: 600;
-                      color: var(--text-light);
+                      color: var(--tx-dim);
                       text-transform: uppercase;
                       letter-spacing: 0.06em;
                       margin-bottom: 8px;
@@ -419,7 +449,7 @@
                     style="
                       font-size: 0.8rem;
                       font-weight: 600;
-                      color: var(--text-light);
+                      color: var(--tx-dim);
                       text-transform: uppercase;
                       letter-spacing: 0.06em;
                       margin-bottom: 8px;
@@ -432,10 +462,10 @@
                       💰 Financial
                     </div>
                     <div class="cat-pill" onclick="toggleCat(this)">
-                      📦 Orders & Fulfilment
+                      🧵 Suppliers
                     </div>
                     <div class="cat-pill" onclick="toggleCat(this)">
-                      🧵 Suppliers
+                      📦 Orders & Fulfilment
                     </div>
                     <div class="cat-pill" onclick="toggleCat(this)">
                       🏪 Marketplace
@@ -460,7 +490,7 @@
               </div>
             </div>
 
-            <!-- SECTION 3: Title + Body -->
+            <!-- § 3 Content -->
             <div class="section">
               <div class="section-head">
                 <div class="section-icon">
@@ -475,9 +505,7 @@
                 </div>
                 <div>
                   <div class="section-title">Your post</div>
-                  <div class="section-sub">
-                    Write your title and main content
-                  </div>
+                  <div class="section-sub">Edit title and main content</div>
                 </div>
               </div>
               <div class="section-body">
@@ -486,16 +514,16 @@
                   id="title-input"
                   type="text"
                   maxlength="140"
-                  placeholder="Write a clear, descriptive title…"
+                  placeholder="Enter your post title…"
                   oninput="updateTitle(this)"
                 />
                 <div class="char-hint" id="title-chars">0 / 140 characters</div>
 
                 <div style="height: 14px"></div>
 
+                <!-- ═══ RICH TEXT EDITOR ═══ -->
                 <div class="editor-wrap">
                   <div class="toolbar">
-                    <!-- Heading / paragraph style dropdown -->
                     <div class="tb-dropdown" id="dd-heading">
                       <button
                         class="tb-btn tb-dd-trigger"
@@ -853,15 +881,20 @@
                       </svg>
                     </button>
                   </div>
+
                   <div
                     class="editor-area"
                     id="editor-area"
                     contenteditable="true"
                     data-placeholder="Write your post here… Be specific and clear. The more context you give, the more useful the community's responses will be."
-                    oninput="updateEditorStats()"
+                    oninput="
+                      updateEditorStats();
+                      markChanged();
+                    "
                     onkeydown="handleEditorKey(event)"
                     onpaste="cleanPaste(event)"
                   ></div>
+
                   <div class="editor-footer">
                     <div class="editor-stats">
                       <span id="word-count">0 words</span>
@@ -875,7 +908,7 @@
               </div>
             </div>
 
-            <!-- SECTION 4: Tags -->
+            <!-- § 4 Tags -->
             <div class="section">
               <div class="section-head">
                 <div class="section-icon">
@@ -913,7 +946,7 @@
               </div>
             </div>
 
-            <!-- SECTION 5: Settings -->
+            <!-- § 5 Settings -->
             <div class="section">
               <div class="section-head">
                 <div class="section-icon">
@@ -932,9 +965,9 @@
                 </div>
               </div>
               <div class="section-body">
-                <div class="settings-row" style="margin-bottom: 16px">
+                <div class="settings-row">
                   <div
-                    class="setting-card active"
+                    class="setting-card"
                     id="aud-friends"
                     onclick="setAudience('friends', this)"
                   >
@@ -944,9 +977,8 @@
                         <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
                         <circle cx="9" cy="7" r="4" />
                         <path d="M23 21v-2a4 4 0 00-3-3.87" />
-                        <path d="M16 3.13a4 4 0 010 7.75" />
-                      </svg>
-                      Friends only
+                        <path d="M16 3.13a4 4 0 010 7.75" /></svg
+                      >Friends only
                     </div>
                   </div>
                   <div
@@ -961,9 +993,8 @@
                         <line x1="2" y1="12" x2="22" y2="12" />
                         <path
                           d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"
-                        />
-                      </svg>
-                      Full community
+                        /></svg
+                      >Full community
                     </div>
                   </div>
                 </div>
@@ -975,8 +1006,19 @@
                     </div>
                   </div>
                   <div
-                    class="toggle on"
-                    id="t-replies"
+                    class="toggle"
+                    onclick="this.classList.toggle('on')"
+                  ></div>
+                </div>
+                <div class="toggle-wrap">
+                  <div>
+                    <div class="toggle-label">Notify respondents of edits</div>
+                    <div class="toggle-sub">
+                      Send a notification to people who already replied
+                    </div>
+                  </div>
+                  <div
+                    class="toggle"
                     onclick="this.classList.toggle('on')"
                   ></div>
                 </div>
@@ -988,21 +1030,7 @@
                     </div>
                   </div>
                   <div
-                    class="toggle on"
-                    id="t-resolve"
-                    onclick="this.classList.toggle('on')"
-                  ></div>
-                </div>
-                <div class="toggle-wrap">
-                  <div>
-                    <div class="toggle-label">Send to your network</div>
-                    <div class="toggle-sub">
-                      Push notification to your followers about this post
-                    </div>
-                  </div>
-                  <div
                     class="toggle"
-                    id="t-notify"
                     onclick="this.classList.toggle('on')"
                   ></div>
                 </div>
@@ -1014,69 +1042,76 @@
                     </div>
                   </div>
                   <div
-                    class="toggle on"
-                    id="t-explore"
+                    class="toggle"
+                    onclick="this.classList.toggle('on')"
+                  ></div>
+                </div>
+                <div class="toggle-wrap">
+                  <div>
+                    <div class="toggle-label">Mark as Solved</div>
+                    <div class="toggle-sub">
+                      Close this post — community helped resolve the issue
+                    </div>
+                  </div>
+                  <div
+                    class="toggle"
                     onclick="this.classList.toggle('on')"
                   ></div>
                 </div>
               </div>
             </div>
 
-            <!-- PUBLISH BAR -->
+            <!-- UPDATE BAR -->
             <div class="publish-bar">
               <div class="publish-info">
-                <div class="publish-info-title" id="pub-status">
-                  Complete required fields
-                </div>
+                <div class="publish-info-title" id="pub-status">Loading…</div>
                 <div class="publish-info-sub" id="pub-sub">
-                  Fill in required fields to unlock publishing
+                  Fetching post data
                 </div>
               </div>
-              <!-- Saves draft to localStorage -->
-              <button class="save-draft-btn" onclick="saveDraft()">
+              <button class="act-btn btn-draft" onclick="saveDraft()">
                 <svg viewBox="0 0 24 24">
-                  <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
-                </svg>
-                Save Draft
+                  <path
+                    d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"
+                  /></svg
+                >Save Draft
               </button>
-              <button class="preview-btn" onclick="previewPost()">
+              <button class="act-btn btn-preview" onclick="previewPost()">
                 <svg viewBox="0 0 24 24">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-                Preview
+                  <circle cx="12" cy="12" r="3" /></svg
+                >Preview
               </button>
-              <!-- Calls publishPost() → POST /api/posts -->
               <button
-                class="publish-btn"
-                id="publish-btn"
-                onclick="publishPost()"
+                class="act-btn btn-update"
+                id="update-btn"
+                onclick="updatePost()"
                 disabled
               >
                 <svg viewBox="0 0 24 24">
-                  <line x1="22" y1="2" x2="11" y2="13" />
-                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                </svg>
-                Publish Post
+                  <polyline points="20 6 9 17 4 12" /></svg
+                >Update Post
               </button>
             </div>
           </div>
           <!-- /form-main -->
 
-          <!-- ════ ASIDE ════ -->
+          <!-- ASIDE -->
           <aside class="form-aside">
             <div class="aside-widget">
               <div class="aw-title">
                 <svg viewBox="0 0 24 24">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-                Live preview
+                  <circle cx="12" cy="12" r="3" /></svg
+                >Live preview
               </div>
               <div id="preview-card">
-                <div class="pc-empty">
-                  Your post preview will appear here as you fill in the form 🌿
+                <div class="pc-type" id="pc-type">—</div>
+                <div class="pc-title" id="pc-title">Your title…</div>
+                <div class="pc-body" id="pc-body">
+                  Preview appears as you type…
                 </div>
+                <div class="pc-tags" id="pc-tags"></div>
               </div>
             </div>
 
@@ -1086,9 +1121,8 @@
                   <polyline points="9 11 12 14 22 4" />
                   <path
                     d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"
-                  />
-                </svg>
-                Publishing checklist
+                  /></svg
+                >Update checklist
               </div>
               <div class="checklist">
                 <div class="check-item" id="chk-type">
@@ -1114,19 +1148,21 @@
               </div>
             </div>
 
-            <div class="aside-widget" id="tips-widget">
+            <div class="aside-widget">
               <div class="aw-title">
                 <svg viewBox="0 0 24 24">
                   <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="8" x2="12" y2="12" />
-                  <line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                Writing tips
+                  <polyline points="12 6 12 12 16 14" /></svg
+                >Edit history
               </div>
-              <div class="tip-list" id="tips-list">
-                <div class="tip-item">
-                  <span class="tip-icon">📝</span>Choose a post type above and
-                  tips tailored to that format will appear here.
+              <!-- Populated dynamically by edit-post.js → renderEditHistory() -->
+              <div id="edit-history-list">
+                <div class="hist-item" style="opacity: 0.5">
+                  <div class="hist-dot" style="background: var(--tx-dim)"></div>
+                  <div class="hist-label" style="font-style: italic">
+                    Loading history…
+                  </div>
+                  <div class="hist-time"></div>
                 </div>
               </div>
             </div>
@@ -1134,38 +1170,414 @@
             <div class="aside-widget">
               <div class="aw-title">
                 <svg viewBox="0 0 24 24">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-                Guidelines
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" /></svg
+                >Formatting guide
               </div>
               <div class="tip-list">
                 <div class="tip-item">
-                  <span class="tip-icon">✅</span>Be specific — include amounts,
-                  timelines, platform names.
+                  <span class="tip-mono">H1</span>Main section headings
                 </div>
                 <div class="tip-item">
-                  <span class="tip-icon">✅</span>Respond to helpers who take
-                  the time to reply.
+                  <span class="tip-mono">H2</span>Subheadings &amp; sub-sections
                 </div>
                 <div class="tip-item">
-                  <span class="tip-icon">✅</span>Mark posts resolved when your
-                  issue is solved.
+                  <span class="tip-mono">H3</span>Smaller sub-points
                 </div>
                 <div class="tip-item">
-                  <span class="tip-icon">🚫</span>No spam, promotion, or
-                  off-topic content.
+                  <span class="tip-mono">❝</span>Blockquote — highlight key info
+                </div>
+                <div class="tip-item">
+                  <span class="tip-mono">&lt;/&gt;</span>Code block — UPI IDs,
+                  order nos.
+                </div>
+                <div class="tip-item">
+                  <span class="tip-mono">—</span>Divider — separate major
+                  sections
+                </div>
+                <div class="tip-item">
+                  <span class="tip-mono">≡</span>Lists — steps, evidence,
+                  options
+                </div>
+                <div class="tip-item">
+                  <span class="tip-mono">🖊</span>Ctrl+B · Ctrl+I · Ctrl+K
                 </div>
               </div>
             </div>
           </aside>
         </div>
-        <!-- /form-row -->
       </main>
     </div>
 
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-    <script src="../js/socket-client.js"></script>
+    <script>
+      /* ════ STATE ════ */
+      let selectedType = "";
+      let activeTags = [];
+      let hasChanges = false;
+
+      const ALL_TAGS = [
+        "#pricing",
+        "#supplier",
+        "#etsy",
+        "#refund",
+        "#gst",
+        "#customorder",
+        "#resin",
+        "#courier",
+        "#dispute",
+        "#UPI",
+        "#financial",
+        "#copyright",
+        "#packaging",
+        "#bakery",
+        "#crochet",
+        "#embroidery",
+        "#candles",
+        "#ceramics",
+        "#tutorial",
+      ];
+
+      /* ── SIDEBAR ── */
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("open");
+        document.getElementById("overlay").classList.toggle("on");
+      }
+      function closeSidebar() {
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("overlay").classList.remove("on");
+      }
+      function pickNav(el) {
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((n) => n.classList.remove("active"));
+        el.classList.add("active");
+      }
+
+      /* ── MARK CHANGED ── */
+      function markChanged() {
+        hasChanges = true;
+        document.getElementById("change-badge").style.display = "";
+      }
+
+      /* ── TYPE ── */
+      function selectType(type, el) {
+        if (!el) return;
+        selectedType = type;
+        document
+          .querySelectorAll(".type-card")
+          .forEach((c) => c.classList.remove("selected"));
+        el.classList.add("selected");
+        markChanged();
+        updateChecklist();
+        updatePreview();
+      }
+
+      /* ── PRIORITY ── */
+      function selectPriority(p, el) {
+        document
+          .querySelectorAll("#priority-pills .pill-opt")
+          .forEach((x) => x.classList.remove("selected"));
+        el.classList.add("selected");
+        markChanged();
+      }
+
+      /* ── CAT ── */
+      function toggleCat(el) {
+        el.classList.toggle("on");
+        markChanged();
+        updateChecklist();
+      }
+
+      /* ── TITLE ── */
+      function updateTitle(inp) {
+        document.getElementById("title-chars").textContent =
+          `${inp.value.length} / 140 characters`;
+        markChanged();
+        updateChecklist();
+        updatePreview();
+      }
+
+      /* ════ TOOLBAR ════ */
+      function fmt(cmd, val) {
+        document.getElementById("editor-area").focus();
+        document.execCommand(cmd, false, val || null);
+        updateEditorStats();
+        markChanged();
+      }
+      function applyBlock(tag) {
+        document.getElementById("editor-area").focus();
+        document.execCommand("formatBlock", false, tag);
+        updateEditorStats();
+        markChanged();
+      }
+      function applyHighlight() {
+        document.getElementById("editor-area").focus();
+        document.execCommand("hiliteColor", false, "#FFF176");
+        updateEditorStats();
+        markChanged();
+      }
+      function toggleDD(id) {
+        document.querySelectorAll(".tb-dropdown").forEach((d) => {
+          if (d.id !== id) d.classList.remove("open");
+        });
+        document.getElementById(id).classList.toggle("open");
+      }
+      function closeDD(id) {
+        document.getElementById(id).classList.remove("open");
+      }
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".tb-dropdown"))
+          document
+            .querySelectorAll(".tb-dropdown")
+            .forEach((d) => d.classList.remove("open"));
+      });
+
+      function insertBlockquote() {
+        const ea = document.getElementById("editor-area");
+        ea.focus();
+        const sel = window.getSelection();
+        if (sel && sel.toString().trim()) {
+          const text = sel.toString();
+          sel.deleteFromDocument();
+          document.execCommand(
+            "insertHTML",
+            false,
+            `<blockquote>${text}</blockquote><p><br></p>`,
+          );
+        } else {
+          document.execCommand(
+            "insertHTML",
+            false,
+            `<blockquote>Quote text here…</blockquote><p><br></p>`,
+          );
+        }
+        updateEditorStats();
+        markChanged();
+      }
+      function insertCodeBlock() {
+        document.getElementById("editor-area").focus();
+        document.execCommand(
+          "insertHTML",
+          false,
+          `<pre><code>// paste your code or reference here</code></pre><p><br></p>`,
+        );
+        updateEditorStats();
+        markChanged();
+      }
+      function insertInlineCode() {
+        document.getElementById("editor-area").focus();
+        const sel = window.getSelection();
+        const text = sel ? sel.toString() : "";
+        document.execCommand(
+          "insertHTML",
+          false,
+          `<code>${text || "code"}</code>`,
+        );
+        updateEditorStats();
+        markChanged();
+      }
+      function insertHR() {
+        document.getElementById("editor-area").focus();
+        document.execCommand("insertHTML", false, `<hr/><p><br></p>`);
+        updateEditorStats();
+        markChanged();
+      }
+      function insertLink() {
+        document.getElementById("editor-area").focus();
+        const sel = window.getSelection();
+        const linkText = sel && sel.toString();
+        const url = prompt("Enter URL:", "https://");
+        if (!url) return;
+        if (linkText) {
+          document.execCommand("createLink", false, url);
+        } else {
+          const text = prompt("Link text:", url) || url;
+          document.execCommand(
+            "insertHTML",
+            false,
+            `<a href="${url}" target="_blank">${text}</a>`,
+          );
+        }
+        updateEditorStats();
+        markChanged();
+      }
+      function handleEditorKey(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+          e.preventDefault();
+          insertLink();
+        }
+      }
+      function cleanPaste(e) {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData(
+          "text/plain",
+        );
+        document.execCommand("insertText", false, text);
+      }
+
+      function updateEditorStats() {
+        const text = document.getElementById("editor-area").innerText || "";
+        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+        document.getElementById("word-count").textContent =
+          words + " word" + (words !== 1 ? "s" : "");
+        document.getElementById("char-count-body").textContent =
+          text.length + " chars";
+        updateChecklist();
+        updatePreview();
+      }
+
+      /* ════ TAGS ════ */
+      function renderTags() {
+        const wrap = document.getElementById("tags-wrap");
+        const inp = document.getElementById("tag-input");
+        wrap.querySelectorAll(".tag-chip").forEach((c) => c.remove());
+        activeTags.forEach((t) => {
+          const chip = document.createElement("span");
+          chip.className = "tag-chip";
+          chip.innerHTML = `${t} <button onclick="removeTag('${t}')">×</button>`;
+          wrap.insertBefore(chip, inp);
+        });
+        updateChecklist();
+        updatePreview();
+      }
+      function removeTag(t) {
+        activeTags = activeTags.filter((x) => x !== t);
+        renderTags();
+        markChanged();
+      }
+      function focusTagInput() {
+        document.getElementById("tag-input").focus();
+      }
+      function handleTagKey(e) {
+        const inp = e.target,
+          val = inp.value.trim();
+        if ((e.key === "Enter" || e.key === "," || e.key === " ") && val) {
+          e.preventDefault();
+          if (activeTags.length >= 8) {
+            showToast("Max 8 tags", "");
+            return;
+          }
+          const tag = (val.startsWith("#") ? val : "#" + val).replace(/,/g, "");
+          if (!activeTags.includes(tag)) {
+            activeTags.push(tag);
+            renderTags();
+            markChanged();
+          }
+          inp.value = "";
+          filterTagSugs("");
+        }
+        if (e.key === "Backspace" && !val && activeTags.length) {
+          activeTags.pop();
+          renderTags();
+          markChanged();
+        }
+      }
+      function filterTagSugs(q) {
+        const row = document.getElementById("tag-sug-row");
+        const matches = ALL_TAGS.filter(
+          (t) =>
+            !activeTags.includes(t) &&
+            (q === "" || t.includes(q.replace("#", ""))),
+        ).slice(0, 8);
+        row.innerHTML = matches
+          .map(
+            (t) =>
+              `<div class="tag-sug" onclick="addSugTag('${t}')">${t}</div>`,
+          )
+          .join("");
+      }
+      function addSugTag(t) {
+        if (activeTags.length >= 8) return;
+        if (!activeTags.includes(t)) {
+          activeTags.push(t);
+          renderTags();
+          markChanged();
+        }
+        filterTagSugs("");
+      }
+
+      /* Audience */
+      function setAudience(a, el) {
+        document
+          .querySelectorAll(".setting-card")
+          .forEach((c) => c.classList.remove("active"));
+        el.classList.add("active");
+        markChanged();
+      }
+
+      /* Checklist */
+      function updateChecklist() {
+        const title = document.getElementById("title-input").value.trim();
+        const body = (
+          document.getElementById("editor-area").innerText || ""
+        ).trim();
+        const cats = document.querySelectorAll(".cat-pill.on").length;
+        setChk("chk-type", !!selectedType);
+        setChk("chk-cat", true); // cosmetic only — categories not in schema
+        setChk("chk-title", title.length >= 10);
+        setChk("chk-body", body.length >= 30);
+        setChk("chk-tags", activeTags.length >= 1);
+        // BUG FIX: chk-cat was required but categories aren't in the Post schema,
+        // so loading a post from the API never selects a category pill → button
+        // was permanently disabled. Category is now advisory only (cosmetic UI).
+        const allDone = ["chk-type", "chk-title", "chk-body", "chk-tags"].every(
+          (id) => document.getElementById(id).classList.contains("done"),
+        );
+        document.getElementById("update-btn").disabled = !allDone;
+        document.getElementById("pub-status").textContent = allDone
+          ? hasChanges
+            ? "Unsaved changes"
+            : "Ready to update"
+          : "Incomplete";
+        document.getElementById("pub-sub").textContent = allDone
+          ? "All required fields are complete"
+          : "Fill in required fields to unlock update";
+      }
+      function setChk(id, done) {
+        document.getElementById(id).classList.toggle("done", done);
+      }
+
+      /* Preview */
+      function updatePreview() {
+        const typeMap = {
+          sos: "🆘 Distress Call",
+          tutorial: "📚 Tutorial",
+          community: "💬 Community Update",
+          resource: "🗂️ Resource",
+        };
+        document.getElementById("pc-type").textContent =
+          typeMap[selectedType] || "";
+        document.getElementById("pc-title").textContent =
+          document.getElementById("title-input").value || "Your title…";
+        document.getElementById("pc-body").textContent =
+          (document.getElementById("editor-area").innerText || "").trim() ||
+          "Your content preview will appear here…";
+        document.getElementById("pc-tags").innerHTML = activeTags
+          .map((t) => `<span class="pc-tag">${t}</span>`)
+          .join("");
+      }
+
+      /* Toast */
+      let tt;
+      function showToast(msg, type) {
+        const t = document.getElementById("toast");
+        document.getElementById("toast-msg").textContent = msg;
+        t.className = "toast show" + (type ? " " + type : "");
+        clearTimeout(tt);
+        tt = setTimeout(() => (t.className = "toast"), 3000);
+      }
+
+      window.addEventListener("beforeunload", (e) => {
+        if (hasChanges) {
+          e.preventDefault();
+          e.returnValue = "";
+        }
+      });
+    </script>
+
+    <!-- External API layer — must come AFTER the inline <script> above -->
+    <script src="../js/edit-post.js"></script>
     <script src="../js/common.js"></script>
-    <script src="../js/create-post.js"></script>
   </body>
 </html>

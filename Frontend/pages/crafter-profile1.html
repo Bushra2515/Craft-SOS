@@ -1,0 +1,950 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Title updated by crafter-profile.js from API data -->
+    <title>Crafter Profile — Craft-SOS</title>
+    <link rel="stylesheet" href="../css/crafter-profile.css" />
+    <style>
+      /* ── Animations used by JS ─────────────────────── */
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      /* ── Follow button "on" state ──────────────────── */
+      .btn.prim.on {
+        background: var(--panel, #f6f4ef);
+        color: var(--accent, #7a8f52);
+        border: 1.5px solid var(--accent, #7a8f52);
+      }
+      /* ── Friend card follow btn ────────────────────── */
+      .fr-btn.on {
+        background: var(--accent, #7a8f52);
+        color: #fff;
+      }
+      /* ── Achievements locked state ─────────────────── */
+      .acard.locked {
+        opacity: 0.48;
+        filter: grayscale(0.7);
+      }
+      .acard-lock {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        font-size: 0.9rem;
+      }
+      .acard {
+        position: relative;
+      }
+      /* ── Topic bar transition ──────────────────────── */
+      .topic-bar {
+        transition: width 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      /* ── Reputation bar transition ─────────────────── */
+      .rep-fill {
+        transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 0;
+      }
+    </style>
+  </head>
+  <!-- crafter-profile.html -->
+  <body>
+    <div id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- Toast notification — shown by toast() -->
+    <div id="toast">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+      <span id="toast-msg"></span>
+    </div>
+
+    <!-- ══ TOPBAR ══ -->
+    <header id="topbar">
+      <button id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+        <svg viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+      <div id="topbar-logo-zone">
+        <div class="logo-pill">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"
+            />
+          </svg>
+        </div>
+      </div>
+      <!-- Updated by JS from profile.name -->
+      <span id="mobile-title">Loading…</span>
+      <nav id="desk-nav">
+        <span class="tnav">Friends</span>
+        <span class="tnav">Explore</span>
+        <span class="tnav">Bookmarked</span>
+      </nav>
+      <div id="topbar-right">
+        <button class="distress-btn">
+          <svg viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>Distress Call</span>
+        </button>
+        <!-- Logged-in user's avatar — filled by populateSidebarUser() -->
+        <div
+          class="topav"
+          onclick="window.location.href = 'profile.html'"
+          style="
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #fff;
+            background: var(--accent, #7a8f52);
+            flex-shrink: 0;
+            overflow: hidden;
+          "
+        ></div>
+      </div>
+    </header>
+
+    <!-- Sub-nav (mobile) -->
+    <nav id="subnav">
+      <span class="snav">Friends</span>
+      <span class="snav">Explore</span>
+      <span class="snav">Bookmarked</span>
+    </nav>
+
+    <!-- ══ SHELL ══ -->
+    <div id="shell">
+      <!-- ══ SIDEBAR ══ -->
+      <!--<aside id="sidebar">
+        <div class="sb-prof">
+           Viewer's avatar (logged-in user) — filled by populateSidebarUser() 
+          <div
+            class="sb-prof-av"
+            style="
+              width: 42px;
+              height: 42px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: 700;
+              font-size: 0.9rem;
+              color: #fff;
+              flex-shrink: 0;
+              overflow: hidden;
+            "
+          ></div>
+          <div class="sb-prof-info">
+            <div class="sb-prof-name">Loading…</div>
+            <div class="sb-prof-sub"></div>
+          </div>
+        </div>
+
+        <nav>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <span class="nav-label">Home</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <span class="nav-label">Explore</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <span class="nav-label">Notifications</span>
+            <!-- Real-time badge — updated by socket-client.js 
+            <span
+              id="notif-badge"
+              style="
+                display: none;
+                background: #d35b3a;
+                color: #fff;
+                font-size: 0.65rem;
+                font-weight: 700;
+                border-radius: 50%;
+                min-width: 18px;
+                height: 18px;
+                padding: 0 4px;
+                align-items: center;
+                justify-content: center;
+                margin-left: auto;
+              "
+              >0</span
+            >
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path
+                d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+              />
+            </svg>
+            <span class="nav-label">Messages</span>
+            <span
+              id="chat-badge"
+              style="
+                display: none;
+                background: #3d5a99;
+                color: #fff;
+                font-size: 0.65rem;
+                font-weight: 700;
+                border-radius: 50%;
+                min-width: 18px;
+                height: 18px;
+                padding: 0 4px;
+                align-items: center;
+                justify-content: center;
+                margin-left: auto;
+              "
+              >0</span
+            >
+          </div>
+          <!-- Active: currently viewing a profile — treat as Profile nav 
+          <div class="nav-item active" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span class="nav-label">Profile</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+            </svg>
+            <span class="nav-label">Bookmarks</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+              />
+            </svg>
+            <span class="nav-label">Settings</span>
+          </div>
+        </nav>
+      </aside>-->
+      <aside id="sidebar">
+        <!-- Profile strip — filled by initSidebar() from localStorage -->
+        <div class="sb-prof">
+          <div class="sb-prof-av"></div>
+          <div class="sb-prof-info">
+            <div class="sb-prof-name">Loading…</div>
+            <div class="sb-prof-sub"></div>
+          </div>
+        </div>
+
+        <nav>
+          <!-- Home -->
+          <div class="nav-item" data-route="../index.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <span class="nav-label">Home</span>
+          </div>
+
+          <!-- Explore -->
+          <div class="nav-item" data-route="explore.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <span class="nav-label">Explore</span>
+          </div>
+
+          <!-- Search -->
+          <div class="nav-item" data-route="explore.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span class="nav-label">Search</span>
+          </div>
+
+          <!-- Notifications -->
+          <div class="nav-item" data-route="dashboard.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <span class="nav-label">Notifications</span>
+            <span
+              id="notif-badge"
+              class="nav-badge-live"
+              style="background: #d35b3a"
+            ></span>
+          </div>
+
+          <!-- Messages -->
+          <div class="nav-item" data-route="chat.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path
+                d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+              />
+            </svg>
+            <span class="nav-label">Messages</span>
+            <span
+              id="chat-badge"
+              class="nav-badge-live"
+              style="background: #3d5a99"
+            ></span>
+          </div>
+
+          <!-- Profile -->
+          <div class="nav-item" data-route="profile.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span class="nav-label">Profile</span>
+          </div>
+
+          <!-- Settings -->
+          <div class="nav-item" data-route="settings.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+              />
+            </svg>
+            <span class="nav-label">Settings</span>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- ══ PAGE ══ -->
+      <div id="page">
+        <!-- ── COVER ──────────────────────────────────────── -->
+        <!--
+      Filled by renderCover():
+        • If profile.bannerImg  → background-image
+        • Else                  → background uses bannerColor + keeps SVG pattern
+    -->
+        <div class="cover">
+          <svg
+            class="cover-svg"
+            viewBox="0 0 1200 240"
+            preserveAspectRatio="xMidYMid slice"
+          >
+            <circle
+              cx="100"
+              cy="80"
+              r="68"
+              fill="none"
+              stroke="white"
+              stroke-width="1.5"
+            />
+            <path
+              d="M56 106 Q100 36 144 106"
+              fill="none"
+              stroke="white"
+              stroke-width="1"
+            />
+            <circle
+              cx="1060"
+              cy="160"
+              r="54"
+              fill="none"
+              stroke="white"
+              stroke-width="1.5"
+            />
+            <path
+              d="M1022 178 Q1060 120 1098 178"
+              fill="none"
+              stroke="white"
+              stroke-width="1"
+            />
+            <rect
+              x="440"
+              y="24"
+              width="120"
+              height="18"
+              rx="9"
+              fill="none"
+              stroke="white"
+              stroke-width="1.5"
+              transform="rotate(12 500 33)"
+            />
+            <circle
+              cx="508"
+              cy="14"
+              r="12"
+              fill="none"
+              stroke="white"
+              stroke-width="1.5"
+            />
+            <path
+              d="M260 200 L300 154 L340 200 L300 246 Z"
+              fill="none"
+              stroke="white"
+              stroke-width="1.5"
+            />
+            <rect
+              x="720"
+              y="60"
+              width="80"
+              height="110"
+              rx="8"
+              fill="none"
+              stroke="white"
+              stroke-width="1.5"
+            />
+            <line
+              x1="720"
+              y1="105"
+              x2="800"
+              y2="105"
+              stroke="white"
+              stroke-width="1"
+            />
+            <circle
+              cx="580"
+              cy="160"
+              r="36"
+              fill="none"
+              stroke="white"
+              stroke-width="1.2"
+            />
+            <path
+              d="M556 160 Q580 126 604 160"
+              fill="none"
+              stroke="white"
+              stroke-width="1"
+            />
+            <path
+              d="M556 172 Q580 206 604 172"
+              fill="none"
+              stroke="white"
+              stroke-width="1"
+            />
+            <ellipse
+              cx="900"
+              cy="100"
+              rx="30"
+              ry="44"
+              fill="none"
+              stroke="white"
+              stroke-width="1.5"
+              transform="rotate(-15 900 100)"
+            />
+            <path
+              d="M876 118 Q900 68 924 118"
+              fill="none"
+              stroke="white"
+              stroke-width="1"
+            />
+          </svg>
+          <div class="cover-fade"></div>
+        </div>
+
+        <!-- ── IDENTITY ────────────────────────────────────── -->
+        <!--
+      All text filled by renderIdentity():
+        .avatar          → photo or initials
+        .av-rank         → rank emoji + label
+        .id-name         → profile.name
+        .id-handle       → @profile.handle
+        .id-loc          → profile.location (with pin icon)
+        .id-member       → member since date + contributor tier
+    -->
+        <div class="identity">
+          <div class="id-row">
+            <div class="av-wrap">
+              <!-- Avatar filled by renderIdentity() -->
+              <div
+                class="avatar"
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-weight: 700;
+                  font-size: 1.6rem;
+                  overflow: hidden;
+                "
+              ></div>
+              <div
+                class="av-online"
+                title="Online now"
+                style="display: none"
+              ></div>
+              <!-- Rank pill — filled from profile.rank -->
+              <div class="av-rank">🌱</div>
+            </div>
+
+            <div class="id-info">
+              <div class="id-name">Loading profile…</div>
+              <div class="id-meta-row">
+                <span class="id-handle"></span>
+                <!-- Verified badge shown only if badges include "verified" -->
+                <span
+                  class="id-verified"
+                  id="id-verified"
+                  title="Verified expert"
+                  style="display: none"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </span>
+                <!-- Location with pin icon — filled by renderIdentity() -->
+                <span class="id-loc"></span>
+              </div>
+              <div class="id-member"></div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="id-actions">
+              <!--
+            Follow button:
+              • Default state: "Follow" with add-user icon
+              • .on state:     "✓ Following" with check icon
+              • Wired to toggleFollow() in crafter-profile.js
+          -->
+              <button class="btn prim" id="follow-btn" onclick="toggleFollow()">
+                <svg id="follow-icon" viewBox="0 0 24 24">
+                  <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle cx="8.5" cy="7" r="4" />
+                  <line x1="20" y1="8" x2="20" y2="14" />
+                  <line x1="23" y1="11" x2="17" y2="11" />
+                </svg>
+                <span id="follow-label">Follow</span>
+              </button>
+
+              <!-- Message button → chat.html?friend=TARGET_ID -->
+              <button class="btn sec" onclick="openMessage()">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                  />
+                </svg>
+                Message
+              </button>
+
+              <!-- Share: copies URL to clipboard -->
+              <button
+                class="btn sec ico"
+                onclick="shareProfile()"
+                title="Share profile"
+              >
+                <svg viewBox="0 0 24 24">
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
+              </button>
+
+              <button
+                class="btn sec ico"
+                title="More options"
+                onclick="toast('More options coming soon…')"
+              >
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="1" />
+                  <circle cx="19" cy="12" r="1" />
+                  <circle cx="5" cy="12" r="1" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STATS BAR ────────────────────────────────────── -->
+        <!--
+      Numbers filled by renderStats(). CSS classes:
+        .stat-posts .stat-helped .stat-points .stat-friends
+        .stat-resolved .stat-tutorials
+      Clicking a stat switches the relevant tab.
+    -->
+        <div class="stats-bar">
+          <div
+            class="stat"
+            onclick="switchTab('posts')"
+            style="cursor: pointer"
+          >
+            <div class="stat-n hi stat-posts">—</div>
+            <div class="stat-l">Posts</div>
+          </div>
+          <div
+            class="stat"
+            onclick="switchTab('helped')"
+            style="cursor: pointer"
+          >
+            <div class="stat-n stat-helped">—</div>
+            <div class="stat-l">Helped</div>
+          </div>
+          <div class="stat">
+            <div class="stat-n hi stat-points">—</div>
+            <div class="stat-l">Points</div>
+          </div>
+          <div
+            class="stat"
+            onclick="switchTab('friends')"
+            style="cursor: pointer"
+          >
+            <div class="stat-n stat-friends">—</div>
+            <div class="stat-l">Friends</div>
+          </div>
+          <div class="stat">
+            <div class="stat-n">—</div>
+            <div class="stat-l">Rating</div>
+          </div>
+          <div class="stat">
+            <div class="stat-n hi">—</div>
+            <div class="stat-l">Response Rate</div>
+          </div>
+          <div
+            class="stat"
+            onclick="switchTab('tutorials')"
+            style="cursor: pointer"
+          >
+            <div class="stat-n stat-resolved">—</div>
+            <div class="stat-l">Resolved</div>
+          </div>
+        </div>
+
+        <!-- ── BIO ──────────────────────────────────────────── -->
+        <!--
+      Filled by renderBio():
+        .bio-text   → profile.bio (plain text, no HTML)
+        .skill-row  → skill/hobby pills from profile.skills[]
+    -->
+        <div class="bio-zone">
+          <p
+            class="bio-text"
+            style="
+              background: linear-gradient(
+                90deg,
+                #f0f0f0 25%,
+                #e8e8e8 50%,
+                #f0f0f0 75%
+              );
+              background-size: 200% 100%;
+              animation: shimmer 1.4s infinite;
+              height: 60px;
+              border-radius: 8px;
+            "
+          ></p>
+          <div class="skill-row" style="min-height: 32px"></div>
+        </div>
+
+        <!-- ── CONTENT GRID ─────────────────────────────────── -->
+        <div class="content-grid">
+          <!-- ── MAIN COLUMN ────────────────────────────────── -->
+          <div class="content-main">
+            <!-- Tabs -->
+            <div class="tabs">
+              <div class="tab on" data-tab="posts" onclick="switchTab('posts')">
+                Posts<span class="tab-n">—</span>
+              </div>
+              <div
+                class="tab"
+                data-tab="tutorials"
+                onclick="switchTab('tutorials')"
+              >
+                Tutorials<span class="tab-n">—</span>
+              </div>
+              <div class="tab" data-tab="helped" onclick="switchTab('helped')">
+                Helped<span class="tab-n">—</span>
+              </div>
+              <div
+                class="tab"
+                data-tab="achievements"
+                onclick="switchTab('achievements')"
+              >
+                Achievements<span class="tab-n">—</span>
+              </div>
+              <div
+                class="tab"
+                data-tab="friends"
+                onclick="switchTab('friends')"
+              >
+                Friends<span class="tab-n">—</span>
+              </div>
+            </div>
+
+            <!--
+          Tab bodies — each has a unique ID.
+          • Shimmer placeholder shown until API responds.
+          • Filled by loadTab() in crafter-profile.js.
+        -->
+            <div class="tab-body on" id="tb-posts">
+              <!-- Shimmer until loadTab('posts') resolves -->
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  gap: 14px;
+                  padding: 4px 0;
+                "
+              >
+                <div
+                  style="
+                    height: 140px;
+                    border-radius: 14px;
+                    background: linear-gradient(
+                      90deg,
+                      #f0f0f0 25%,
+                      #e8e8e8 50%,
+                      #f0f0f0 75%
+                    );
+                    background-size: 200% 100%;
+                    animation: shimmer 1.4s infinite;
+                  "
+                ></div>
+                <div
+                  style="
+                    height: 140px;
+                    border-radius: 14px;
+                    background: linear-gradient(
+                      90deg,
+                      #f0f0f0 25%,
+                      #e8e8e8 50%,
+                      #f0f0f0 75%
+                    );
+                    background-size: 200% 100%;
+                    animation: shimmer 1.4s infinite;
+                  "
+                ></div>
+                <div
+                  style="
+                    height: 140px;
+                    border-radius: 14px;
+                    background: linear-gradient(
+                      90deg,
+                      #f0f0f0 25%,
+                      #e8e8e8 50%,
+                      #f0f0f0 75%
+                    );
+                    background-size: 200% 100%;
+                    animation: shimmer 1.4s infinite;
+                  "
+                ></div>
+              </div>
+            </div>
+            <div class="tab-body" id="tb-tutorials"></div>
+            <div class="tab-body" id="tb-helped"></div>
+            <div class="tab-body" id="tb-achievements"></div>
+            <div class="tab-body" id="tb-friends"></div>
+          </div>
+          <!-- /content-main -->
+
+          <!-- ── RIGHT SIDEBAR ──────────────────────────────── -->
+          <aside class="content-side">
+            <!-- ── COMMUNITY WIDGETS (admin-created) ── -->
+            <!-- Dismissible announcement banners from admin dashboard -->
+            <div id="widget-announcements"></div>
+            <!-- Active challenges — user can join from this page -->
+            <div id="widget-challenges"></div>
+            <!-- Reputation widget -->
+            <div class="widget">
+              <div class="w-title">
+                <svg viewBox="0 0 24 24">
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  />
+                </svg>
+                Reputation
+              </div>
+              <!--
+            Bar widths set by renderReputation() via IntersectionObserver.
+            Labels also set dynamically.
+          -->
+              <div class="rep-row">
+                <span class="rep-lbl">Overall standing</span>
+                <span class="rep-val rep-standing" style="color: var(--accent)"
+                  >—</span
+                >
+              </div>
+              <div class="rep-bar">
+                <div
+                  class="rep-fill"
+                  id="rf1"
+                  style="
+                    background: linear-gradient(
+                      90deg,
+                      var(--accent, #7a8f52),
+                      #b5c98a
+                    );
+                  "
+                ></div>
+              </div>
+
+              <div class="rep-row">
+                <span class="rep-lbl">Helpfulness score</span>
+                <span class="rep-val" style="color: #3a7d2c" id="rep-helpful"
+                  >—</span
+                >
+              </div>
+              <div class="rep-bar">
+                <div
+                  class="rep-fill"
+                  id="rf2"
+                  style="background: linear-gradient(90deg, #3a7d2c, #6ab04c)"
+                ></div>
+              </div>
+
+              <div class="rep-row">
+                <span class="rep-lbl">Response quality</span>
+                <span class="rep-val" style="color: #c8a21a">4.9 / 5</span>
+              </div>
+              <div class="rep-bar">
+                <div
+                  class="rep-fill"
+                  id="rf3"
+                  style="background: linear-gradient(90deg, #c8a21a, #e8d060)"
+                ></div>
+              </div>
+
+              <div class="rank-row">
+                <span>Community rank</span>
+                <strong>#47 of community</strong>
+              </div>
+            </div>
+
+            <!-- Points breakdown widget — filled by renderPointsBreakdown() -->
+            <div class="widget" style="animation-delay: 0.06s">
+              <div class="w-title">
+                <svg viewBox="0 0 24 24">
+                  <line x1="12" y1="1" x2="12" y2="23" />
+                  <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                </svg>
+                Points Breakdown
+              </div>
+              <!-- Filled by renderPointsBreakdown() -->
+              <div id="points-breakdown">
+                <div
+                  style="
+                    height: 140px;
+                    border-radius: 8px;
+                    background: linear-gradient(
+                      90deg,
+                      #f0f0f0 25%,
+                      #e8e8e8 50%,
+                      #f0f0f0 75%
+                    );
+                    background-size: 200% 100%;
+                    animation: shimmer 1.4s infinite;
+                  "
+                ></div>
+              </div>
+            </div>
+
+            <!-- Top topics widget — filled by renderTopics() -->
+            <div class="widget" style="animation-delay: 0.12s">
+              <div class="w-title">
+                <svg viewBox="0 0 24 24">
+                  <path d="M18 20V10" />
+                  <path d="M12 20V4" />
+                  <path d="M6 20v-6" />
+                </svg>
+                Top Topics
+              </div>
+              <div id="topics-list"></div>
+            </div>
+
+            <!-- Mutual friends widget — filled by renderMutualFriends() -->
+            <div class="widget" style="animation-delay: 0.18s">
+              <div class="w-title">
+                <svg viewBox="0 0 24 24">
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                  <path d="M16 3.13a4 4 0 010 7.75" />
+                </svg>
+                Mutual Friends
+              </div>
+              <!-- Avatar faces row — filled by renderMutualFriends() -->
+              <div class="mutual-faces"></div>
+              <div class="mutual-text"></div>
+            </div>
+            <!-- Badge showcase — admin-created badges -->
+            <div id="widget-badges"></div>
+
+            <!-- Activity widget — filled by renderActivity() via getCrafterActivity() -->
+            <div class="widget" style="animation-delay: 0.24s">
+              <div class="w-title">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Recent Activity
+              </div>
+              <div id="activity-list">
+                <!-- Shimmer until API responds -->
+                <div
+                  style="
+                    height: 80px;
+                    border-radius: 8px;
+                    background: linear-gradient(
+                      90deg,
+                      #f0f0f0 25%,
+                      #e8e8e8 50%,
+                      #f0f0f0 75%
+                    );
+                    background-size: 200% 100%;
+                    animation: shimmer 1.4s infinite;
+                  "
+                ></div>
+              </div>
+            </div>
+          </aside>
+          <!-- /content-side -->
+        </div>
+        <!-- /content-grid -->
+      </div>
+      <!-- /page -->
+    </div>
+    <!-- /shell -->
+
+    <!--
+  Script loading order (matters):
+    1. socket.io CDN     → provides global `io` function
+    2. socket-client.js  → connects socket, handles notif/chat badges globally
+    3. crafter-profile.js→ page logic — uses window.craftSocket
+-->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="../js/socket-client.js"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/crafter-profile.js"></script>
+    <!-- Community widgets: announcements, challenges, badges from admin dashboard -->
+    <script src="../js/community-widgets.js"></script>
+  </body>
+</html>

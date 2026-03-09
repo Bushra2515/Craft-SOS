@@ -201,10 +201,11 @@ async function publishPost() {
 
   try {
     const payload = {
-      type: postType, // controller maps "tutorial" → "tut" etc.
+      // type: postType, // controller maps "tutorial" → "tut" etc.
+      type: TYPE_MAP[postType],
       title,
       body,
-      tags: tags.join(","), // server splits by comma
+      tags: [...tags], // ← was: tags.join(",")
       priority: priority || undefined,
       categories: collectCategories(),
       audience,
@@ -238,7 +239,7 @@ async function publishPost() {
       `"${title.substring(0, 55)}${title.length > 55 ? "…" : ""}" is now live.`;
 
     // Store post ID so "View Post" can navigate to it
-    overlay.dataset.postId = json.data.id;
+    overlay.dataset.postId = json.post?.id || json.post?._id;
 
     // Clear any saved draft
     localStorage.removeItem("craftsos_draft");
@@ -339,7 +340,7 @@ function viewPost() {
   const overlay = document.getElementById("success-overlay");
   const id = overlay.dataset.postId;
   overlay.classList.remove("show");
-  if (id) window.location.href = `dashboard.html?post=${id}`;
+  if (id) window.location.href = `post-detail.html?id=${id}`;
 }
 
 function createAnother() {
@@ -426,13 +427,112 @@ function updateEditorStats() {
 function fmt(cmd, val) {
   document.getElementById("editor-area").focus();
   document.execCommand(cmd, false, val || null);
+  updateEditorStats();
 }
 
+/* ── Heading / paragraph block format ── */
+function applyBlock(tag) {
+  document.getElementById("editor-area").focus();
+  document.execCommand("formatBlock", false, tag);
+  updateEditorStats();
+}
+
+/* ── Highlight selected text ── */
+function applyHighlight() {
+  document.getElementById("editor-area").focus();
+  document.execCommand("hiliteColor", false, "#FFF176");
+  updateEditorStats();
+}
+
+/* ── Heading dropdown open/close ── */
+function toggleDD(id) {
+  document.querySelectorAll(".tb-dropdown").forEach((d) => {
+    if (d.id !== id) d.classList.remove("open");
+  });
+  document.getElementById(id).classList.toggle("open");
+}
+function closeDD(id) {
+  document.getElementById(id).classList.remove("open");
+}
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".tb-dropdown"))
+    document
+      .querySelectorAll(".tb-dropdown")
+      .forEach((d) => d.classList.remove("open"));
+});
+
+/* ── Block inserts ── */
+function insertBlockquote() {
+  const ea = document.getElementById("editor-area");
+  ea.focus();
+  const sel = window.getSelection();
+  if (sel && sel.toString().trim()) {
+    const text = sel.toString();
+    sel.deleteFromDocument();
+    document.execCommand(
+      "insertHTML",
+      false,
+      `<blockquote>${text}</blockquote><p><br></p>`,
+    );
+  } else {
+    document.execCommand(
+      "insertHTML",
+      false,
+      `<blockquote>Quote text here…</blockquote><p><br></p>`,
+    );
+  }
+  updateEditorStats();
+}
+
+function insertCodeBlock() {
+  document.getElementById("editor-area").focus();
+  document.execCommand(
+    "insertHTML",
+    false,
+    `<pre><code>// paste your code or reference here</code></pre><p><br></p>`,
+  );
+  updateEditorStats();
+}
+
+function insertInlineCode() {
+  document.getElementById("editor-area").focus();
+  const sel = window.getSelection();
+  const text = sel ? sel.toString() : "";
+  document.execCommand("insertHTML", false, `<code>${text || "code"}</code>`);
+  updateEditorStats();
+}
+
+function insertHR() {
+  document.getElementById("editor-area").focus();
+  document.execCommand("insertHTML", false, `<hr/><p><br></p>`);
+  updateEditorStats();
+}
+
+/* ── Link insert (enhanced: Ctrl+K, supports selected text) ── */
 function insertLink() {
-  const url = prompt("Enter URL:");
-  if (url) {
-    document.getElementById("editor-area").focus();
+  document.getElementById("editor-area").focus();
+  const sel = window.getSelection();
+  const linkText = sel && sel.toString();
+  const url = prompt("Enter URL:", "https://");
+  if (!url) return;
+  if (linkText) {
     document.execCommand("createLink", false, url);
+  } else {
+    const text = prompt("Link text:", url) || url;
+    document.execCommand(
+      "insertHTML",
+      false,
+      `<a href="${url}" target="_blank">${text}</a>`,
+    );
+  }
+  updateEditorStats();
+}
+
+/* ── Keyboard shortcut: Ctrl+K → insertLink ── */
+function handleEditorKey(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+    e.preventDefault();
+    insertLink();
   }
 }
 
@@ -669,48 +769,10 @@ function previewPost() {
 }
 
 /* ══════════════════════════════════════════════════
-   NAV HELPERS
-══════════════════════════════════════════════════ */
-function syncNav(el) {
-  const label = el.textContent.trim();
-  document
-    .querySelectorAll(".tnav")
-    .forEach((l) =>
-      l.classList.toggle("active", l.textContent.trim() === label),
-    );
-  document
-    .querySelectorAll(".snav")
-    .forEach((l) =>
-      l.classList.toggle("active", l.textContent.trim() === label),
-    );
-}
-
-function pickNav(el) {
-  document
-    .querySelectorAll(".nav-item")
-    .forEach((i) => i.classList.remove("active"));
-  el.classList.add("active");
-  if (window.innerWidth <= 520) closeSidebar();
-}
-
-function toggleSidebar() {
-  const open = document.getElementById("sidebar").classList.toggle("open");
-  document.getElementById("overlay").classList.toggle("on", open);
-}
-
-function closeSidebar() {
-  document.getElementById("sidebar").classList.remove("open");
-  document.getElementById("overlay").classList.remove("on");
-}
-
-window.addEventListener("resize", () => {
-  if (window.innerWidth > 520) closeSidebar();
-});
-
-/* ══════════════════════════════════════════════════
    INIT  (runs after DOM is ready)
 ══════════════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", () => {
+  initSidebar();
   // ── Contenteditable placeholder ───────────────
   const ed = document.getElementById("editor-area");
   if (ed) {
@@ -727,6 +789,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ── Tag suggestions ───────────────────────────
   filterTagSugs("");
+  // After loading the user from localStorage or the API:
+  initSidebar(_me); // or initSidebar(userData), initSidebar(w) — whatever the variable is called
 
   // ── Checklist initial state ───────────────────
   updateChecklist();

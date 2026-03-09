@@ -1,0 +1,1422 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Craft-SOS — Supporting Independent Makers</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #eef0e8;
+        --panel: #d4dbbf;
+        --sidebar-bg: #c9d3af;
+        --card: #dde4cb;
+        --card2: #e4ead6;
+        --accent: #7a8f52;
+        --accent-dark: #5e6e3b;
+        --accent-light: #e6ecda;
+        --accent-mid: #a8bc70;
+        --text-dark: #2e3520;
+        --text-mid: #4a5730;
+        --text-light: #6b7a50;
+        --green: #4a8c42;
+        --amber: #b8920e;
+        --red: #c84830;
+        --blue: #3a7ab8;
+        --top-h: 60px;
+        --ease: cubic-bezier(0.4, 0, 0.2, 1);
+        --r: 16px;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text-dark);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        opacity: 0.038;
+        pointer-events: none;
+        z-index: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='480'%3E%3Ccircle cx='68' cy='68' r='28' fill='none' stroke='%237a8f52' stroke-width='1.8'/%3E%3Cpath d='M50 88 Q68 48 86 88' fill='none' stroke='%237a8f52' stroke-width='1.2'/%3E%3Crect x='188' y='26' width='64' height='11' rx='5.5' fill='none' stroke='%237a8f52' stroke-width='1.4' transform='rotate(28 220 31)'/%3E%3Ccircle cx='218' cy='18' r='7' fill='none' stroke='%237a8f52' stroke-width='1.4'/%3E%3Cellipse cx='400' cy='120' rx='22' ry='32' fill='none' stroke='%237a8f52' stroke-width='1.6' transform='rotate(-18 400 120)'/%3E%3C/svg%3E");
+      }
+
+      /* ══════════════ TOPBAR ══════════════ */
+      #topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--top-h);
+        background: rgba(238, 240, 232, 0.92);
+        backdrop-filter: blur(12px);
+        display: flex;
+        align-items: center;
+        padding: 0 28px;
+        z-index: 200;
+        border-bottom: 1.5px solid rgba(122, 143, 82, 0.14);
+      }
+      .tb-logo-zone {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-right: auto;
+      }
+      .tb-logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 12px rgba(122, 143, 82, 0.3);
+        cursor: pointer;
+      }
+      .tb-logo svg {
+        width: 17px;
+        height: 17px;
+        fill: white;
+      }
+      .tb-name {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: var(--text-dark);
+      }
+      .tb-search {
+        flex: 1;
+        max-width: 420px;
+        margin: 0 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--card);
+        border: 1.5px solid rgba(122, 143, 82, 0.18);
+        border-radius: 22px;
+        padding: 8px 16px;
+        transition: border-color 0.2s;
+      }
+      .tb-search:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(122, 143, 82, 0.12);
+      }
+      .tb-search svg {
+        width: 14px;
+        height: 14px;
+        stroke: var(--text-light);
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        flex-shrink: 0;
+      }
+      .tb-search input {
+        background: none;
+        border: none;
+        outline: none;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.86rem;
+        color: var(--text-dark);
+        width: 100%;
+      }
+      .tb-search input::placeholder {
+        color: var(--text-light);
+      }
+      .tb-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .tb-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 15px;
+        border-radius: 22px;
+        font-size: 0.84rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.18s;
+        white-space: nowrap;
+        font-family: "DM Sans", sans-serif;
+      }
+      .tb-btn.prim {
+        background: var(--red);
+        color: white;
+        box-shadow: 0 3px 12px rgba(200, 72, 48, 0.3);
+      }
+      .tb-btn.prim:hover {
+        background: #a83828;
+        transform: scale(1.04);
+      }
+      .tb-btn.sec {
+        background: var(--card);
+        color: var(--text-mid);
+      }
+      .tb-btn.sec:hover {
+        background: var(--panel);
+      }
+      .tb-btn svg {
+        width: 13px;
+        height: 13px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+      }
+
+      /* ══════════════ HERO ══════════════ */
+      #shell {
+        margin-top: var(--top-h);
+        min-height: calc(100vh - var(--top-h));
+        position: relative;
+        z-index: 1;
+      }
+      .hero {
+        background: linear-gradient(
+          135deg,
+          #a8ba7e 0%,
+          #7a8f52 45%,
+          #5e6e3b 100%
+        );
+        padding: 60px 28px 70px;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0.12;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='300'%3E%3Ccircle cx='100' cy='80' r='50' fill='none' stroke='white' stroke-width='2'/%3E%3Cpath d='M70 105 Q100 55 130 105' fill='none' stroke='white' stroke-width='1.5'/%3E%3Ccircle cx='700' cy='220' r='40' fill='none' stroke='white' stroke-width='2'/%3E%3Cpath d='M675 240 Q700 200 725 240' fill='none' stroke='white' stroke-width='1.5'/%3E%3Crect x='350' y='30' width='90' height='16' rx='8' fill='none' stroke='white' stroke-width='1.5' transform='rotate(20 395 38)'/%3E%3Ccircle cx='400' cy='18' r='10' fill='none' stroke='white' stroke-width='1.5'/%3E%3Cpath d='M220 250 L250 215 L280 250 L250 285 Z' fill='none' stroke='white' stroke-width='1.5'/%3E%3Crect x='520' y='80' width='60' height='85' rx='7' fill='none' stroke='white' stroke-width='1.5'/%3E%3Cline x1='520' y1='125' x2='580' y2='125' stroke='white' stroke-width='1'/%3E%3C/svg%3E");
+      }
+      .hero-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+        text-align: center;
+      }
+      .hero-title {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 3rem;
+        color: white;
+        line-height: 1.2;
+        margin-bottom: 16px;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+      }
+      .hero-subtitle {
+        font-size: 1.15rem;
+        color: rgba(255, 255, 255, 0.88);
+        line-height: 1.7;
+        max-width: 680px;
+        margin: 0 auto 32px;
+      }
+      .hero-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .hero-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border-radius: 24px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.92rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        white-space: nowrap;
+      }
+      .hero-btn.prim {
+        background: white;
+        color: var(--accent-dark);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
+      }
+      .hero-btn.prim:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+      }
+      .hero-btn.sec {
+        background: rgba(255, 255, 255, 0.18);
+        color: white;
+        border: 1.5px solid rgba(255, 255, 255, 0.35);
+      }
+      .hero-btn.sec:hover {
+        background: rgba(255, 255, 255, 0.28);
+        transform: translateY(-1px);
+      }
+      .hero-btn svg {
+        width: 15px;
+        height: 15px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+      }
+      .hero-stats {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 32px;
+        margin-top: 40px;
+        flex-wrap: wrap;
+      }
+      .hero-stat {
+        text-align: center;
+      }
+      .hero-stat-num {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 2rem;
+        color: white;
+        line-height: 1;
+      }
+      .hero-stat-label {
+        font-size: 0.82rem;
+        color: rgba(255, 255, 255, 0.78);
+        margin-top: 4px;
+        font-weight: 500;
+      }
+
+      /* ══════════════ CONTAINER ══════════════ */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 28px;
+      }
+      .section {
+        padding: 50px 0;
+      }
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .section-title {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 1.6rem;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .section-title svg {
+        width: 22px;
+        height: 22px;
+        stroke: var(--accent);
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+      }
+      .section-link {
+        font-size: 0.86rem;
+        font-weight: 600;
+        color: var(--accent-dark);
+        cursor: pointer;
+        transition: color 0.15s;
+      }
+      .section-link:hover {
+        color: var(--accent);
+      }
+
+      /* ══════════════ FEATURED POSTS ══════════════ */
+      .featured-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .featured-card {
+        background: var(--card);
+        border-radius: var(--r);
+        overflow: hidden;
+        cursor: pointer;
+        border: 1.5px solid rgba(122, 143, 82, 0.15);
+        transition: all 0.2s;
+        animation: fadeUp 0.35s ease both;
+      }
+      .featured-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 28px rgba(46, 53, 32, 0.14);
+        border-color: rgba(122, 143, 82, 0.3);
+      }
+      .featured-card:nth-child(1) {
+        animation-delay: 0.05s;
+      }
+      .featured-card:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+      .featured-card:nth-child(3) {
+        animation-delay: 0.15s;
+      }
+      .fc-image {
+        height: 180px;
+        background: linear-gradient(135deg, #a8ba7e, var(--accent));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        position: relative;
+      }
+      .fc-image::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          transparent 50%,
+          rgba(46, 53, 32, 0.3)
+        );
+      }
+      .fc-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--text-dark);
+        font-size: 0.7rem;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: 4px 10px;
+      }
+      .fc-body {
+        padding: 18px 18px 16px;
+      }
+      .fc-title {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: var(--text-dark);
+        line-height: 1.35;
+        margin-bottom: 8px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .fc-excerpt {
+        font-size: 0.84rem;
+        color: var(--text-mid);
+        line-height: 1.6;
+        margin-bottom: 12px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .fc-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.76rem;
+        color: var(--text-light);
+        flex-wrap: wrap;
+      }
+      .fc-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .fc-meta-item svg {
+        width: 11px;
+        height: 11px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+      .fc-author {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(122, 143, 82, 0.12);
+      }
+      .fc-author-av {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #b5c98a, var(--accent));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 0.7rem;
+        color: white;
+      }
+      .fc-author-name {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-mid);
+      }
+
+      /* ══════════════ POST GRID ══════════════ */
+      .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+      .post-card {
+        background: var(--card);
+        border-radius: 14px;
+        padding: 16px;
+        cursor: pointer;
+        border: 1.5px solid rgba(122, 143, 82, 0.15);
+        transition: all 0.18s;
+        animation: fadeUp 0.3s ease both;
+      }
+      .post-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 18px rgba(46, 53, 32, 0.1);
+        border-color: rgba(122, 143, 82, 0.28);
+      }
+      .pc-badge {
+        display: inline-flex;
+        font-size: 0.68rem;
+        font-weight: 700;
+        background: var(--accent-light);
+        color: var(--accent);
+        border-radius: 8px;
+        padding: 3px 8px;
+        margin-bottom: 10px;
+      }
+      .pc-badge.sos {
+        background: rgba(200, 72, 48, 0.12);
+        color: var(--red);
+      }
+      .pc-badge.com {
+        background: rgba(184, 146, 14, 0.12);
+        color: var(--amber);
+      }
+      .pc-title {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 0.92rem;
+        color: var(--text-dark);
+        line-height: 1.4;
+        margin-bottom: 8px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .pc-excerpt {
+        font-size: 0.8rem;
+        color: var(--text-light);
+        line-height: 1.55;
+        margin-bottom: 10px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .pc-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.72rem;
+        color: var(--text-light);
+      }
+      .pc-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+      }
+
+      /* ══════════════ DISTRESS CALLS ══════════════ */
+      .distress-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .distress-card {
+        background: rgba(200, 72, 48, 0.06);
+        border: 1.5px solid rgba(200, 72, 48, 0.18);
+        border-radius: 14px;
+        padding: 14px 16px;
+        cursor: pointer;
+        transition: all 0.16s;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        animation: fadeUp 0.3s ease both;
+      }
+      .distress-card:hover {
+        background: rgba(200, 72, 48, 0.1);
+        border-color: rgba(200, 72, 48, 0.3);
+        transform: translateY(-1px);
+      }
+      .dc-icon {
+        font-size: 1.8rem;
+        flex-shrink: 0;
+        animation: pulse 2s infinite;
+      }
+      .dc-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .dc-badge {
+        display: inline-flex;
+        font-size: 0.65rem;
+        font-weight: 700;
+        background: var(--red);
+        color: white;
+        border-radius: 8px;
+        padding: 2px 8px;
+        margin-bottom: 6px;
+      }
+      .dc-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        line-height: 1.4;
+        margin-bottom: 4px;
+      }
+      .dc-meta {
+        font-size: 0.74rem;
+        color: var(--text-light);
+      }
+
+      /* ══════════════ CATEGORIES ══════════════ */
+      .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+      }
+      .cat-card {
+        background: var(--card);
+        border-radius: 14px;
+        padding: 18px 16px;
+        border: 1.5px solid rgba(122, 143, 82, 0.15);
+        cursor: pointer;
+        transition: all 0.18s;
+        text-align: center;
+        animation: fadeUp 0.3s ease both;
+      }
+      .cat-card:hover {
+        background: var(--panel);
+        border-color: rgba(122, 143, 82, 0.3);
+        transform: translateY(-2px);
+      }
+      .cat-icon {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+      }
+      .cat-name {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 0.92rem;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+      }
+      .cat-count {
+        font-size: 0.74rem;
+        color: var(--text-light);
+      }
+
+      /* ══════════════ FOOTER ══════════════ */
+      .footer {
+        background: var(--sidebar-bg);
+        border-top: 1.5px solid rgba(122, 143, 82, 0.18);
+        padding: 50px 28px 30px;
+        margin-top: 60px;
+      }
+      .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 40px;
+      }
+      .footer-brand {
+      }
+      .footer-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .footer-logo-pill {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .footer-logo-pill svg {
+        width: 17px;
+        height: 17px;
+        fill: white;
+      }
+      .footer-logo-name {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: var(--text-dark);
+      }
+      .footer-desc {
+        font-size: 0.84rem;
+        color: var(--text-mid);
+        line-height: 1.7;
+        margin-bottom: 16px;
+      }
+      .footer-social {
+        display: flex;
+        gap: 8px;
+      }
+      .footer-social-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: var(--card);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .footer-social-btn:hover {
+        background: var(--accent);
+        transform: scale(1.08);
+      }
+      .footer-social-btn svg {
+        width: 14px;
+        height: 14px;
+        stroke: var(--text-mid);
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+      .footer-social-btn:hover svg {
+        stroke: white;
+      }
+      .footer-col {
+      }
+      .footer-col-title {
+        font-family: "Lora", serif;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+        margin-bottom: 14px;
+      }
+      .footer-links {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .footer-link {
+        font-size: 0.82rem;
+        color: var(--text-mid);
+        cursor: pointer;
+        transition: color 0.15s;
+      }
+      .footer-link:hover {
+        color: var(--accent);
+      }
+      .footer-bottom {
+        max-width: 1200px;
+        margin: 30px auto 0;
+        padding-top: 20px;
+        border-top: 1px solid rgba(122, 143, 82, 0.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.78rem;
+        color: var(--text-light);
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      /* ══════════════ ANIMATIONS ══════════════ */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.6;
+        }
+      }
+
+      /* ══════════════ RESPONSIVE ══════════════ */
+      @media (max-width: 1024px) {
+        .featured-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .posts-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .footer-content {
+          grid-template-columns: 2fr 1fr 1fr;
+        }
+      }
+      @media (max-width: 768px) {
+        .hero-title {
+          font-size: 2.2rem;
+        }
+        .featured-grid {
+          grid-template-columns: 1fr;
+        }
+        .posts-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .categories-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .footer-content {
+          grid-template-columns: 1fr;
+        }
+        .tb-search {
+          display: none;
+        }
+      }
+      @media (max-width: 520px) {
+        #topbar {
+          padding: 0 14px;
+        }
+        .container {
+          padding: 0 14px;
+        }
+        .hero {
+          padding: 40px 14px 50px;
+        }
+        .hero-title {
+          font-size: 1.8rem;
+        }
+        .hero-subtitle {
+          font-size: 1rem;
+        }
+        .posts-grid {
+          grid-template-columns: 1fr;
+        }
+        .categories-grid {
+          grid-template-columns: 1fr;
+        }
+        .footer {
+          padding: 40px 14px 20px;
+        }
+        .tb-btn.sec {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ══════════════ TOPBAR ══════════════ -->
+    <header id="topbar">
+      <div class="tb-logo-zone">
+        <div class="tb-logo" onclick="window.location.href = 'index.html'">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"
+            />
+          </svg>
+        </div>
+        <span class="tb-name">Craft-SOS</span>
+      </div>
+      <div class="tb-search">
+        <svg viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search posts, topics, people…"
+          id="search-input"
+        />
+      </div>
+      <div class="tb-right">
+        <button class="tb-btn prim" onclick="alert('Post distress call')">
+          <svg viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Distress Call
+        </button>
+        <button class="tb-btn sec" onclick="alert('Sign in')">Sign In</button>
+      </div>
+    </header>
+
+    <!-- ══════════════ SHELL ══════════════ -->
+    <div id="shell">
+      <!-- HERO SECTION -->
+      <section class="hero">
+        <div class="hero-content">
+          <h1 class="hero-title">
+            Supporting Independent Makers,<br />One Solution at a Time 🌿
+          </h1>
+          <p class="hero-subtitle">
+            A community-driven platform where craft sellers help each other
+            solve real problems, share business knowledge, and build sustainable
+            creative practices.
+          </p>
+          <div class="hero-actions">
+            <button class="hero-btn prim" onclick="alert('Browse tutorials')">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              Browse Tutorials
+            </button>
+            <button class="hero-btn sec" onclick="alert('Post SOS')">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              Post a Distress Call
+            </button>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <div class="hero-stat-num" id="stat-members">8,312</div>
+              <div class="hero-stat-label">Active Members</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-num" id="stat-posts">2,847</div>
+              <div class="hero-stat-label">Published Posts</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-num" id="stat-responses">24,391</div>
+              <div class="hero-stat-label">Community Responses</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-num" id="stat-resolved">1,923</div>
+              <div class="hero-stat-label">Issues Resolved</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FEATURED POSTS -->
+      <section class="section">
+        <div class="container">
+          <div class="section-head">
+            <h2 class="section-title">
+              <svg viewBox="0 0 24 24">
+                <polygon
+                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                />
+              </svg>
+              Featured This Week
+            </h2>
+            <span class="section-link" onclick="alert('View all featured')"
+              >View all →</span
+            >
+          </div>
+          <div class="featured-grid" id="featured-grid"></div>
+        </div>
+      </section>
+
+      <!-- ACTIVE DISTRESS CALLS -->
+      <section
+        class="section"
+        style="background: rgba(200, 72, 48, 0.03); padding: 50px 0"
+      >
+        <div class="container">
+          <div class="section-head">
+            <h2 class="section-title">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              Active Distress Calls
+            </h2>
+            <span class="section-link" onclick="alert('View all SOS')"
+              >View all →</span
+            >
+          </div>
+          <div class="distress-list" id="distress-list"></div>
+        </div>
+      </section>
+
+      <!-- RECENT POSTS -->
+      <section class="section">
+        <div class="container">
+          <div class="section-head">
+            <h2 class="section-title">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              Recent Posts
+            </h2>
+            <span class="section-link" onclick="alert('View all posts')"
+              >View all →</span
+            >
+          </div>
+          <div class="posts-grid" id="posts-grid"></div>
+        </div>
+      </section>
+
+      <!-- BROWSE CATEGORIES -->
+      <section
+        class="section"
+        style="background: var(--accent-light); padding: 50px 0"
+      >
+        <div class="container">
+          <div class="section-head">
+            <h2 class="section-title">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+              Browse by Category
+            </h2>
+          </div>
+          <div class="categories-grid" id="categories-grid"></div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="footer">
+        <div class="footer-content">
+          <div class="footer-brand">
+            <div class="footer-logo">
+              <div class="footer-logo-pill">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"
+                  />
+                </svg>
+              </div>
+              <span class="footer-logo-name">Craft-SOS</span>
+            </div>
+            <p class="footer-desc">
+              Supporting independent makers with community-driven solutions,
+              business knowledge, and a network of craftspeople who genuinely
+              understand the challenges of running a creative business.
+            </p>
+            <div class="footer-social">
+              <div class="footer-social-btn">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"
+                  />
+                </svg>
+              </div>
+              <div class="footer-social-btn">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
+                  />
+                </svg>
+              </div>
+              <div class="footer-social-btn">
+                <svg viewBox="0 0 24 24">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                  <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="footer-col">
+            <div class="footer-col-title">Community</div>
+            <div class="footer-links">
+              <span class="footer-link">Browse Posts</span>
+              <span class="footer-link">Distress Calls</span>
+              <span class="footer-link">Tutorials</span>
+              <span class="footer-link">Member Directory</span>
+              <span class="footer-link">Success Stories</span>
+            </div>
+          </div>
+          <div class="footer-col">
+            <div class="footer-col-title">Resources</div>
+            <div class="footer-links">
+              <span class="footer-link">How It Works</span>
+              <span class="footer-link">Community Guidelines</span>
+              <span class="footer-link">Pricing Guides</span>
+              <span class="footer-link">Business Templates</span>
+              <span class="footer-link">Help Center</span>
+            </div>
+          </div>
+          <div class="footer-col">
+            <div class="footer-col-title">About</div>
+            <div class="footer-links">
+              <span class="footer-link">Our Mission</span>
+              <span class="footer-link">Contact Us</span>
+              <span class="footer-link">Privacy Policy</span>
+              <span class="footer-link">Terms of Service</span>
+              <span class="footer-link">Support Us</span>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span
+            >&copy; 2026 Craft-SOS. Built with 💚 for the maker community.</span
+          >
+          <span>Made by craftspeople, for craftspeople.</span>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // ════════════════════════════════════════════════════
+      // SAMPLE DATA
+      // ════════════════════════════════════════════════════
+      const featuredPosts = [
+        {
+          id: 1,
+          emoji: "💰",
+          badge: "Tutorial",
+          title:
+            "How I priced my hand-dyed yarn to actually make a living wage — the full formula",
+          excerpt:
+            "The complete 5-step framework I use to price every skein I dye, with real numbers and a worked example.",
+          author: { name: "WoolCraft Co", initials: "W", color: "#7a8f52" },
+          views: 2841,
+          responses: 89,
+          readTime: 12,
+        },
+        {
+          id: 2,
+          emoji: "🏦",
+          badge: "Tutorial",
+          title:
+            "VAT threshold hit unexpectedly — what I did and what I wish I'd known",
+          excerpt:
+            "Crossing the VAT threshold as a sole trader caught me off guard. Here's how I handled it and what to prepare for.",
+          author: { name: "FiberArts Jo", initials: "F", color: "#c8a98a" },
+          views: 1592,
+          responses: 47,
+          readTime: 8,
+        },
+        {
+          id: 3,
+          emoji: "📦",
+          badge: "Resource",
+          title: "Free invoice template for UK craft sellers (Google Sheets)",
+          excerpt:
+            "A ready-to-use invoice template with automatic calculations, VAT handling, and professional formatting.",
+          author: { name: "KnitQueen", initials: "K", color: "#a8c4d8" },
+          views: 3214,
+          responses: 62,
+          readTime: 5,
+        },
+      ];
+
+      const distressCalls = [
+        {
+          id: 1,
+          title: "Etsy account restricted — all listings deactivated overnight",
+          author: "StitchWorks",
+          time: "1 hour ago",
+          responses: 3,
+        },
+        {
+          id: 2,
+          title:
+            "HMRC letter about undeclared income from 2023 — really scared",
+          author: "CraftsByClara",
+          time: "3 hours ago",
+          responses: 8,
+        },
+        {
+          id: 3,
+          title: "My main courier lost £280 of stock and refusing to pay out",
+          author: "YarnWitch",
+          time: "5 hours ago",
+          responses: 12,
+        },
+        {
+          id: 4,
+          title:
+            "Customer threatening to report me to Trading Standards over delayed order",
+          author: "PotteryStudio",
+          time: "8 hours ago",
+          responses: 15,
+        },
+        {
+          id: 5,
+          title:
+            "Can't afford rent this month after supplier increased minimum order",
+          author: "TextileCreations",
+          time: "Yesterday",
+          responses: 22,
+        },
+      ];
+
+      const recentPosts = [
+        {
+          id: 1,
+          badge: "tutorial",
+          title: "Natural mordanting with alum — complete beginner guide",
+          excerpt:
+            "Everything you need to know about preparing natural fibres for dyeing.",
+          time: "2 hours ago",
+          readTime: 10,
+        },
+        {
+          id: 2,
+          badge: "sos",
+          title: "Shopify vs Etsy for ceramics — which should I choose?",
+          excerpt: "Trying to decide where to focus my selling efforts.",
+          time: "4 hours ago",
+          readTime: 3,
+        },
+        {
+          id: 3,
+          badge: "com",
+          title: "Just hit my first £1000 month — here's what changed",
+          excerpt: "After 18 months of struggling, things finally clicked.",
+          time: "6 hours ago",
+          readTime: 7,
+        },
+        {
+          id: 4,
+          badge: "tutorial",
+          title:
+            "Setting up a UK craft business — sole trader vs limited company",
+          excerpt: "The pros and cons of each structure, with real numbers.",
+          time: "8 hours ago",
+          readTime: 15,
+        },
+        {
+          id: 5,
+          badge: "com",
+          title: "Does anyone else find winter months brutally slow for Etsy?",
+          excerpt: "Down 40% on last November. Is it just me or the platform?",
+          time: "10 hours ago",
+          readTime: 4,
+        },
+        {
+          id: 6,
+          badge: "tutorial",
+          title: "Wholesale pricing that actually works — my formula",
+          excerpt: "How to price for wholesale without losing money.",
+          time: "12 hours ago",
+          readTime: 11,
+        },
+        {
+          id: 7,
+          badge: "sos",
+          title: "Customer wants refund after using my product for 3 months",
+          excerpt: "How do I handle this professionally and legally?",
+          time: "14 hours ago",
+          readTime: 5,
+        },
+        {
+          id: 8,
+          badge: "com",
+          title: "Raising prices mid-season — how did you communicate it?",
+          excerpt:
+            "Material costs up 30%. Need to raise prices but worried about backlash.",
+          time: "16 hours ago",
+          readTime: 6,
+        },
+      ];
+
+      const categories = [
+        { emoji: "💰", name: "Pricing & Business", count: 342 },
+        { emoji: "🧶", name: "Natural Dyeing", count: 289 },
+        { emoji: "📦", name: "Selling & Marketing", count: 451 },
+        { emoji: "🏛", name: "Legal & Tax", count: 178 },
+        { emoji: "🤝", name: "Wholesale", count: 124 },
+        { emoji: "📊", name: "Bookkeeping", count: 156 },
+        { emoji: "🎨", name: "Product Development", count: 267 },
+        { emoji: "🚚", name: "Shipping & Logistics", count: 203 },
+      ];
+
+      // ════════════════════════════════════════════════════
+      // RENDER FUNCTIONS
+      // ════════════════════════════════════════════════════
+      function renderFeatured() {
+        const grid = document.getElementById("featured-grid");
+        grid.innerHTML = featuredPosts
+          .map(
+            (post) => `
+        <div class="featured-card" onclick="viewPost(${post.id})">
+          <div class="fc-image">
+            <span>${post.emoji}</span>
+            <div class="fc-badge">${post.badge}</div>
+          </div>
+          <div class="fc-body">
+            <h3 class="fc-title">${post.title}</h3>
+            <p class="fc-excerpt">${post.excerpt}</p>
+            <div class="fc-meta">
+              <div class="fc-meta-item">
+                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                ${post.views.toLocaleString()}
+              </div>
+              <div class="fc-meta-item">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                ${post.responses}
+              </div>
+              <div class="fc-meta-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                ${post.readTime} min
+              </div>
+            </div>
+            <div class="fc-author">
+              <div class="fc-author-av" style="background:${post.author.color}">${post.author.initials}</div>
+              <span class="fc-author-name">${post.author.name}</span>
+            </div>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      function renderDistressCalls() {
+        const list = document.getElementById("distress-list");
+        list.innerHTML = distressCalls
+          .map(
+            (call) => `
+        <div class="distress-card" onclick="viewPost(${call.id})">
+          <div class="dc-icon">🆘</div>
+          <div class="dc-body">
+            <div class="dc-badge">ACTIVE · ${call.responses} ${call.responses === 1 ? "RESPONSE" : "RESPONSES"}</div>
+            <div class="dc-title">${call.title}</div>
+            <div class="dc-meta">${call.author} · ${call.time}</div>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      function renderRecentPosts() {
+        const grid = document.getElementById("posts-grid");
+        grid.innerHTML = recentPosts
+          .map((post, i) => {
+            const badgeClass =
+              post.badge === "sos" ? "sos" : post.badge === "com" ? "com" : "";
+            const badgeLabel =
+              post.badge === "tutorial"
+                ? "Tutorial"
+                : post.badge === "sos"
+                  ? "SOS"
+                  : "Community";
+            return `
+          <div class="post-card" onclick="viewPost(${post.id})" style="animation-delay:${i * 0.05}s">
+            <div class="pc-badge ${badgeClass}">${badgeLabel}</div>
+            <h3 class="pc-title">${post.title}</h3>
+            <p class="pc-excerpt">${post.excerpt}</p>
+            <div class="pc-meta">
+              <div class="pc-meta-item">${post.time}</div>
+              <div class="pc-meta-item">· ${post.readTime} min</div>
+            </div>
+          </div>
+        `;
+          })
+          .join("");
+      }
+
+      function renderCategories() {
+        const grid = document.getElementById("categories-grid");
+        grid.innerHTML = categories
+          .map(
+            (cat, i) => `
+        <div class="cat-card" onclick="browseCategory('${cat.name}')" style="animation-delay:${i * 0.05}s">
+          <div class="cat-icon">${cat.emoji}</div>
+          <div class="cat-name">${cat.name}</div>
+          <div class="cat-count">${cat.count} posts</div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      // ════════════════════════════════════════════════════
+      // EVENT HANDLERS
+      // ════════════════════════════════════════════════════
+      function viewPost(id) {
+        // In real app: window.location.href = `post.html?id=${id}`;
+        console.log("View post:", id);
+        alert(
+          `Opening post ${id}...\n\nIn production, this would navigate to: post.html?id=${id}`,
+        );
+      }
+
+      function browseCategory(name) {
+        console.log("Browse category:", name);
+        alert(
+          `Browsing category: ${name}\n\nIn production, this would show filtered posts.`,
+        );
+      }
+
+      // Search functionality
+      document.getElementById("search-input").addEventListener("input", (e) => {
+        const query = e.target.value;
+        if (query.length > 2) {
+          console.log("Searching for:", query);
+          // In real app: call API to search
+        }
+      });
+
+      // ════════════════════════════════════════════════════
+      // INITIALIZE
+      // ════════════════════════════════════════════════════
+      function init() {
+        console.log("🚀 Initializing Craft-SOS Home Page...");
+        renderFeatured();
+        renderDistressCalls();
+        renderRecentPosts();
+        renderCategories();
+        console.log("✅ Page loaded successfully");
+      }
+
+      // Run on page load
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
+      }
+    </script>
+  </body>
+</html>

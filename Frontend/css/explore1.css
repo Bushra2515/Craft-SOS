@@ -49,7 +49,7 @@ body::before {
 
 /* ══════════════════════════════
        TOPBAR
-══════════════════════════════ */
+    ══════════════════════════════ */
 #topbar {
   position: fixed;
   top: 0;
@@ -160,8 +160,6 @@ body::before {
   stroke-width: 2.5;
   stroke-linecap: round;
 }
-/* Support both class names — common.js uses .topbar-avatar */
-.topbar-avatar,
 .profile-av-btn {
   width: 34px;
   height: 34px;
@@ -170,14 +168,6 @@ body::before {
   border: 2px solid var(--accent);
   cursor: pointer;
   flex-shrink: 0;
-  overflow: hidden;
-  font-family: "Lora", serif;
-  font-weight: 700;
-  font-size: 0.78rem;
-  color: var(--accent-dark);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 #hamburger {
   display: none;
@@ -251,7 +241,7 @@ body::before {
 
 /* ══════════════════════════════
        SHELL
-══════════════════════════════ */
+    ══════════════════════════════ */
 #shell {
   display: flex;
   margin-top: var(--topbar-h);
@@ -259,10 +249,10 @@ body::before {
   position: relative;
   z-index: 1;
 }
-/* 
+
 /* ══════════════════════════════
        SIDEBAR
-══════════════════════════════ */
+    ══════════════════════════════ */
 #sidebar {
   width: var(--sb-collapsed);
   flex-shrink: 0;
@@ -286,7 +276,6 @@ body::before {
 #sidebar.open {
   width: var(--sb-expanded);
 }
-
 .sb-prof {
   display: flex;
   align-items: center;
@@ -303,14 +292,6 @@ body::before {
   background: var(--panel);
   border: 2px solid var(--accent);
   flex-shrink: 0;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: "Lora", serif;
-  font-weight: 700;
-  font-size: 0.82rem;
-  color: var(--accent-dark);
 }
 .sb-prof-info {
   opacity: 0;
@@ -389,29 +370,9 @@ body::before {
   opacity: 1;
 }
 
-/* Live notification badges */
-.nav-badge-live {
-  min-width: 18px;
-  height: 18px;
-  border-radius: 9px;
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 5px;
-  margin-left: auto;
-  opacity: 0;
-  transition: opacity var(--ease);
-}
-.nav-badge-live:not(:empty) {
-  opacity: 1;
-}
-
 /* ══════════════════════════════
        MAIN
-══════════════════════════════ */
+    ══════════════════════════════ */
 #main {
   flex: 1;
   min-width: 0;
@@ -423,7 +384,7 @@ body::before {
 
 /* ══════════════════════════════
        FEED COLUMN
-══════════════════════════════ */
+    ══════════════════════════════ */
 #feed-col {
   flex: 1;
   min-width: 0;
@@ -432,36 +393,23 @@ body::before {
   gap: 20px;
 }
 
-/* ══════════════════════════════
-   SEARCH HERO
-   KEY FIX: overflow must be VISIBLE so the live-search
-   dropdown (#search-drop) can escape the card boundary.
-   The decorative ::before is self-clipped via border-radius.
-══════════════════════════════ */
+/* ── Search Hero ── */
 .search-hero {
   background: linear-gradient(135deg, #a8ba7e 0%, #7a8f52 55%, #5e6e3b 100%);
   border-radius: 20px;
   padding: 28px 24px;
   position: relative;
-  overflow: visible; /* allows dropdown to escape the card — see ::before for pattern clipping */
-  z-index: 20; /* stacks above sibling .cat-row / .posts-grid so dropdown isn't painted under them */
+  overflow: hidden;
   animation: fadeUp 0.4s ease both;
   box-shadow: 0 4px 20px rgba(46, 53, 32, 0.14);
 }
-
-/* Decorative SVG pattern — clipped with its own border-radius
-   so it never bleeds outside the card even without parent overflow:hidden */
 .search-hero::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 20px; /* ← clips the pattern to the card shape     */
-  overflow: hidden; /* ← belt-and-suspenders for the bg image     */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='160' opacity='0.12'%3E%3Ccircle cx='360' cy='30' r='28' fill='none' stroke='white' stroke-width='2'/%3E%3Cpath d='M340 46 Q360 16 380 46' fill='none' stroke='white' stroke-width='1.5'/%3E%3Ccircle cx='50' cy='130' r='22' fill='none' stroke='white' stroke-width='1.5'/%3E%3Cpath d='M36 142 Q50 116 64 142' fill='none' stroke='white' stroke-width='1'/%3E%3Crect x='170' y='10' width='50' height='8' rx='4' fill='none' stroke='white' stroke-width='1' transform='rotate(20 195 14)'/%3E%3C/svg%3E");
   pointer-events: none;
-  z-index: 0;
 }
-
 .search-hero-label {
   font-family: "Lora", serif;
   font-weight: 700;
@@ -469,28 +417,18 @@ body::before {
   color: white;
   margin-bottom: 4px;
   position: relative;
-  z-index: 1;
 }
 .search-hero-sub {
   font-size: 0.88rem;
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 18px;
   position: relative;
-  z-index: 1;
 }
-
-/* ══════════════════════════════
-   SEARCH BAR + DROPDOWN
-══════════════════════════════ */
 .search-bar-wrap {
-  position: relative; /* dropdown positions relative to this */
+  position: relative;
   max-width: 560px;
-  display: flex;
-  align-items: center;
-  z-index: 10; /* above hero siblings so dropdown is on top */
 }
-/* Search icon */
-.search-bar-wrap > svg:first-child {
+.search-bar-wrap svg {
   position: absolute;
   left: 14px;
   top: 50%;
@@ -502,11 +440,10 @@ body::before {
   stroke-width: 1.8;
   stroke-linecap: round;
   pointer-events: none;
-  z-index: 2;
 }
 #global-search {
   width: 100%;
-  padding: 13px 40px 13px 44px; /* right-pad reserves space for clear btn */
+  padding: 13px 14px 13px 44px;
   border-radius: 24px;
   border: none;
   outline: none;
@@ -524,133 +461,7 @@ body::before {
   color: var(--text-light);
 }
 
-/* Clear (×) button */
-.search-clear-btn {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: rgba(100, 110, 80, 0.6);
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition:
-    color 0.15s,
-    background 0.15s;
-  z-index: 3;
-}
-.search-clear-btn:hover {
-  color: var(--text-dark);
-  background: rgba(122, 143, 82, 0.12);
-}
-.search-clear-btn svg {
-  width: 14px;
-  height: 14px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-}
-
-/* Live search dropdown */
-#search-drop {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  right: 0;
-  background: #fff;
-  border-radius: 16px;
-  z-index: 500; /* high so it clears topbar siblings */
-  box-shadow:
-    0 8px 32px rgba(46, 53, 32, 0.16),
-    0 2px 8px rgba(46, 53, 32, 0.08);
-  max-height: 420px;
-  overflow-y: auto;
-  border: 1.5px solid rgba(122, 143, 82, 0.2);
-  display: none;
-  animation: fadeUp 0.15s ease both;
-}
-#search-drop::-webkit-scrollbar {
-  width: 4px;
-}
-#search-drop::-webkit-scrollbar-thumb {
-  background: rgba(122, 143, 82, 0.3);
-  border-radius: 4px;
-}
-.sdrop-label {
-  font-size: 0.69rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: #9a9690;
-  padding: 10px 14px 4px;
-}
-.sdrop-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 14px;
-  cursor: pointer;
-  transition: background 0.14s;
-}
-.sdrop-row:hover {
-  background: rgba(122, 143, 82, 0.07);
-}
-.sdrop-footer {
-  padding: 10px 14px;
-  border-top: 1px solid #f0ece5;
-  text-align: center;
-  font-size: 0.78rem;
-  color: var(--accent);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* Search type filter pills */
-.stype-row {
-  display: flex;
-  gap: 7px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-  position: relative;
-  z-index: 1;
-}
-.stype-pill {
-  padding: 5px 15px;
-  border-radius: 20px;
-  border: 1.5px solid rgba(255, 255, 255, 0.32);
-  background: rgba(255, 255, 255, 0.14);
-  color: rgba(255, 255, 255, 0.88);
-  font-family: "DM Sans", sans-serif;
-  font-size: 0.79rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background 0.18s,
-    border-color 0.18s,
-    color 0.18s;
-  backdrop-filter: blur(4px);
-  white-space: nowrap;
-}
-.stype-pill:hover {
-  background: rgba(255, 255, 255, 0.26);
-  border-color: rgba(255, 255, 255, 0.5);
-}
-.stype-pill.active {
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--accent-dark);
-  border-color: transparent;
-  box-shadow: 0 2px 8px rgba(46, 53, 32, 0.12);
-}
-
-/* ══════════════════════════════
-   CATEGORY PILLS
-══════════════════════════════ */
+/* ── Category Pills ── */
 .cat-row {
   display: flex;
   gap: 8px;
@@ -693,9 +504,7 @@ body::before {
   flex-shrink: 0;
 }
 
-/* ══════════════════════════════
-   SECTION HEADINGS
-══════════════════════════════ */
+/* ── Section heading ── */
 .section-head {
   display: flex;
   align-items: center;
@@ -731,9 +540,7 @@ body::before {
   color: var(--accent-dark);
 }
 
-/* ══════════════════════════════
-   FEATURED CRAFTERS CAROUSEL
-══════════════════════════════ */
+/* ── Featured Crafters Carousel ── */
 .crafters-strip {
   display: flex;
   gap: 12px;
@@ -745,6 +552,7 @@ body::before {
 .crafters-strip::-webkit-scrollbar {
   display: none;
 }
+
 .crafter-card {
   flex-shrink: 0;
   width: 160px;
@@ -761,11 +569,13 @@ body::before {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(46, 53, 32, 0.14);
 }
+
 .crafter-banner {
   height: 54px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  padding-bottom: 0;
   position: relative;
 }
 .crafter-av {
@@ -854,22 +664,8 @@ body::before {
   background: var(--accent-light);
   color: var(--accent);
 }
-/* Pending sent — muted olive, shows request is awaiting */
-.follow-btn.pending {
-  background: rgba(122, 143, 82, 0.15);
-  color: var(--accent);
-  border: 1.5px solid rgba(122, 143, 82, 0.3);
-  cursor: pointer;
-}
-.follow-btn.pending:hover {
-  background: rgba(200, 72, 48, 0.08);
-  color: #c0392b;
-  border-color: rgba(200, 72, 48, 0.25);
-}
 
-/* ══════════════════════════════
-   TRENDING TOPICS
-══════════════════════════════ */
+/* ── Trending Topics ── */
 .trends-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -914,9 +710,7 @@ body::before {
   margin-top: 1px;
 }
 
-/* ══════════════════════════════
-   SORT BAR
-══════════════════════════════ */
+/* ── Sort bar ── */
 .sort-bar {
   display: flex;
   align-items: center;
@@ -955,15 +749,14 @@ body::before {
   color: var(--text-light);
 }
 
-/* ══════════════════════════════
-   POST CARDS
-══════════════════════════════ */
+/* ── Post Cards Grid ── */
 .posts-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 14px;
   animation: fadeUp 0.4s 0.2s ease both;
 }
+
 .explore-card {
   background: var(--card);
   border-radius: 18px;
@@ -972,6 +765,7 @@ body::before {
   transition:
     transform 0.18s,
     box-shadow 0.18s;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -980,6 +774,7 @@ body::before {
   transform: translateY(-2px);
   box-shadow: 0 6px 22px rgba(46, 53, 32, 0.13);
 }
+
 .ec-header {
   display: flex;
   align-items: flex-start;
@@ -1018,6 +813,7 @@ body::before {
   flex-wrap: wrap;
   margin-top: 3px;
 }
+
 .badge {
   font-size: 0.71rem;
   font-weight: 600;
@@ -1045,6 +841,9 @@ body::before {
   background: #e5f5e0;
   color: #3a7d2c;
 }
+
+.ec-body {
+}
 .ec-title {
   font-family: "Lora", serif;
   font-weight: 700;
@@ -1058,20 +857,24 @@ body::before {
   color: var(--text-mid);
   line-height: 1.6;
 }
-.ec-tags {
+
+.ec-img {
+  background: rgba(122, 143, 82, 0.12);
+  border-radius: 12px;
+  height: 120px;
   display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 8px;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
 }
-.ec-tag {
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: var(--accent);
-  background: var(--accent-light);
-  border-radius: 10px;
-  padding: 2px 9px;
+.ec-img svg {
+  width: 26px;
+  height: 26px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.3;
 }
+
 .ec-footer {
   display: flex;
   align-items: center;
@@ -1085,13 +888,6 @@ body::before {
   border-radius: 50%;
   background: var(--panel);
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: "Lora", serif;
-  font-weight: 700;
-  font-size: 0.72rem;
-  color: var(--accent-dark);
 }
 .ec-msg-input {
   flex: 1;
@@ -1171,7 +967,7 @@ body::before {
 /* Load more */
 .load-more-wrap {
   text-align: center;
-  padding: 8px 0 4px;
+  padding: 8px 0 4px 0;
 }
 .load-more-btn {
   background: var(--card);
@@ -1192,30 +988,9 @@ body::before {
   transform: scale(1.02);
 }
 
-/* Shimmer skeleton */
-.loading-shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--panel) 25%,
-    var(--card) 50%,
-    var(--panel) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
-  border-radius: 10px;
-}
-@keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
 /* ══════════════════════════════
-   RIGHT COLUMN
-══════════════════════════════ */
+       RIGHT COLUMN
+    ══════════════════════════════ */
 #right-col {
   width: 264px;
   flex-shrink: 0;
@@ -1223,13 +998,17 @@ body::before {
   flex-direction: column;
   gap: 18px;
 }
+
 .panel-card {
   background: var(--sidebar-bg);
   border-radius: 18px;
   padding: 18px 16px;
   box-shadow: 0 2px 12px rgba(46, 53, 32, 0.07);
+  position: sticky;
+  top: calc(var(--topbar-h) + 22px);
   animation: fadeUp 0.4s 0.1s ease both;
 }
+
 .panel-title {
   font-family: "Lora", serif;
   font-weight: 700;
@@ -1276,11 +1055,6 @@ body::before {
   font-weight: 600;
   color: var(--text-dark);
 }
-.loc-item.loc-disabled {
-  opacity: 0.5;
-  cursor: default;
-  pointer-events: none;
-}
 .loc-left {
   display: flex;
   align-items: center;
@@ -1306,15 +1080,8 @@ body::before {
   display: flex;
   align-items: flex-start;
   gap: 9px;
-  padding: 9px 6px;
-  margin-inline: -6px;
+  padding: 9px 0;
   border-bottom: 1px solid rgba(122, 143, 82, 0.13);
-  cursor: pointer;
-  border-radius: 8px;
-  transition: background 0.14s;
-}
-.live-item:hover {
-  background: rgba(122, 143, 82, 0.08);
 }
 .live-item:last-child {
   border-bottom: none;
@@ -1375,22 +1142,18 @@ body::before {
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 7px 6px;
-  margin-inline: -6px;
+  padding: 7px 0;
   border-bottom: 1px solid rgba(122, 143, 82, 0.12);
-  cursor: pointer;
-  border-radius: 8px;
-  transition: background 0.14s;
-}
-.leader-item:hover {
-  background: rgba(122, 143, 82, 0.08);
 }
 .leader-item:last-child {
   border-bottom: none;
 }
 .leader-rank {
-  font-size: 1.1rem;
-  width: 24px;
+  font-family: "Lora", serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  width: 18px;
   text-align: center;
   flex-shrink: 0;
 }
@@ -1408,7 +1171,6 @@ body::before {
   height: 30px;
   border-radius: 50%;
   flex-shrink: 0;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1425,13 +1187,13 @@ body::before {
   font-size: 0.84rem;
   font-weight: 600;
   color: var(--text-dark);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .leader-pts {
   font-size: 0.72rem;
   color: var(--text-light);
+}
+.leader-badge-icon {
+  font-size: 0.9rem;
 }
 
 /* Overlay */
@@ -1459,8 +1221,8 @@ body::before {
 }
 
 /* ══════════════════════════════
-   RESPONSIVE
-══════════════════════════════ */
+       RESPONSIVE
+    ══════════════════════════════ */
 @media (max-width: 1060px) {
   #right-col {
     width: 230px;
@@ -1532,12 +1294,5 @@ body::before {
   }
   .trends-grid {
     grid-template-columns: 1fr 1fr;
-  }
-  .stype-row {
-    gap: 5px;
-  }
-  .stype-pill {
-    font-size: 0.74rem;
-    padding: 4px 11px;
   }
 }

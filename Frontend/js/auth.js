@@ -85,7 +85,7 @@
 
 // Frontend/js/auth.js
 // Handles login.html — talks to POST /api/auth/login and POST /api/auth/forgot-password
-
+// Fronted/js/auth.js
 const API = "http://localhost:5000/api/auth";
 
 /* ══════════════════════════════════════════════════
@@ -196,15 +196,31 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
       return;
     }
 
+    // // ✅ Success — store token + user info
+    // localStorage.setItem("token", data.token);
+    // localStorage.setItem("user", JSON.stringify(data.user));
+
+    // // Show success overlay, then redirect
+    // document.getElementById("success-overlay").classList.add("show");
+
+    // setTimeout(() => {
+    //   // Admin goes to a different dashboard if needed
+    //   window.location.href =
+    //     data.user.role === "admin" ? "admin.html" : "dashboard.html";
+    // }, 1600);
     // ✅ Success — store token + user info
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
+
+    // Admin panel needs its own key (admin.js reads "adminToken")
+    if (data.user.role === "admin" || mode === "admin") {
+      localStorage.setItem("adminToken", data.token);
+    }
 
     // Show success overlay, then redirect
     document.getElementById("success-overlay").classList.add("show");
 
     setTimeout(() => {
-      // Admin goes to a different dashboard if needed
       window.location.href =
         data.user.role === "admin" ? "admin.html" : "dashboard.html";
     }, 1600);

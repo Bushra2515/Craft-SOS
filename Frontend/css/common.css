@@ -1,0 +1,210 @@
+/* css/common.css
+   ─────────────────────────────────────────────────────────────────────────────
+   Shared sidebar styles loaded on every page.
+   Keeps the sidebar look identical regardless of which page CSS is active.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Sidebar Shell ─────────────────────────────────────── */
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 220px;
+  height: 100vh;
+  background: #fff;
+  border-right: 1px solid #eef0e8;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 12px 20px;
+  box-sizing: border-box;
+  z-index: 1000;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Profile Strip ─────────────────────────────────────── */
+.sb-prof {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 4px 16px;
+  border-bottom: 1px solid #eef0e8;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.sb-prof-av {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #b5c98a;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.sb-prof-av:hover {
+  opacity: 0.85;
+}
+
+.sb-prof-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.sb-prof-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #2d3520;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sb-prof-sub {
+  font-size: 0.73rem;
+  color: #888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Nav Items ─────────────────────────────────────────── */
+#sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #5a6640;
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition:
+    background 0.14s,
+    color 0.14s;
+  position: relative;
+  user-select: none;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background: #f4f7ed;
+  color: #3d4a28;
+}
+
+.nav-item.active {
+  background: #e8f0d9;
+  color: #4a5e2a;
+  font-weight: 700;
+}
+
+.nav-item.active .nav-icon {
+  stroke: #5a7a30;
+}
+
+/* ─── Nav Icon ──────────────────────────────────────────── */
+.nav-icon {
+  width: 19px;
+  height: 19px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+/* ─── Nav Label ─────────────────────────────────────────── */
+.nav-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Live Badges (Notif / Chat count) ──────────────────── */
+.nav-badge-live {
+  display: none; /* shown by socket-client.js when count > 0 */
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  padding: 0 5px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  flex-shrink: 0;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* ─── "Coming Soon" pill ────────────────────────────────── */
+.nav-pill-soon {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: #e8f0d9;
+  color: #7a8f52;
+  border-radius: 4px;
+  padding: 2px 5px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Coming-soon nav item is muted */
+.nav-item.sb-coming {
+  opacity: 0.6;
+}
+
+/* ─── Divider ───────────────────────────────────────────── */
+.sb-divider {
+  height: 1px;
+  background: #eef0e8;
+  margin: 8px 4px;
+  flex-shrink: 0;
+}
+
+/* ─── Mobile: Sidebar slides in ────────────────────────── */
+@media (max-width: 768px) {
+  #sidebar {
+    transform: translateX(-100%);
+    box-shadow: none;
+  }
+
+  #sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 32px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* ─── Overlay (mobile backdrop) ─────────────────────────── */
+#overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 999;
+}
+
+#overlay.on {
+  display: block;
+}

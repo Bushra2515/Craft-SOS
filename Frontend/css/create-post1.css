@@ -30,6 +30,7 @@
   overflow-x: hidden;
 } */
 
+/* create-post.css */
 @import url(basic.css);
 
 body::before {
@@ -1763,72 +1764,4 @@ body::before {
   .distress-btn {
     padding: 9px 11px;
   }
-}
-
-/* ═══ TOOLBAR DROPDOWN (heading/paragraph style) ═══ */
-.tb-dropdown {
-  position: relative;
-}
-.tb-dd-trigger {
-  min-width: 54px;
-  width: auto;
-  padding: 0 8px;
-  font-size: 0.74rem;
-  font-weight: 700;
-  gap: 3px;
-}
-.tb-dd-trigger svg {
-  width: 10px;
-  height: 10px;
-}
-.tb-dd-menu {
-  display: none;
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  z-index: 200;
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  box-shadow: var(--sh-lg);
-  overflow: hidden;
-  min-width: 165px;
-}
-.tb-dropdown.open .tb-dd-menu {
-  display: block;
-}
-.tb-dd-item {
-  display: block;
-  width: 100%;
-  padding: 9px 13px;
-  border: none;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-  font-family: "DM Sans", sans-serif;
-  color: var(--tx-mid);
-  font-size: 0.82rem;
-  transition: background 0.12s;
-}
-.tb-dd-item:hover {
-  background: var(--surface2);
-  color: var(--tx);
-}
-.tb-dd-h1 {
-  font-family: "Lora", serif;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--tx);
-}
-.tb-dd-h2 {
-  font-family: "Lora", serif;
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: var(--tx);
-}
-.tb-dd-h3 {
-  font-family: "Lora", serif;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--tx);
 }

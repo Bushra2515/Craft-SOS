@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>User Profile</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        padding-top: 50px;
+      }
+
+      .container {
+        background: white;
+        padding: 30px;
+        width: 400px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+
+      button {
+        width: 100%;
+        padding: 10px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      button:hover {
+        background: #45a049;
+      }
+
+      .logout-btn {
+        background: #f44336;
+        margin-top: 15px;
+      }
+
+      .logout-btn:hover {
+        background: #d32f2f;
+      }
+
+      .message {
+        text-align: center;
+        margin-top: 10px;
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>My Profile</h2>
+
+      <form id="profileForm">
+        <input type="text" id="name" placeholder="Name" required />
+        <textarea id="bio" placeholder="Bio"></textarea>
+        <input
+          type="text"
+          id="hobbies"
+          placeholder="Hobbies (comma separated)"
+        />
+        <button type="submit">Update Profile</button>
+      </form>
+
+      <button class="logout-btn" onclick="logout()">Logout</button>
+
+      <p class="message" id="message"></p>
+    </div>
+
+    <script>
+      // 🔐 Protect page
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.href = "login.html";
+      }
+
+      // 📥 Load Profile
+      async function loadProfile() {
+        try {
+          const res = await fetch("http://localhost:5000/api/users/me", {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          });
+
+          if (!res.ok) {
+            throw new Error("Failed to load profile");
+          }
+
+          const user = await res.json();
+
+          document.getElementById("name").value = user.name || "";
+          document.getElementById("bio").value = user.bio || "";
+          document.getElementById("hobbies").value =
+            user.hobbies?.join(", ") || "";
+        } catch (error) {
+          alert("Session expired. Please login again.");
+          localStorage.removeItem("token");
+          window.location.href = "login.html";
+        }
+      }
+
+      loadProfile();
+
+      // ✏ Update Profile
+      document
+        .getElementById("profileForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const name = document.getElementById("name").value;
+          const bio = document.getElementById("bio").value;
+          const hobbies = document
+            .getElementById("hobbies")
+            .value.split(",")
+            .map((h) => h.trim())
+            .filter((h) => h !== "");
+
+          try {
+            const res = await fetch("http://localhost:5000/api/users/me", {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token,
+              },
+              body: JSON.stringify({
+                name,
+                bio,
+                hobbies,
+              }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+              throw new Error(data.message);
+            }
+
+            document.getElementById("message").innerText =
+              "Profile updated successfully!";
+            setTimeout(() => {
+              document.getElementById("message").innerText = "";
+            }, 3000);
+          } catch (error) {
+            alert("Update failed");
+          }
+        });
+
+      // 🚪 Logout
+      function logout() {
+        localStorage.removeItem("token");
+        window.location.href = "login.html";
+      }
+    </script>
+  </body>
+</html>

@@ -259,7 +259,7 @@ body::before {
   position: relative;
   z-index: 1;
 }
-/* 
+
 /* ══════════════════════════════
        SIDEBAR
 ══════════════════════════════ */
@@ -853,18 +853,6 @@ body::before {
 .follow-btn.following {
   background: var(--accent-light);
   color: var(--accent);
-}
-/* Pending sent — muted olive, shows request is awaiting */
-.follow-btn.pending {
-  background: rgba(122, 143, 82, 0.15);
-  color: var(--accent);
-  border: 1.5px solid rgba(122, 143, 82, 0.3);
-  cursor: pointer;
-}
-.follow-btn.pending:hover {
-  background: rgba(200, 72, 48, 0.08);
-  color: #c0392b;
-  border-color: rgba(200, 72, 48, 0.25);
 }
 
 /* ══════════════════════════════

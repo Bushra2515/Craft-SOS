@@ -1,0 +1,1790 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Craft-SOS · Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/admin.css" />
+  </head>
+  <body>
+    <!-- ══════════════ TOAST CONTAINER ══════════════ -->
+    <div id="toast-container"></div>
+
+    <!-- ══════════════ MODALS ══════════════ -->
+
+    <!-- Create Badge -->
+    <div
+      class="modal-ov"
+      id="m-badge"
+      onclick="if (event.target === this) closeModal('m-badge');"
+    >
+      <div class="modal-box">
+        <div class="modal-title">✨ Create New Badge</div>
+        <div class="modal-sub">
+          Define a badge and the criteria crafters need to earn it.
+        </div>
+        <div class="modal-form">
+          <div class="field">
+            <label class="field-label">Badge Name *</label
+            ><input
+              class="inp"
+              id="mb-name"
+              placeholder="e.g. First Responder"
+            />
+          </div>
+          <div class="modal-grid">
+            <div class="field">
+              <label class="field-label">Emoji</label
+              ><input
+                class="inp"
+                id="mb-emoji"
+                placeholder="e.g. ⚡"
+                value="🏅"
+              />
+            </div>
+            <div class="field">
+              <label class="field-label">Trigger</label>
+              <select class="sel" id="mb-trigger">
+                <option value="auto">Auto — based on actions</option>
+                <option value="manual">Manual — admin assigns</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Criteria</label
+            ><textarea
+              class="inp inp-area"
+              id="mb-criteria"
+              placeholder="How do crafters earn this?"
+            ></textarea>
+          </div>
+          <div class="field">
+            <label class="field-label">Points Reward</label
+            ><input
+              class="inp"
+              id="mb-points"
+              type="number"
+              placeholder="e.g. 50"
+              min="0"
+            />
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn btn-ghost btn-sm" onclick="closeModal('m-badge')">
+            Cancel
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="submitCreateBadge()">
+            Create Badge
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Challenge -->
+    <div
+      class="modal-ov"
+      id="m-challenge"
+      onclick="if (event.target === this) closeModal('m-challenge');"
+    >
+      <div class="modal-box">
+        <div class="modal-title">🏆 New Challenge</div>
+        <div class="modal-sub">
+          Launch a community challenge to boost engagement.
+        </div>
+        <div class="modal-form">
+          <div class="field">
+            <label class="field-label">Challenge Title *</label
+            ><input
+              class="inp"
+              id="mc-title"
+              placeholder="e.g. April Upcycle Challenge"
+            />
+          </div>
+          <div class="field">
+            <label class="field-label">Subtitle / Meta</label
+            ><input
+              class="inp"
+              id="mc-meta"
+              placeholder="Short description shown on the card"
+            />
+          </div>
+          <div class="modal-grid">
+            <div class="field">
+              <label class="field-label">Icon (emoji)</label
+              ><input class="inp" id="mc-icon" placeholder="🎯" value="🎯" />
+            </div>
+            <div class="field">
+              <label class="field-label">End Date (optional)</label
+              ><input class="inp" id="mc-ends" type="date" />
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button
+            class="btn btn-ghost btn-sm"
+            onclick="closeModal('m-challenge')"
+          >
+            Cancel
+          </button>
+          <button
+            class="btn btn-primary btn-sm"
+            onclick="submitCreateChallenge()"
+          >
+            🚀 Launch
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assign Badge -->
+    <div
+      class="modal-ov"
+      id="m-assign-badge"
+      onclick="if (event.target === this) closeModal('m-assign-badge');"
+    >
+      <div class="modal-box">
+        <div class="modal-title" id="m-assign-badge-title">🏅 Assign Badge</div>
+        <div class="modal-sub">
+          Enter the user ID and a reason for this award.
+        </div>
+        <div class="modal-form">
+          <div class="field">
+            <label class="field-label">User ID *</label
+            ><input
+              class="inp"
+              id="assign-uid"
+              placeholder="MongoDB ObjectId of the user"
+            />
+          </div>
+          <div class="field">
+            <label class="field-label">Reason (optional)</label
+            ><textarea
+              class="inp inp-area"
+              id="assign-reason"
+              placeholder="e.g. 50+ SOS helps this month"
+              style="min-height: 60px"
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button
+            class="btn btn-ghost btn-sm"
+            onclick="closeModal('m-assign-badge')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="submitAssignBadge()">
+            Assign Badge
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Detail -->
+    <div
+      class="modal-ov"
+      id="m-user"
+      onclick="if (event.target === this) closeModal('m-user');"
+    >
+      <div class="modal-box" id="m-user-content">
+        <div class="empty">
+          <div class="empty-icon">👤</div>
+          Loading user…
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ TOPBAR ══════════════ -->
+    <header id="topbar">
+      <div class="tb-left">
+        <div class="tb-logo">
+          <div class="logo-pill">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"
+              />
+            </svg>
+          </div>
+          <div class="logo-word">Craft<span>-SOS</span></div>
+          <span class="admin-chip">Admin</span>
+        </div>
+        <div class="tb-search">
+          <svg viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search users, posts, reports…"
+            id="global-search"
+            oninput="globalSearch(this.value)"
+          />
+        </div>
+      </div>
+      <div class="tb-right">
+        <button
+          class="tb-icon"
+          title="Reports"
+          onclick="goSection('reports', null)"
+        >
+          <svg viewBox="0 0 24 24">
+            <polygon
+              points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"
+            />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <div class="tb-dot" id="tb-reports-count">9</div>
+        </button>
+        <div class="tb-divider"></div>
+        <div class="tb-av" id="tb-admin-av">SA</div>
+        <div class="tb-name" id="tb-admin-name">Admin</div>
+      </div>
+    </header>
+
+    <div id="shell">
+      <!-- ══════════════ SIDEBAR ══════════════ -->
+      <aside id="sidebar">
+        <div class="sb-section">Overview</div>
+        <div class="nav-item active" onclick="goSection('dashboard', this)">
+          <svg class="ni" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          Dashboard
+        </div>
+
+        <div class="sb-section">Management</div>
+        <div class="nav-item" onclick="goSection('users', this)">
+          <svg class="ni" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+          </svg>
+          Users <span class="nb nb-green" id="nb-users">—</span>
+        </div>
+        <div class="nav-item" onclick="goSection('posts', this)">
+          <svg class="ni" viewBox="0 0 24 24">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+          </svg>
+          SOS Posts <span class="nb nb-red" id="nb-posts">—</span>
+        </div>
+        <div class="nav-item" onclick="goSection('reports', this)">
+          <svg class="ni" viewBox="0 0 24 24">
+            <polygon
+              points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"
+            />
+            <line x1="12" y1="8" x2="12" y2="12" />
+          </svg>
+          Reports <span class="nb nb-red" id="nb-reports">—</span>
+        </div>
+        <div class="nav-item" onclick="goSection('moderation', this)">
+          <svg class="ni" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          Moderation
+        </div>
+        <div class="nav-item" onclick="goSection('verification', this)">
+          <svg class="ni" viewBox="0 0 24 24">
+            <polyline points="9 11 12 14 22 4" />
+            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+          </svg>
+          Verification <span class="nb nb-amber" id="nb-verify">—</span>
+        </div>
+
+        <div class="sb-section">Content</div>
+        <div class="nav-item" onclick="goSection('badges', this)">
+          <svg class="ni" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="6" />
+            <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+          </svg>
+          Badges & Ranks
+        </div>
+        <div class="nav-item" onclick="goSection('challenges', this)">
+          <svg class="ni" viewBox="0 0 24 24">
+            <path d="M18 2H6v7a6 6 0 0012 0V2z" />
+            <path d="M6 9H4.5a2.5 2.5 0 010-5H6" />
+            <path d="M18 9h1.5a2.5 2.5 0 000-5H18" />
+            <path d="M4 22h16" />
+          </svg>
+          Challenges
+        </div>
+        <div class="nav-item" onclick="goSection('announcements', this)">
+          <svg class="ni" viewBox="0 0 24 24">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+          </svg>
+          Announcements
+        </div>
+        <div class="nav-item" onclick="goSection('analytics', this)">
+          <svg class="ni" viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10" />
+            <line x1="12" y1="20" x2="12" y2="4" />
+            <line x1="6" y1="20" x2="6" y2="14" />
+          </svg>
+          Analytics
+        </div>
+
+        <div class="sb-section">System</div>
+        <div class="nav-item" onclick="goSection('logs', this)">
+          <svg class="ni" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          Activity Logs
+        </div>
+        <div class="nav-item" onclick="goSection('tags', this)">
+          <svg class="ni" viewBox="0 0 24 24">
+            <path
+              d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"
+            />
+            <line x1="7" y1="7" x2="7.01" y2="7" />
+          </svg>
+          Tags & Niches
+        </div>
+        <div class="nav-item" onclick="goSection('system', this)">
+          <svg class="ni" viewBox="0 0 24 24">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="17" x2="12" y2="21" />
+          </svg>
+          System Health
+        </div>
+
+        <div class="sb-alert" style="margin-top: auto" id="sidebar-alert">
+          <div class="sb-alert-title">⚠ Reports Pending</div>
+          <div class="sb-alert-sub">Require immediate review</div>
+          <button
+            class="btn btn-danger btn-sm"
+            style="width: 100%; justify-content: center; margin-top: 8px"
+            onclick="goSection('reports', null)"
+          >
+            Review Now
+          </button>
+        </div>
+        <button onclick="adminLogout()" class="btn btn-ghost btn-sm">
+          Logout
+        </button>
+      </aside>
+
+      <!-- ══════════════ MAIN ══════════════ -->
+      <main id="main">
+        <!-- ═══════════════════════════════════
+     1. DASHBOARD
+═══════════════════════════════════ -->
+        <div id="s-dashboard">
+          <div class="ph">
+            <div class="ph-left">
+              <div class="ph-bc">Admin / <span>Dashboard</span></div>
+              <div class="ph-title">
+                Dashboard <span class="live-badge">LIVE</span>
+              </div>
+            </div>
+            <div class="ph-right">
+              <button class="btn btn-ghost btn-sm" onclick="loadDashboard()">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="23 4 23 10 17 10" />
+                  <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" /></svg
+                >Refresh
+              </button>
+            </div>
+          </div>
+
+          <!-- Stat cards -->
+          <div class="sg" id="dash-stats">
+            <!-- JS renders these -->
+            <div class="sc skeleton" style="height: 110px"></div>
+            <div class="sc skeleton" style="height: 110px"></div>
+            <div class="sc skeleton" style="height: 110px"></div>
+            <div class="sc skeleton" style="height: 110px"></div>
+            <div class="sc skeleton" style="height: 110px"></div>
+            <div class="sc skeleton" style="height: 110px"></div>
+          </div>
+
+          <div class="two-col">
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title">
+                  <em>📈</em> SOS Activity — Last 7 Days
+                </div>
+              </div>
+              <div style="padding: 16px 16px 10px">
+                <div class="chart-area" id="dash-chart">
+                  <div class="empty" style="width: 100%">Loading chart…</div>
+                </div>
+              </div>
+              <div class="metric-strip" id="dash-metrics">
+                <div class="metric-tile">
+                  <div
+                    class="m-val skeleton"
+                    style="width: 50px; height: 22px; margin: auto"
+                  ></div>
+                  <div class="m-lbl">—</div>
+                </div>
+                <div class="metric-tile">
+                  <div
+                    class="m-val skeleton"
+                    style="width: 50px; height: 22px; margin: auto"
+                  ></div>
+                  <div class="m-lbl">—</div>
+                </div>
+                <div class="metric-tile">
+                  <div
+                    class="m-val skeleton"
+                    style="width: 50px; height: 22px; margin: auto"
+                  ></div>
+                  <div class="m-lbl">—</div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title">
+                  <em>🧶</em> Top Skills Breakdown
+                </div>
+              </div>
+              <div class="donut-wrap" id="dash-skills">
+                <div class="empty">Loading…</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title"><em>👥</em> Recent Signups</div>
+                <button
+                  class="btn btn-ghost btn-sm"
+                  onclick="goSection('users', null)"
+                >
+                  View all →
+                </button>
+              </div>
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-recent-users">
+                  <tr>
+                    <td colspan="3" class="empty">Loading…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title"><em>⚡</em> Recent Posts</div>
+                <button
+                  class="btn btn-ghost btn-sm"
+                  onclick="goSection('posts', null)"
+                >
+                  View all →
+                </button>
+              </div>
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Post</th>
+                    <th>Status</th>
+                    <th>Replies</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-recent-posts">
+                  <tr>
+                    <td colspan="3" class="empty">Loading…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="spotlight-card">
+              <div
+                style="
+                  font-size: 0.72rem;
+                  font-weight: 700;
+                  color: rgba(255, 255, 255, 0.7);
+                  text-transform: uppercase;
+                  letter-spacing: 0.08em;
+                  margin-bottom: 6px;
+                "
+              >
+                ⭐ Quick Actions
+              </div>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 8px;
+                  margin-top: 8px;
+                "
+              >
+                <button
+                  class="btn btn-ghost btn-sm"
+                  onclick="goSection('verification', null)"
+                >
+                  ✅ Verify Queue
+                </button>
+                <button
+                  class="btn btn-ghost btn-sm"
+                  onclick="goSection('reports', null)"
+                >
+                  🚩 Reports
+                </button>
+                <button
+                  class="btn btn-ghost btn-sm"
+                  onclick="openModal('m-badge')"
+                >
+                  🏅 Create Badge
+                </button>
+                <button
+                  class="btn btn-ghost btn-sm"
+                  onclick="openModal('m-challenge')"
+                >
+                  🏆 New Challenge
+                </button>
+                <button
+                  class="btn btn-ghost btn-sm"
+                  onclick="goSection('announcements', null)"
+                >
+                  📢 Announce
+                </button>
+                <button
+                  class="btn btn-ghost btn-sm"
+                  onclick="goSection('system', null)"
+                >
+                  💻 System
+                </button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title">
+                  <em>🏅</em> Recent Badge Awards
+                </div>
+              </div>
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Badge</th>
+                    <th>When</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-recent-awards">
+                  <tr>
+                    <td colspan="3" class="empty">Loading…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+     2. USERS
+═══════════════════════════════════ -->
+        <div id="s-users" style="display: none">
+          <div class="ph">
+            <div class="ph-left">
+              <div class="ph-bc">Admin / <span>Users</span></div>
+              <div class="ph-title">User Management</div>
+            </div>
+          </div>
+          <div class="sg sg-3" style="margin-bottom: 0">
+            <div class="sc">
+              <div class="sc-top">
+                <div
+                  class="sc-ico"
+                  style="background: var(--low-bg); color: var(--low)"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    style="
+                      width: 18px;
+                      height: 18px;
+                      stroke: currentColor;
+                      fill: none;
+                      stroke-width: 2;
+                      stroke-linecap: round;
+                    "
+                  >
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                  </svg>
+                </div>
+                <span class="sc-trend up">Active</span>
+              </div>
+              <div class="sc-val" id="ust-active">—</div>
+              <div class="sc-label">Active Users</div>
+            </div>
+            <div class="sc">
+              <div class="sc-top">
+                <div
+                  class="sc-ico"
+                  style="background: var(--med-bg); color: var(--med)"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    style="
+                      width: 18px;
+                      height: 18px;
+                      stroke: currentColor;
+                      fill: none;
+                      stroke-width: 2;
+                      stroke-linecap: round;
+                    "
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                  </svg>
+                </div>
+              </div>
+              <div class="sc-val" id="ust-pending">—</div>
+              <div class="sc-label">Pending Verification</div>
+            </div>
+            <div class="sc">
+              <div class="sc-top">
+                <div
+                  class="sc-ico"
+                  style="background: var(--high-bg); color: var(--high)"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    style="
+                      width: 18px;
+                      height: 18px;
+                      stroke: currentColor;
+                      fill: none;
+                      stroke-width: 2;
+                      stroke-linecap: round;
+                    "
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="15" y1="9" x2="9" y2="15" />
+                    <line x1="9" y1="9" x2="15" y2="15" />
+                  </svg>
+                </div>
+              </div>
+              <div class="sc-val" id="ust-suspended">—</div>
+              <div class="sc-label">Suspended / Banned</div>
+            </div>
+          </div>
+          <div class="card" style="margin-top: 14px">
+            <div class="card-hdr">
+              <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                <input
+                  class="inp"
+                  style="width: 200px"
+                  placeholder="Search handle, email…"
+                  id="user-search"
+                  oninput="searchUsers()"
+                />
+                <select
+                  class="sel"
+                  id="user-role-filter"
+                  onchange="searchUsers()"
+                >
+                  <option value="">All Roles</option>
+                  <option value="user">User</option>
+                  <option value="moderator">Moderator</option>
+                  <option value="admin">Admin</option>
+                </select>
+                <select
+                  class="sel"
+                  id="user-status-filter"
+                  onchange="filterUsersByStatus()"
+                >
+                  <option value="">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="pending">Pending</option>
+                  <option value="suspended">Suspended</option>
+                </select>
+              </div>
+              <div
+                style="font-size: 0.81rem; color: var(--text-dim)"
+                id="user-total-label"
+              >
+                Loading…
+              </div>
+            </div>
+            <table class="tbl" id="user-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Skills</th>
+                  <th>Joined</th>
+                  <th>Role</th>
+                  <th>Points</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="user-tbody">
+                <tr>
+                  <td colspan="7" class="empty">
+                    <div class="empty-icon">👥</div>
+                    Loading users…
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="pager">
+              <span id="user-pager-label">—</span>
+              <div class="act-row">
+                <button
+                  class="btn btn-ghost btn-xs"
+                  id="user-prev"
+                  onclick="userPage(-1)"
+                >
+                  ← Prev
+                </button>
+                <button
+                  class="btn btn-primary btn-xs"
+                  id="user-next"
+                  onclick="userPage(1)"
+                >
+                  Next →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+     3. SOS POSTS
+═══════════════════════════════════ -->
+        <div id="s-posts" style="display: none">
+          <div class="ph">
+            <div class="ph-left">
+              <div class="ph-bc">Admin / <span>SOS Posts</span></div>
+              <div class="ph-title">Post Management</div>
+            </div>
+          </div>
+          <div class="sg" style="margin-bottom: 0">
+            <div class="sc">
+              <div class="sc-val" id="pst-active" style="color: var(--high)">
+                —
+              </div>
+              <div class="sc-label">Active</div>
+            </div>
+            <div class="sc">
+              <div class="sc-val" id="pst-resolved" style="color: var(--low)">
+                —
+              </div>
+              <div class="sc-label">Resolved</div>
+            </div>
+            <div class="sc">
+              <div class="sc-val" id="pst-closed">—</div>
+              <div class="sc-label">Closed</div>
+            </div>
+            <div class="sc">
+              <div class="sc-val" id="pst-zero" style="color: var(--med)">
+                —
+              </div>
+              <div class="sc-label">0-Reply Posts</div>
+            </div>
+          </div>
+          <div class="card" style="margin-top: 14px">
+            <div class="card-hdr">
+              <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                <input
+                  class="inp"
+                  style="width: 200px"
+                  placeholder="Search posts…"
+                  id="post-search"
+                  oninput="searchPosts()"
+                />
+                <select
+                  class="sel"
+                  id="post-status-filter"
+                  onchange="searchPosts()"
+                >
+                  <option value="">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="closed">Closed</option>
+                </select>
+                <select
+                  class="sel"
+                  id="post-type-filter"
+                  onchange="searchPosts()"
+                >
+                  <option value="">All Types</option>
+                  <option value="sos">SOS</option>
+                  <option value="tut">Tutorial</option>
+                  <option value="com">Community</option>
+                  <option value="res">Resource</option>
+                </select>
+              </div>
+              <div
+                style="font-size: 0.81rem; color: var(--text-dim)"
+                id="post-total-label"
+              >
+                Loading…
+              </div>
+            </div>
+            <table class="tbl" id="post-table">
+              <thead>
+                <tr>
+                  <th>Post Title</th>
+                  <th>Author</th>
+                  <th>Type</th>
+                  <th>Replies</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="post-tbody">
+                <tr>
+                  <td colspan="6" class="empty">
+                    <div class="empty-icon">📋</div>
+                    Loading posts…
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="pager">
+              <span id="post-pager-label">—</span>
+              <div class="act-row">
+                <button
+                  class="btn btn-ghost btn-xs"
+                  id="post-prev"
+                  onclick="postPage(-1)"
+                >
+                  ← Prev
+                </button>
+                <button
+                  class="btn btn-primary btn-xs"
+                  id="post-next"
+                  onclick="postPage(1)"
+                >
+                  Next →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+     4. REPORTS
+═══════════════════════════════════ -->
+        <div id="s-reports" style="display: none">
+          <div class="ph">
+            <div class="ph-left">
+              <div class="ph-bc">Admin / <span>Reports</span></div>
+              <div class="ph-title">
+                Reported Content
+                <span
+                  class="pill p-red"
+                  id="report-pending-pill"
+                  style="font-size: 0.8rem"
+                  >pending</span
+                >
+              </div>
+            </div>
+            <div class="ph-right">
+              <button
+                class="btn btn-ghost btn-sm"
+                onclick="dismissAllReports()"
+              >
+                Dismiss All
+              </button>
+            </div>
+          </div>
+          <div class="sg sg-3" style="margin-bottom: 0">
+            <div class="sc">
+              <div class="sc-val" style="color: var(--high)" id="rc-spam">
+                —
+              </div>
+              <div class="sc-label">Spam Reports</div>
+            </div>
+            <div class="sc">
+              <div class="sc-val" style="color: var(--med)" id="rc-harassment">
+                —
+              </div>
+              <div class="sc-label">Harassment</div>
+            </div>
+            <div class="sc">
+              <div class="sc-val" style="color: var(--blue)" id="rc-scam">
+                —
+              </div>
+              <div class="sc-label">Scam / Fraud</div>
+            </div>
+          </div>
+          <div class="card" style="margin-top: 14px">
+            <div class="card-hdr">
+              <div class="card-hdr-title"><em>🚩</em> Pending Reports</div>
+            </div>
+            <div id="reports-list">
+              <div class="empty">
+                <div class="empty-icon">🚩</div>
+                Loading reports…
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+     5. MODERATION
+═══════════════════════════════════ -->
+        <div id="s-moderation" style="display: none">
+          <div class="ph">
+            <div class="ph-left">
+              <div class="ph-bc">Admin / <span>Moderation</span></div>
+              <div class="ph-title">Content Moderation Tools</div>
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title">
+                  <em>🛡</em> Auto-Moderation Controls
+                </div>
+              </div>
+              <div class="mod-row">
+                <div>
+                  <div class="mod-info-title">Keyword Filtering</div>
+                  <div class="mod-info-sub">
+                    Auto-flag posts containing banned keywords
+                  </div>
+                </div>
+                <button class="tog on" onclick="togBtn(this)"></button>
+              </div>
+              <div class="mod-row">
+                <div>
+                  <div class="mod-info-title">Spam Detection</div>
+                  <div class="mod-info-sub">
+                    Detect repeated content and link-heavy posts
+                  </div>
+                </div>
+                <button class="tog on" onclick="togBtn(this)"></button>
+              </div>
+              <div class="mod-row">
+                <div>
+                  <div class="mod-info-title">Profanity Filter</div>
+                  <div class="mod-info-sub">
+                    Replace or blur offensive language
+                  </div>
+                </div>
+                <button class="tog on" onclick="togBtn(this)"></button>
+              </div>
+              <div class="mod-row">
+                <div>
+                  <div class="mod-info-title">Duplicate Post Detection</div>
+                  <div class="mod-info-sub">
+                    Block identical posts within 24 hours
+                  </div>
+                </div>
+                <button class="tog on" onclick="togBtn(this)"></button>
+              </div>
+              <div class="mod-row">
+                <div>
+                  <div class="mod-info-title">Auto-flag New Accounts</div>
+                  <div class="mod-info-sub">
+                    Hold posts from accounts &lt;24h old for review
+                  </div>
+                </div>
+                <button class="tog off" onclick="togBtn(this)"></button>
+              </div>
+              <div class="mod-row">
+                <div>
+                  <div class="mod-info-title">Manual Approval — First Post</div>
+                  <div class="mod-info-sub">
+                    New users' first post needs admin approval
+                  </div>
+                </div>
+                <button class="tog off" onclick="togBtn(this)"></button>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <div class="card">
+                <div class="card-hdr">
+                  <div class="card-hdr-title"><em>🔑</em> Blocked Keywords</div>
+                  <button class="btn btn-primary btn-sm" onclick="addKeyword()">
+                    + Add
+                  </button>
+                </div>
+                <div class="tags-wrap" id="keyword-list">
+                  <div class="tag-chip">
+                    buy now<span>23 hits</span
+                    ><button
+                      class="tag-x"
+                      onclick="this.closest('.tag-chip').remove()"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div class="tag-chip">
+                    wholesale discount<span>11 hits</span
+                    ><button
+                      class="tag-x"
+                      onclick="this.closest('.tag-chip').remove()"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div class="tag-chip">
+                    click here<span>8 hits</span
+                    ><button
+                      class="tag-x"
+                      onclick="this.closest('.tag-chip').remove()"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div class="tag-chip">
+                    telegram group<span>6 hits</span
+                    ><button
+                      class="tag-x"
+                      onclick="this.closest('.tag-chip').remove()"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div class="tag-chip">
+                    earn money fast<span>3 hits</span
+                    ><button
+                      class="tag-x"
+                      onclick="this.closest('.tag-chip').remove()"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+                <div style="padding: 0 18px 14px">
+                  <div class="info-box">
+                    <strong>📊 This month:</strong> 55 posts auto-flagged · 38
+                    removed · 17 dismissed
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+     6. VERIFICATION
+═══════════════════════════════════ -->
+        <div id="s-verification" style="display: none">
+          <div class="ph">
+            <div class="ph-left">
+              <div class="ph-bc">Admin / <span>Verification</span></div>
+              <div class="ph-title">
+                Verification Queue
+                <span class="pill p-amber" id="verify-count-pill">pending</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hdr">
+              <div class="card-hdr-title">
+                <em>🔍</em> Pending Verifications
+              </div>
+            </div>
+            <div id="verify-list">
+              <div class="empty">
+                <div class="empty-icon">🔍</div>
+                Loading queue…
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+     7. ANALYTICS
+═══════════════════════════════════ -->
+        <div id="s-analytics" style="display: none">
+          <div class="ph">
+            <div class="ph-left">
+              <div class="ph-bc">Admin / <span>Analytics</span></div>
+              <div class="ph-title">Community Analytics</div>
+            </div>
+          </div>
+          <div class="sg">
+            <div class="sc">
+              <div class="sc-top">
+                <div
+                  class="sc-ico"
+                  style="background: var(--low-bg); color: var(--low)"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    style="
+                      width: 18px;
+                      height: 18px;
+                      stroke: currentColor;
+                      fill: none;
+                      stroke-width: 2;
+                      stroke-linecap: round;
+                    "
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <span class="sc-trend up">↑ 2%</span>
+              </div>
+              <div class="sc-val" id="an-resolution">—</div>
+              <div class="sc-label">SOS Resolution Rate</div>
+            </div>
+            <div class="sc">
+              <div class="sc-top">
+                <div
+                  class="sc-ico"
+                  style="background: var(--blue-bg); color: var(--blue)"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    style="
+                      width: 18px;
+                      height: 18px;
+                      stroke: currentColor;
+                      fill: none;
+                      stroke-width: 2;
+                      stroke-linecap: round;
+                    "
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                </div>
+              </div>
+              <div class="sc-val" id="an-total-posts">—</div>
+              <div class="sc-label">Total Posts</div>
+            </div>
+            <div class="sc">
+              <div class="sc-top">
+                <div
+                  class="sc-ico"
+                  style="background: var(--accent-pale); color: var(--accent)"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    style="
+                      width: 18px;
+                      height: 18px;
+                      stroke: currentColor;
+                      fill: none;
+                      stroke-width: 2;
+                      stroke-linecap: round;
+                    "
+                  >
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                  </svg>
+                </div>
+              </div>
+              <div class="sc-val" id="an-total-users">—</div>
+              <div class="sc-label">Total Users</div>
+            </div>
+            <div class="sc">
+              <div class="sc-top">
+                <div
+                  class="sc-ico"
+                  style="background: var(--purple-bg); color: var(--purple)"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    style="
+                      width: 18px;
+                      height: 18px;
+                      stroke: currentColor;
+                      fill: none;
+                      stroke-width: 2;
+                      stroke-linecap: round;
+                    "
+                  >
+                    <path
+                      d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div class="sc-val" id="an-tutorials">—</div>
+              <div class="sc-label">Tutorials Shared</div>
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title"><em>🏆</em> Top Helpers</div>
+              </div>
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Helped</th>
+                    <th>Points</th>
+                    <th>Badges</th>
+                  </tr>
+                </thead>
+                <tbody id="an-top-helpers">
+                  <tr>
+                    <td colspan="5" class="empty">Loading…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title">
+                  <em>📊</em> Post Status Breakdown
+                </div>
+              </div>
+              <div style="padding: 16px 18px">
+                <div class="kpi" id="an-post-kpi">
+                  <div class="empty">Loading…</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+     8. BADGES
+═══════════════════════════════════ -->
+        <div id="s-badges" style="display: none">
+          <div class="ph">
+            <div class="ph-left">
+              <div class="ph-bc">Admin / <span>Badges & Ranks</span></div>
+              <div class="ph-title">Badge Management</div>
+            </div>
+            <div class="ph-right">
+              <button
+                class="btn btn-primary btn-sm"
+                onclick="openModal('m-badge')"
+              >
+                + Create Badge
+              </button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hdr">
+              <div class="card-hdr-title"><em>🏅</em> All Badges</div>
+              <span
+                style="font-size: 0.81rem; color: var(--text-dim)"
+                id="badge-count-label"
+                >—</span
+              >
+            </div>
+            <div class="badge-grid" id="badge-grid">
+              <div class="empty" style="grid-column: 1/-1">Loading badges…</div>
+            </div>
+          </div>
+          <div class="card" style="margin-top: 16px">
+            <div class="card-hdr">
+              <div class="card-hdr-title"><em>⭐</em> Recent Badge Awards</div>
+            </div>
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Badge</th>
+                  <th>Awarded By</th>
+                  <th>Date</th>
+                  <th>Reason</th>
+                </tr>
+              </thead>
+              <tbody id="badge-awards-tbody">
+                <tr>
+                  <td colspan="5" class="empty">Loading…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+     9. CHALLENGES
+═══════════════════════════════════ -->
+        <div id="s-challenges" style="display: none">
+          <div class="ph">
+            <div class="ph-left">
+              <div class="ph-bc">Admin / <span>Challenges</span></div>
+              <div class="ph-title">Challenge Management</div>
+            </div>
+            <div class="ph-right">
+              <button
+                class="btn btn-primary btn-sm"
+                onclick="openModal('m-challenge')"
+              >
+                + New Challenge
+              </button>
+            </div>
+          </div>
+          <div class="sg sg-3" style="margin-bottom: 0">
+            <div class="sc">
+              <div class="sc-val" id="ch-active">—</div>
+              <div class="sc-label">Active Challenges</div>
+            </div>
+            <div class="sc">
+              <div class="sc-val" id="ch-ended">—</div>
+              <div class="sc-label">Past Challenges</div>
+            </div>
+            <div class="sc">
+              <div class="sc-val" id="ch-participants">—</div>
+              <div class="sc-label">Total Participants</div>
+            </div>
+          </div>
+          <div class="card" style="margin-top: 14px">
+            <div class="card-hdr">
+              <div class="card-hdr-title"><em>🏆</em> Active Challenges</div>
+            </div>
+            <div id="challenges-list">
+              <div class="empty">
+                <div class="empty-icon">🏆</div>
+                Loading challenges…
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+     10. ANNOUNCEMENTS
+═══════════════════════════════════ -->
+        <div id="s-announcements" style="display: none">
+          <div class="ph">
+            <div class="ph-left">
+              <div class="ph-bc">Admin / <span>Announcements</span></div>
+              <div class="ph-title">Broadcast & Announcements</div>
+            </div>
+          </div>
+          <div class="col-6040">
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title">
+                  <em>📢</em> Compose Announcement
+                </div>
+              </div>
+              <div class="compose">
+                <div class="field">
+                  <label class="field-label">Title *</label
+                  ><input
+                    class="inp"
+                    id="ann-title"
+                    placeholder="e.g. April Craft Challenge is LIVE 🎨"
+                  />
+                </div>
+                <div class="field">
+                  <label class="field-label">Message *</label
+                  ><textarea
+                    class="inp inp-area"
+                    id="ann-message"
+                    placeholder="Write your announcement here…"
+                    style="min-height: 100px"
+                  ></textarea>
+                </div>
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+                  "
+                >
+                  <div class="field">
+                    <label class="field-label">Audience</label>
+                    <select class="sel" id="ann-audience">
+                      <option value="all">All Users</option>
+                      <option value="crochet">Crochet Only</option>
+                      <option value="baking">Bakers Only</option>
+                      <option value="resin">Resin Artists</option>
+                      <option value="new_members">New Members</option>
+                      <option value="moderators">Moderators Only</option>
+                      <option value="verified_sellers">Verified Sellers</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label class="field-label">Type</label>
+                    <select class="sel" id="ann-type">
+                      <option value="announcement">📢 Announcement</option>
+                      <option value="challenge">🏆 Challenge</option>
+                      <option value="spotlight">⭐ Member Spotlight</option>
+                      <option value="notification">🔔 Notification</option>
+                      <option value="feature_update">🛠 Feature Update</option>
+                      <option value="safety_notice">⚠ Safety Notice</option>
+                    </select>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 8px">
+                  <button
+                    class="btn btn-primary btn-sm"
+                    style="flex: 1"
+                    onclick="sendAnnouncement()"
+                  >
+                    <svg viewBox="0 0 24 24">
+                      <line x1="22" y1="2" x2="11" y2="13" />
+                      <polygon points="22 2 15 22 11 13 2 9 22 2" /></svg
+                    >Send Now
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title"><em>📋</em> Recent Broadcasts</div>
+              </div>
+              <div id="ann-list"><div class="empty">Loading…</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+     11. TAGS & NICHES
+═══════════════════════════════════ -->
+        <div id="s-tags" style="display: none">
+          <div class="ph">
+            <div class="ph-left">
+              <div class="ph-bc">Admin / <span>Tags & Niches</span></div>
+              <div class="ph-title">Category & Tag Management</div>
+            </div>
+            <div class="ph-right">
+              <button class="btn btn-ghost btn-sm" onclick="addTagFn()">
+                + Add Tag
+              </button>
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title"><em>🧶</em> Craft Niches</div>
+              </div>
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Niche</th>
+                    <th>Users</th>
+                    <th>Posts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-weight: 600">🧶 Crochet & Knitting</td>
+                    <td>—</td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600">🍰 Home Bakery</td>
+                    <td>—</td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600">🏮 Resin Art</td>
+                    <td>—</td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600">🪡 Embroidery & Sewing</td>
+                    <td>—</td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600">🕯 Candles & Soaps</td>
+                    <td>—</td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600">🏺 Ceramics</td>
+                    <td>—</td>
+                    <td>—</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title"><em>🔖</em> Active Tags</div>
+              </div>
+              <div class="tags-wrap" id="tag-list">
+                <div class="tag-chip">
+                  #supplierscam <span>47</span
+                  ><button
+                    class="tag-x"
+                    onclick="this.closest('.tag-chip').remove()"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div class="tag-chip">
+                  #pricing <span>72</span
+                  ><button
+                    class="tag-x"
+                    onclick="this.closest('.tag-chip').remove()"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div class="tag-chip">
+                  #refundpolicy <span>38</span
+                  ><button
+                    class="tag-x"
+                    onclick="this.closest('.tag-chip').remove()"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div class="tag-chip">
+                  #etsyappeal <span>31</span
+                  ><button
+                    class="tag-x"
+                    onclick="this.closest('.tag-chip').remove()"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div class="tag-chip">
+                  #customorder <span>55</span
+                  ><button
+                    class="tag-x"
+                    onclick="this.closest('.tag-chip').remove()"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div class="tag-chip">
+                  #packaging <span>28</span
+                  ><button
+                    class="tag-x"
+                    onclick="this.closest('.tag-chip').remove()"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div class="tag-chip">
+                  #copyright <span>19</span
+                  ><button
+                    class="tag-x"
+                    onclick="this.closest('.tag-chip').remove()"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div class="tag-chip">
+                  #financialdistress <span>44</span
+                  ><button
+                    class="tag-x"
+                    onclick="this.closest('.tag-chip').remove()"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+     12. ACTIVITY LOGS
+═══════════════════════════════════ -->
+        <div id="s-logs" style="display: none">
+          <div class="ph">
+            <div class="ph-left">
+              <div class="ph-bc">Admin / <span>Activity Logs</span></div>
+              <div class="ph-title">Admin Activity Logs</div>
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title"><em>🔐</em> Admin Action Log</div>
+                <select
+                  class="sel"
+                  style="
+                    font-size: 0.78rem;
+                    padding: 5px 10px;
+                    border-radius: 7px;
+                  "
+                  id="log-action-filter"
+                  onchange="loadLogs()"
+                >
+                  <option value="">All Actions</option>
+                  <option value="ban">Bans</option>
+                  <option value="delete_post">Deletions</option>
+                  <option value="promote">Role Changes</option>
+                  <option value="verify">Approvals</option>
+                </select>
+              </div>
+              <div class="timeline" id="log-timeline">
+                <div class="empty">
+                  <div class="empty-icon">📋</div>
+                  Loading logs…
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title"><em>📊</em> Log Summary (30d)</div>
+              </div>
+              <div style="padding: 14px 18px">
+                <div class="kpi" id="log-summary-kpi">
+                  <div class="empty">Loading…</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════
+     13. SYSTEM HEALTH
+═══════════════════════════════════ -->
+        <div id="s-system" style="display: none">
+          <div class="ph">
+            <div class="ph-left">
+              <div class="ph-bc">Admin / <span>System</span></div>
+              <div class="ph-title">System Health</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hdr">
+              <div class="card-hdr-title"><em>💻</em> Platform Status</div>
+              <span class="live-badge">All Systems Operational</span>
+            </div>
+            <div class="health-row">
+              <div class="health-tile">
+                <div class="h-ico">🌐</div>
+                <div class="h-val">99.9%</div>
+                <div class="h-lbl">Uptime (30d)</div>
+                <div class="h-status hs-good">✓ Healthy</div>
+              </div>
+              <div class="health-tile">
+                <div class="h-ico">⚡</div>
+                <div class="h-val">220ms</div>
+                <div class="h-lbl">Avg Response</div>
+                <div class="h-status hs-good">✓ Fast</div>
+              </div>
+              <div class="health-tile">
+                <div class="h-ico">💾</div>
+                <div class="h-val">62%</div>
+                <div class="h-lbl">Storage Used</div>
+                <div class="h-status hs-warn">⚠ Monitor</div>
+              </div>
+              <div class="health-tile">
+                <div class="h-ico">📡</div>
+                <div class="h-val" id="sys-sessions">—</div>
+                <div class="h-lbl">Active Sessions</div>
+                <div class="h-status hs-good">✓ Normal</div>
+              </div>
+            </div>
+          </div>
+          <div class="two-col" style="margin-top: 16px">
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title"><em>📊</em> Resource Usage</div>
+              </div>
+              <div style="padding: 16px 18px">
+                <div class="kpi">
+                  <div class="kpi-item">
+                    <div class="kpi-top">
+                      <span class="kpi-lbl">CPU Usage</span
+                      ><span class="kpi-val">34%</span>
+                    </div>
+                    <div class="kpi-bar">
+                      <div
+                        class="kpi-fill"
+                        style="width: 34%; background: var(--low)"
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="kpi-item">
+                    <div class="kpi-top">
+                      <span class="kpi-lbl">Memory</span
+                      ><span class="kpi-val">58%</span>
+                    </div>
+                    <div class="kpi-bar">
+                      <div
+                        class="kpi-fill"
+                        style="width: 58%; background: var(--med)"
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="kpi-item">
+                    <div class="kpi-top">
+                      <span class="kpi-lbl">Storage Used</span
+                      ><span class="kpi-val">62%</span>
+                    </div>
+                    <div class="kpi-bar">
+                      <div
+                        class="kpi-fill"
+                        style="width: 62%; background: var(--med)"
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="kpi-item">
+                    <div class="kpi-top">
+                      <span class="kpi-lbl">DB Query Load</span
+                      ><span class="kpi-val">28%</span>
+                    </div>
+                    <div class="kpi-bar">
+                      <div
+                        class="kpi-fill"
+                        style="width: 28%; background: var(--blue)"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-hdr">
+                <div class="card-hdr-title">
+                  <em>🛠</em> Maintenance Controls
+                </div>
+              </div>
+              <div class="mod-row">
+                <div>
+                  <div class="mod-info-title">Maintenance Mode</div>
+                  <div class="mod-info-sub">
+                    Show maintenance banner to users
+                  </div>
+                </div>
+                <button class="tog off" onclick="togBtn(this)"></button>
+              </div>
+              <div class="mod-row">
+                <div>
+                  <div class="mod-info-title">Email Notifications</div>
+                  <div class="mod-info-sub">
+                    Send email alerts for critical events
+                  </div>
+                </div>
+                <button class="tog on" onclick="togBtn(this)"></button>
+              </div>
+              <div class="mod-row">
+                <div>
+                  <div class="mod-info-title">Auto Backup (Daily)</div>
+                  <div class="mod-info-sub">
+                    Automatic daily backups at 3 AM IST
+                  </div>
+                </div>
+                <button class="tog on" onclick="togBtn(this)"></button>
+              </div>
+              <div class="mod-row">
+                <div>
+                  <div class="mod-info-title">Error Logging</div>
+                  <div class="mod-info-sub">
+                    Log all server errors for debugging
+                  </div>
+                </div>
+                <button class="tog on" onclick="togBtn(this)"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ══════════════ admin.js ══════════════ -->
+    <script src="../js/admin.js"></script>
+  </body>
+</html>

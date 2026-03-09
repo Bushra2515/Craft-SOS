@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Craft-SOS — Your Craft Business Community</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #eef0e8;
+      --bg-dark:      #2e3520;
+      --panel:        #d4dbbf;
+      --card:         #c5cf9e;
+      --card2:        #d0d9b0;
+      --sidebar-bg:   #c9d3af;
+      --accent:       #7a8f52;
+      --accent-dark:  #5e6e3b;
+      --accent-light: #a8bc72;
+      --accent-pale:  #dde8c4;
+      --text-dark:    #2e3520;
+      --text-mid:     #4a5730;
+      --text-light:   #6b7a50;
+      --high:         #d35b3a;
+      --high-bg:      #fce8e1;
+      --med:          #c8932a;
+      --white:        #ffffff;
+      --ease:         cubic-bezier(.4,0,.2,1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* ─── TEXTURE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      opacity: 0.045;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Ccircle cx='80' cy='80' r='35' fill='none' stroke='%237a8f52' stroke-width='2'/%3E%3Cpath d='M58 105 Q80 65 102 105' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cellipse cx='500' cy='150' rx='28' ry='40' fill='none' stroke='%237a8f52' stroke-width='2' transform='rotate(-20 500 150)'/%3E%3Crect x='230' y='30' width='80' height='14' rx='7' fill='none' stroke='%237a8f52' stroke-width='1.5' transform='rotate(30 270 37)'/%3E%3Ccircle cx='270' cy='20' r='8' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cpath d='M100 430 L128 398 L156 430 L128 462 Z' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Crect x='400' y='380' width='54' height='74' rx='6' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cline x1='400' y1='420' x2='454' y2='420' stroke='%237a8f52' stroke-width='1'/%3E%3Ccircle cx='280' cy='480' r='48' fill='none' stroke='%237a8f52' stroke-width='2'/%3E%3Cpath d='M252 480 Q280 440 308 480' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cpath d='M252 494 Q280 534 308 494' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3C/svg%3E");
+    }
+
+    /* ═══════════════════════════
+       NAVBAR
+    ═══════════════════════════ */
+    #navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    #navbar.scrolled {
+      background: rgba(238,240,232,0.94);
+      box-shadow: 0 2px 20px rgba(46,53,32,0.09);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; cursor: pointer;
+    }
+    .nav-logo-pill {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .nav-logo-pill svg { width: 20px; height: 20px; fill: white; }
+    .nav-wordmark {
+      font-family: 'Lora', serif; font-weight: 700; font-size: 1.2rem;
+      color: var(--text-dark); letter-spacing: -0.01em;
+    }
+    .nav-wordmark span { color: var(--accent); }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nav-link {
+      font-size: 0.9rem; font-weight: 500; color: var(--text-mid);
+      padding: 7px 16px; border-radius: 20px; cursor: pointer;
+      transition: background 0.18s, color 0.18s; text-decoration: none;
+    }
+    .nav-link:hover { background: rgba(122,143,82,0.12); color: var(--text-dark); }
+
+    .nav-cta {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-ghost {
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
+      color: var(--accent); background: transparent;
+      border: 2px solid var(--accent); border-radius: 22px;
+      padding: 8px 20px; cursor: pointer;
+      transition: background 0.18s, color 0.18s, transform 0.14s;
+    }
+    .btn-ghost:hover { background: var(--accent); color: white; transform: scale(1.03); }
+
+    .btn-solid {
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
+      color: white; background: var(--accent);
+      border: none; border-radius: 22px;
+      padding: 9px 22px; cursor: pointer;
+      transition: background 0.18s, transform 0.14s, box-shadow 0.18s;
+      box-shadow: 0 4px 14px rgba(122,143,82,0.35);
+    }
+    .btn-solid:hover { background: var(--accent-dark); transform: scale(1.04); box-shadow: 0 6px 20px rgba(122,143,82,0.4); }
+
+    #mob-menu-btn {
+      display: none; background: none; border: none; cursor: pointer; padding: 6px;
+    }
+    #mob-menu-btn svg { width: 24px; height: 24px; stroke: var(--text-dark); fill: none; stroke-width: 2; stroke-linecap: round; }
+
+    /* ═══════════════════════════
+       HERO
+    ═══════════════════════════ */
+    #hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 100px 40px 60px;
+      position: relative; z-index: 1;
+      overflow: hidden;
+    }
+
+    /* large decorative circle background */
+    #hero::before {
+      content: '';
+      position: absolute; right: -140px; top: -140px;
+      width: 680px; height: 680px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(122,143,82,0.13) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    #hero::after {
+      content: '';
+      position: absolute; left: -80px; bottom: -80px;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(122,143,82,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 1200px; margin: 0 auto; width: 100%;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    }
+
+    .hero-left { position: relative; z-index: 2; }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--accent-pale); border: 1.5px solid rgba(122,143,82,0.3);
+      border-radius: 30px; padding: 6px 16px;
+      font-size: 0.8rem; font-weight: 600; color: var(--accent-dark);
+      margin-bottom: 22px;
+      animation: fadeUp 0.6s var(--ease) both;
+    }
+    .hero-eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: blink 1.5s infinite; }
+
+    .hero-headline {
+      font-family: 'Lora', serif; font-weight: 700;
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      line-height: 1.18; color: var(--text-dark);
+      margin-bottom: 20px;
+      animation: fadeUp 0.6s var(--ease) 0.1s both;
+    }
+    .hero-headline em { font-style: italic; color: var(--accent); }
+    .hero-headline .under {
+      position: relative; display: inline-block;
+    }
+    .hero-headline .under::after {
+      content: '';
+      position: absolute; left: 0; bottom: -4px; right: 0; height: 3px;
+      background: var(--accent); border-radius: 3px;
+      transform: scaleX(0); transform-origin: left;
+      animation: underlineIn 0.5s var(--ease) 0.8s forwards;
+    }
+
+    .hero-sub {
+      font-size: 1.05rem; color: var(--text-mid); line-height: 1.7;
+      max-width: 480px; margin-bottom: 32px;
+      animation: fadeUp 0.6s var(--ease) 0.2s both;
+    }
+
+    .hero-btns {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      animation: fadeUp 0.6s var(--ease) 0.3s both;
+    }
+    .hero-btn-primary {
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700;
+      color: white; background: var(--accent);
+      border: none; border-radius: 26px; padding: 14px 30px;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 6px 22px rgba(122,143,82,0.4);
+      transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+    }
+    .hero-btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(122,143,82,0.45); }
+    .hero-btn-primary svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+    .hero-btn-secondary {
+      font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600;
+      color: var(--text-mid); background: transparent;
+      border: 2px solid rgba(122,143,82,0.35); border-radius: 26px; padding: 13px 24px;
+      cursor: pointer; transition: border-color 0.18s, color 0.18s, background 0.18s;
+    }
+    .hero-btn-secondary:hover { border-color: var(--accent); color: var(--accent-dark); background: rgba(122,143,82,0.07); }
+
+    .hero-social {
+      display: flex; align-items: center; gap: 12px; margin-top: 28px;
+      animation: fadeUp 0.6s var(--ease) 0.4s both;
+    }
+    .hero-avatars { display: flex; }
+    .hero-avatars span {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 2.5px solid var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Lora', serif; font-size: 0.72rem; font-weight: 700; color: white;
+      margin-left: -8px;
+    }
+    .hero-avatars span:first-child { margin-left: 0; }
+    .hero-social-text { font-size: 0.83rem; color: var(--text-light); }
+    .hero-social-text strong { color: var(--text-dark); }
+
+    /* Hero right — floating cards */
+    .hero-right {
+      position: relative; z-index: 2;
+      height: 480px;
+      animation: fadeUp 0.7s var(--ease) 0.2s both;
+    }
+
+    .hero-card {
+      position: absolute;
+      background: var(--card); border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(46,53,32,0.14);
+      padding: 16px;
+    }
+
+    /* Main SOS preview card */
+    .hc-main {
+      width: 310px; left: 10px; top: 30px;
+      animation: floatA 6s ease-in-out infinite;
+    }
+    .hc-main-label {
+      font-size: 0.72rem; font-weight: 700; color: var(--high);
+      display: flex; align-items: center; gap: 5px; margin-bottom: 10px;
+    }
+    .hc-main-label::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--high); animation: blink 1.2s infinite; }
+    .hc-main-title { font-family: 'Lora', serif; font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; line-height: 1.4; }
+    .hc-main-sub { font-size: 0.78rem; color: var(--text-mid); line-height: 1.5; margin-bottom: 10px; }
+    .hc-main-footer { display: flex; align-items: center; justify-content: space-between; }
+    .hc-av-row { display: flex; }
+    .hc-av { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--card); margin-left: -5px; font-size: 0.6rem; font-weight: 700; display: flex; align-items: center; justify-content: center; color: white; font-family: 'Lora', serif; }
+    .hc-av:first-child { margin-left: 0; }
+    .hc-resp { font-size: 0.74rem; color: var(--text-light); }
+    .hc-badge { font-size: 0.7rem; font-weight: 700; background: var(--high-bg); color: var(--high); border-radius: 12px; padding: 3px 9px; }
+
+    /* Reply card */
+    .hc-reply {
+      width: 230px; right: 0; top: 170px;
+      animation: floatB 7s ease-in-out 1s infinite;
+      background: var(--card2);
+    }
+    .hc-reply-head { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+    .hc-reply-av { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-size: 0.68rem; font-weight: 700; color: white; flex-shrink: 0; }
+    .hc-reply-name { font-size: 0.8rem; font-weight: 600; color: var(--text-dark); }
+    .hc-reply-badge { font-size: 0.66rem; background: rgba(122,143,82,0.2); color: var(--accent-dark); border-radius: 10px; padding: 2px 7px; font-weight: 600; }
+    .hc-reply-text { font-size: 0.78rem; color: var(--text-mid); line-height: 1.5; }
+
+    /* Stats card */
+    .hc-stats {
+      width: 200px; left: 0; bottom: 20px;
+      animation: floatA 8s ease-in-out 2s infinite;
+      background: var(--bg-dark); padding: 14px;
+    }
+    .hc-stats-title { font-size: 0.72rem; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .hc-stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .hc-stat-val { font-family: 'Lora', serif; font-size: 1.1rem; font-weight: 700; color: white; }
+    .hc-stat-lbl { font-size: 0.71rem; color: rgba(255,255,255,0.55); margin-top: 1px; }
+
+    /* Solved card */
+    .hc-solved {
+      width: 200px; right: 10px; bottom: 30px;
+      animation: floatB 6.5s ease-in-out 0.5s infinite;
+    }
+    .hc-solved-inner { display: flex; align-items: center; gap: 10px; }
+    .hc-solved-ico { width: 38px; height: 38px; border-radius: 50%; background: rgba(122,143,82,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .hc-solved-ico svg { width: 18px; height: 18px; stroke: var(--accent-dark); fill: none; stroke-width: 2.2; stroke-linecap: round; }
+    .hc-solved-num { font-family: 'Lora', serif; font-size: 1.2rem; font-weight: 700; color: var(--text-dark); }
+    .hc-solved-lbl { font-size: 0.75rem; color: var(--text-light); }
+
+    /* ═══════════════════════════
+       MARQUEE STRIP
+    ═══════════════════════════ */
+    .marquee-strip {
+      background: var(--accent);
+      padding: 12px 0; overflow: hidden;
+      position: relative; z-index: 2;
+    }
+    .marquee-track {
+      display: flex; gap: 0;
+      animation: marquee 28s linear infinite;
+      white-space: nowrap;
+    }
+    .marquee-item {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 0 32px;
+      font-size: 0.85rem; font-weight: 600; color: rgba(255,255,255,0.9);
+    }
+    .marquee-item::before { content: '✦'; color: rgba(255,255,255,0.5); font-size: 0.7rem; }
+
+    /* ═══════════════════════════
+       SECTION WRAPPERS
+    ═══════════════════════════ */
+    .section { padding: 80px 40px; position: relative; z-index: 1; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+
+    .section-label {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.78rem; font-weight: 700; color: var(--accent);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;
+    }
+    .section-label::before { content: ''; width: 20px; height: 2px; background: var(--accent); border-radius: 2px; }
+
+    .section-title {
+      font-family: 'Lora', serif; font-weight: 700;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      color: var(--text-dark); line-height: 1.25; margin-bottom: 14px;
+    }
+    .section-title em { color: var(--accent); font-style: italic; }
+
+    .section-sub {
+      font-size: 1rem; color: var(--text-mid); line-height: 1.7;
+      max-width: 560px;
+    }
+
+    /* ═══════════════════════════
+       PROBLEM STRIP (What is this)
+    ═══════════════════════════ */
+    #problem {
+      background: var(--bg-dark);
+      padding: 70px 40px;
+      position: relative; overflow: hidden; z-index: 1;
+    }
+    #problem::before {
+      content: '';
+      position: absolute; right: -100px; top: -100px;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(122,143,82,0.15) 0%, transparent 70%);
+    }
+    .problem-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    }
+    .problem-left .section-label { color: var(--accent-light); }
+    .problem-left .section-label::before { background: var(--accent-light); }
+    .problem-left .section-title { color: white; }
+    .problem-left .section-sub { color: rgba(255,255,255,0.7); max-width: 100%; }
+
+    .problem-list { margin-top: 28px; display: flex; flex-direction: column; gap: 14px; }
+    .prob-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px; padding: 14px 16px;
+    }
+    .prob-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+    .prob-text { font-size: 0.9rem; color: rgba(255,255,255,0.82); line-height: 1.55; }
+    .prob-text strong { color: white; }
+
+    .problem-right { position: relative; }
+    .solution-card {
+      background: var(--card); border-radius: 20px; padding: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .sol-header { font-family: 'Lora', serif; font-weight: 700; font-size: 1.1rem; color: var(--text-dark); margin-bottom: 16px; }
+    .sol-step {
+      display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px;
+    }
+    .sol-num {
+      width: 28px; height: 28px; border-radius: 50%; background: var(--accent);
+      color: white; font-size: 0.78rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .sol-step-text { font-size: 0.88rem; color: var(--text-mid); line-height: 1.5; padding-top: 3px; }
+    .sol-step-text strong { color: var(--text-dark); }
+
+    /* ═══════════════════════════
+       FEATURES
+    ═══════════════════════════ */
+    #features .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+      margin-top: 50px;
+    }
+    .feat-card {
+      background: var(--card); border-radius: 20px; padding: 24px;
+      box-shadow: 0 3px 14px rgba(46,53,32,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: default;
+    }
+    .feat-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(46,53,32,0.14); }
+    .feat-ico {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: rgba(255,255,255,0.6); margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .feat-ico svg { width: 22px; height: 22px; stroke: var(--accent-dark); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .feat-title { font-family: 'Lora', serif; font-weight: 700; font-size: 1.05rem; color: var(--text-dark); margin-bottom: 8px; }
+    .feat-desc { font-size: 0.87rem; color: var(--text-mid); line-height: 1.65; }
+
+    /* Featured SOS types */
+    .feat-card.accent-card {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    }
+    .feat-card.accent-card .feat-ico { background: rgba(255,255,255,0.18); }
+    .feat-card.accent-card .feat-ico svg { stroke: white; }
+    .feat-card.accent-card .feat-title { color: white; }
+    .feat-card.accent-card .feat-desc { color: rgba(255,255,255,0.82); }
+
+    /* ═══════════════════════════
+       SOS CATEGORIES SHOWCASE
+    ═══════════════════════════ */
+    #categories { background: var(--panel); }
+    .cats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      margin-top: 44px;
+    }
+    .cat-card {
+      background: var(--bg); border-radius: 18px; padding: 20px 16px;
+      text-align: center; cursor: pointer;
+      transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+      border: 2px solid transparent;
+    }
+    .cat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(46,53,32,0.1); border-color: var(--accent-light); }
+    .cat-emoji { font-size: 2rem; margin-bottom: 10px; }
+    .cat-name { font-family: 'Lora', serif; font-weight: 700; font-size: 0.95rem; color: var(--text-dark); margin-bottom: 4px; }
+    .cat-count { font-size: 0.78rem; color: var(--text-light); }
+
+    /* ═══════════════════════════
+       SOCIAL PROOF / TESTIMONIALS
+    ═══════════════════════════ */
+    #testimonials .testi-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+      margin-top: 50px;
+    }
+    .testi-card {
+      background: var(--card); border-radius: 20px; padding: 24px;
+      box-shadow: 0 3px 14px rgba(46,53,32,0.07);
+      position: relative;
+    }
+    .testi-quote {
+      font-size: 3rem; font-family: 'Lora', serif; color: var(--accent-pale);
+      line-height: 0.7; margin-bottom: 14px; display: block;
+    }
+    .testi-text { font-size: 0.9rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 18px; font-style: italic; }
+    .testi-author { display: flex; align-items: center; gap: 10px; }
+    .testi-av {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Lora', serif; font-weight: 700; font-size: 0.8rem; color: white;
+    }
+    .testi-name { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); }
+    .testi-niche { font-size: 0.76rem; color: var(--text-light); }
+
+    /* ═══════════════════════════
+       STATS BAND
+    ═══════════════════════════ */
+    #stats-band {
+      background: var(--accent-pale); padding: 50px 40px;
+      position: relative; z-index: 1;
+    }
+    .stats-band-inner {
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center;
+    }
+    .sband-num { font-family: 'Lora', serif; font-size: 2.2rem; font-weight: 700; color: var(--accent-dark); }
+    .sband-label { font-size: 0.85rem; color: var(--text-mid); margin-top: 4px; font-weight: 500; }
+
+    /* ═══════════════════════════
+       CTA SECTION
+    ═══════════════════════════ */
+    #cta-section {
+      padding: 80px 40px;
+      position: relative; z-index: 1; overflow: hidden;
+    }
+    .cta-box {
+      max-width: 860px; margin: 0 auto;
+      background: var(--bg-dark); border-radius: 28px; padding: 60px 50px;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-box::before {
+      content: '';
+      position: absolute; right: -80px; top: -80px;
+      width: 320px; height: 320px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(122,143,82,0.2) 0%, transparent 70%);
+    }
+    .cta-box::after {
+      content: '';
+      position: absolute; left: -60px; bottom: -60px;
+      width: 240px; height: 240px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(122,143,82,0.12) 0%, transparent 70%);
+    }
+    .cta-eyebrow { font-size: 0.78rem; font-weight: 700; color: var(--accent-light); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; position: relative; z-index: 1; }
+    .cta-title { font-family: 'Lora', serif; font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 700; color: white; line-height: 1.25; margin-bottom: 16px; position: relative; z-index: 1; }
+    .cta-title em { color: var(--accent-light); font-style: italic; }
+    .cta-sub { font-size: 1rem; color: rgba(255,255,255,0.7); line-height: 1.65; margin-bottom: 36px; position: relative; z-index: 1; max-width: 540px; margin-left: auto; margin-right: auto; }
+    .cta-btns { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; position: relative; z-index: 1; }
+    .cta-btn-main {
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text-dark);
+      background: white; border: none; border-radius: 26px; padding: 14px 32px;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.2);
+      transition: transform 0.15s, box-shadow 0.18s;
+    }
+    .cta-btn-main:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,0.3); }
+    .cta-btn-sec {
+      font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,0.85);
+      background: transparent; border: 2px solid rgba(255,255,255,0.3); border-radius: 26px; padding: 13px 26px;
+      cursor: pointer; transition: border-color 0.18s, color 0.18s;
+    }
+    .cta-btn-sec:hover { border-color: rgba(255,255,255,0.7); color: white; }
+    .cta-note { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-top: 18px; position: relative; z-index: 1; }
+
+    /* ═══════════════════════════
+       FOOTER
+    ═══════════════════════════ */
+    footer {
+      background: var(--bg-dark); padding: 50px 40px 30px;
+      position: relative; z-index: 1;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
+      padding-bottom: 36px; border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .footer-brand .nav-wordmark { color: white; font-size: 1.15rem; }
+    .footer-desc { font-size: 0.84rem; color: rgba(255,255,255,0.5); line-height: 1.65; margin-top: 10px; max-width: 260px; }
+    .footer-col-title { font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
+    .footer-link { display: block; font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 8px; cursor: pointer; transition: color 0.15s; text-decoration: none; }
+    .footer-link:hover { color: white; }
+    .footer-bottom { max-width: 1100px; margin: 24px auto 0; display: flex; justify-content: space-between; align-items: center; }
+    .footer-copy { font-size: 0.8rem; color: rgba(255,255,255,0.3); }
+    .footer-heart { font-size: 0.8rem; color: rgba(255,255,255,0.3); }
+    .footer-heart span { color: var(--high); }
+
+    /* ═══════════════════════════
+       MODAL (Login / Register)
+    ═══════════════════════════ */
+    #modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(46,53,32,0.45); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    #modal-overlay.on { display: flex; }
+
+    .modal {
+      background: var(--bg); border-radius: 24px;
+      padding: 36px; width: 100%; max-width: 420px;
+      box-shadow: 0 20px 60px rgba(46,53,32,0.35);
+      position: relative; animation: modalIn 0.3s var(--ease) both;
+    }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 32px; height: 32px; border-radius: 50%; border: none;
+      background: var(--panel); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--text-mid); transition: background 0.15s;
+    }
+    .modal-close:hover { background: var(--card); }
+    .modal-close svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; }
+
+    .modal-logo { display: flex; align-items: center; gap: 9px; margin-bottom: 24px; }
+    .modal-logo .nav-logo-pill { width: 32px; height: 32px; }
+    .modal-logo .nav-logo-pill svg { width: 16px; height: 16px; }
+    .modal-logo .nav-wordmark { font-size: 1.05rem; }
+
+    .modal-tabs { display: flex; background: var(--panel); border-radius: 14px; padding: 4px; margin-bottom: 24px; }
+    .modal-tab {
+      flex: 1; text-align: center; padding: 8px;
+      font-size: 0.88rem; font-weight: 600; color: var(--text-light);
+      border-radius: 11px; cursor: pointer; transition: all 0.18s;
+    }
+    .modal-tab.active { background: white; color: var(--text-dark); box-shadow: 0 2px 8px rgba(46,53,32,0.1); }
+
+    .modal-form { display: none; flex-direction: column; gap: 13px; }
+    .modal-form.active { display: flex; }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-label { font-size: 0.8rem; font-weight: 600; color: var(--text-mid); }
+    .form-input {
+      background: white; border: 1.5px solid rgba(122,143,82,0.25);
+      border-radius: 12px; padding: 10px 14px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--text-dark);
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(122,143,82,0.12); }
+    .form-input::placeholder { color: var(--text-light); }
+
+    .form-submit {
+      margin-top: 4px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 700;
+      color: white; background: var(--accent); border: none; border-radius: 14px;
+      padding: 12px; cursor: pointer; width: 100%;
+      transition: background 0.18s, transform 0.14s;
+      box-shadow: 0 4px 14px rgba(122,143,82,0.35);
+    }
+    .form-submit:hover { background: var(--accent-dark); transform: translateY(-1px); }
+
+    .form-divider { text-align: center; font-size: 0.78rem; color: var(--text-light); position: relative; margin: 4px 0; }
+    .form-divider::before, .form-divider::after { content: ''; position: absolute; top: 50%; width: 38%; height: 1px; background: rgba(122,143,82,0.2); }
+    .form-divider::before { left: 0; } .form-divider::after { right: 0; }
+
+    .form-google {
+      font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600;
+      color: var(--text-dark); background: white;
+      border: 1.5px solid rgba(122,143,82,0.25); border-radius: 14px;
+      padding: 10px; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .form-google:hover { border-color: var(--accent); box-shadow: 0 2px 10px rgba(122,143,82,0.12); }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes underlineIn {
+      to { transform: scaleX(1); }
+    }
+    @keyframes floatA {
+      0%,100% { transform: translateY(0px); }
+      50%      { transform: translateY(-12px); }
+    }
+    @keyframes floatB {
+      0%,100% { transform: translateY(0px) rotate(0deg); }
+      50%      { transform: translateY(10px) rotate(1deg); }
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.94) translateY(16px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* ─── SCROLL REVEAL ─── */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 960px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+      .hero-right { display: none; }
+      #features .features-grid { grid-template-columns: repeat(2,1fr); }
+      .cats-grid { grid-template-columns: repeat(2,1fr); }
+      #testimonials .testi-grid { grid-template-columns: 1fr; }
+      .problem-inner { grid-template-columns: 1fr; }
+      .stats-band-inner { grid-template-columns: repeat(2,1fr); }
+      .footer-inner { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 680px) {
+      #navbar { padding: 0 20px; }
+      .nav-links { display: none; }
+      #mob-menu-btn { display: flex; }
+      #hero { padding: 90px 20px 50px; }
+      .section { padding: 60px 20px; }
+      #stats-band { padding: 40px 20px; }
+      #problem { padding: 60px 20px; }
+      #cta-section { padding: 60px 20px; }
+      .cta-box { padding: 40px 24px; }
+      footer { padding: 40px 20px 24px; }
+      .footer-inner { grid-template-columns: 1fr; gap: 24px; }
+      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+      #features .features-grid { grid-template-columns: 1fr; }
+      .stats-band-inner { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ MODAL ══ -->
+<div id="modal-overlay" onclick="modalClickOut(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="modal-logo">
+      <div class="nav-logo-pill"><svg viewBox="0 0 24 24"><path d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"/></svg></div>
+      <div class="nav-wordmark">Craft<span>-SOS</span></div>
+    </div>
+    <div class="modal-tabs">
+      <div class="modal-tab active" onclick="switchTab('login')">Log In</div>
+      <div class="modal-tab" onclick="switchTab('register')">Join Free</div>
+    </div>
+
+    <!-- Login form -->
+    <form class="modal-form active" id="form-login" onsubmit="return false">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" placeholder="Your password"/>
+      </div>
+      <button class="form-submit">Log In to Craft-SOS</button>
+      <div class="form-divider">or continue with</div>
+      <button class="form-google">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+    </form>
+
+    <!-- Register form -->
+    <form class="modal-form" id="form-register" onsubmit="return false">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" placeholder="Your name or business name"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Craft Niche</label>
+        <select class="form-input" style="cursor:pointer;">
+          <option value="">Select your craft...</option>
+          <option>🧶 Crochet / Knitting</option>
+          <option>🏮 Resin Art</option>
+          <option>🍰 Home Bakery</option>
+          <option>🪡 Embroidery / Sewing</option>
+          <option>🕯 Candles / Soaps</option>
+          <option>🏺 Ceramics / Pottery</option>
+          <option>🎨 Painting / Illustration</option>
+          <option>📦 Packaging / Print</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" placeholder="Create a password"/>
+      </div>
+      <button class="form-submit">Create My Account — It's Free</button>
+      <div class="form-divider">or</div>
+      <button class="form-google">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Sign up with Google
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ══ NAVBAR ══ -->
+<nav id="navbar">
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-pill"><svg viewBox="0 0 24 24"><path d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"/></svg></div>
+    <span class="nav-wordmark">Craft<span>-SOS</span></span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="#features">Features</a>
+    <a class="nav-link" href="#categories">Craft Niches</a>
+    <a class="nav-link" href="#testimonials">Stories</a>
+    <a class="nav-link" href="#">Community</a>
+  </div>
+  <div class="nav-cta">
+    <button class="btn-ghost" onclick="openModal('login')">Log In</button>
+    <button class="btn-solid" onclick="openModal('register')">Join Free →</button>
+  </div>
+  <button id="mob-menu-btn" onclick="openModal('register')">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span>
+        500+ craft businesses already inside
+      </div>
+      <h1 class="hero-headline">
+        The community that <em>rescues</em> your craft<br/>
+        business when you're <span class="under">stuck</span>
+      </h1>
+      <p class="hero-sub">
+        Post an SOS. Get real help from real crafters — fast. Whether it's a supplier ghosting you, a tricky customer, or pricing paralysis, Craft-SOS has your back.
+      </p>
+      <div class="hero-btns">
+        <button class="hero-btn-primary" onclick="openModal('register')">
+          Join Free — Post Your First SOS
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+        <button class="hero-btn-secondary" onclick="openModal('login')">I already have an account</button>
+      </div>
+      <div class="hero-social">
+        <div class="hero-avatars">
+          <span style="background:var(--accent);">MK</span>
+          <span style="background:#c8932a;">ZR</span>
+          <span style="background:#7a5c10;">FH</span>
+          <span style="background:#5e6e3b;">RQ</span>
+          <span style="background:#9a6050;">SW</span>
+        </div>
+        <div class="hero-social-text"><strong>Mariam, Zara, Faisal</strong> + 497 others joined this month</div>
+      </div>
+    </div>
+
+    <!-- Floating UI cards -->
+    <div class="hero-right">
+
+      <!-- Main SOS Card -->
+      <div class="hero-card hc-main">
+        <div class="hc-main-label">🚨 LIVE SOS — 2 hrs ago</div>
+        <div class="hc-main-title">Supplier took bulk payment & disappeared — need urgent help</div>
+        <div class="hc-main-sub">Paid ₹18k upfront. No response in 3 days. Only WhatsApp proof. What are my options?</div>
+        <div class="hc-main-footer">
+          <div>
+            <div class="hc-av-row">
+              <div class="hc-av" style="background:var(--accent);">RQ</div>
+              <div class="hc-av" style="background:#c8932a;">WC</div>
+              <div class="hc-av" style="background:#5e6e3b;">YW</div>
+            </div>
+          </div>
+          <div class="hc-resp">4 responses</div>
+          <div class="hc-badge">🔴 High</div>
+        </div>
+      </div>
+
+      <!-- Reply card -->
+      <div class="hero-card hc-reply">
+        <div class="hc-reply-head">
+          <div class="hc-reply-av">RQ</div>
+          <div>
+            <div class="hc-reply-name">ResinQueenDelhi</div>
+            <div class="hc-reply-badge">🏅 Problem Solver</div>
+          </div>
+        </div>
+        <div class="hc-reply-text">"File a complaint with the Consumer Forum — I've done this twice and got refunds both times!"</div>
+      </div>
+
+      <!-- Stats card -->
+      <div class="hero-card hc-stats">
+        <div class="hc-stats-title">This week</div>
+        <div class="hc-stat-row">
+          <div><div class="hc-stat-val">47</div><div class="hc-stat-lbl">SOS posted</div></div>
+          <div><div class="hc-stat-val">43</div><div class="hc-stat-lbl">Resolved ✅</div></div>
+        </div>
+      </div>
+
+      <!-- Solved card -->
+      <div class="hero-card hc-solved">
+        <div class="hc-solved-inner">
+          <div class="hc-solved-ico"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div>
+            <div class="hc-solved-num">91%</div>
+            <div class="hc-solved-lbl">SOS resolved</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ MARQUEE ══ -->
+<div class="marquee-strip">
+  <div class="marquee-track" id="marquee">
+    <span class="marquee-item">🧶 Crochet Sellers</span>
+    <span class="marquee-item">🏮 Resin Artists</span>
+    <span class="marquee-item">🍰 Home Bakers</span>
+    <span class="marquee-item">🪡 Embroidery Makers</span>
+    <span class="marquee-item">🕯 Candle Businesses</span>
+    <span class="marquee-item">🏺 Pottery Studios</span>
+    <span class="marquee-item">🎨 Illustrators</span>
+    <span class="marquee-item">📦 Packaging Designers</span>
+    <span class="marquee-item">🧶 Crochet Sellers</span>
+    <span class="marquee-item">🏮 Resin Artists</span>
+    <span class="marquee-item">🍰 Home Bakers</span>
+    <span class="marquee-item">🪡 Embroidery Makers</span>
+    <span class="marquee-item">🕯 Candle Businesses</span>
+    <span class="marquee-item">🏺 Pottery Studios</span>
+    <span class="marquee-item">🎨 Illustrators</span>
+    <span class="marquee-item">📦 Packaging Designers</span>
+  </div>
+</div>
+
+<!-- ══ PROBLEM SECTION ══ -->
+<section id="problem">
+  <div class="problem-inner">
+    <div class="problem-left">
+      <div class="section-label">The Reality</div>
+      <h2 class="section-title" style="color:white;">Running a craft business is <em style="color:var(--accent-light);">harder</em> than it looks</h2>
+      <p class="section-sub" style="color:rgba(255,255,255,0.68);max-width:100%;">You pour your heart into your work. But no one prepares you for the business chaos that comes with it.</p>
+      <div class="problem-list">
+        <div class="prob-item"><div class="prob-icon">😤</div><div class="prob-text"><strong>Suppliers ghost you</strong> after taking payment and you have no idea what legal steps to take</div></div>
+        <div class="prob-item"><div class="prob-icon">😰</div><div class="prob-text"><strong>Customers demand refunds</strong> 3 weeks later and you don't know if you're legally required to comply</div></div>
+        <div class="prob-item"><div class="prob-icon">😞</div><div class="prob-text"><strong>You underprice your work</strong> because you feel guilty charging fairly — and burn out slowly</div></div>
+        <div class="prob-item"><div class="prob-icon">🤯</div><div class="prob-text"><strong>You face these crises alone</strong> because most communities are for hobbyists, not working craft businesses</div></div>
+      </div>
+    </div>
+    <div class="problem-right reveal">
+      <div class="solution-card">
+        <div class="sol-header">✨ How Craft-SOS helps</div>
+        <div class="sol-step">
+          <div class="sol-num">1</div>
+          <div class="sol-step-text"><strong>Post your SOS</strong> — describe your situation in plain language. Tag your niche and urgency level.</div>
+        </div>
+        <div class="sol-step">
+          <div class="sol-num">2</div>
+          <div class="sol-step-text"><strong>Crafters who've been there</strong> respond with real, lived advice — not generic tips.</div>
+        </div>
+        <div class="sol-step">
+          <div class="sol-num">3</div>
+          <div class="sol-step-text"><strong>Get unstuck fast.</strong> 91% of SOS posts are answered within 24 hours.</div>
+        </div>
+        <div class="sol-step">
+          <div class="sol-num">4</div>
+          <div class="sol-step-text"><strong>Mark as solved</strong> so your story helps the next crafter who faces the same thing.</div>
+        </div>
+        <div style="margin-top:16px;padding:14px;background:rgba(122,143,82,0.12);border-radius:12px;font-size:0.85rem;color:var(--text-mid);border-left:3px solid var(--accent);">
+          💬 <em>"I recovered ₹18,000 from a scam supplier using advice from this community. I would never have known the steps alone."</em><br/><span style="font-size:0.78rem;color:var(--text-light);margin-top:4px;display:block;">— MarnaKnits, Mumbai</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ══ -->
+<section id="features" class="section">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">What's Inside</div>
+      <h2 class="section-title">Everything a craft business <em>actually needs</em></h2>
+      <p class="section-sub">Not just a forum. A full toolkit for when things go sideways — and a community to celebrate when they don't.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feat-card accent-card reveal reveal-delay-1">
+        <div class="feat-ico"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="feat-title">SOS Feed</div>
+        <div class="feat-desc">Post urgent problems and get real answers from crafters who've faced the same. Urgency badges, niche filters, and 0-reply alerts ensure no one is left stuck.</div>
+      </div>
+      <div class="feat-card reveal reveal-delay-2">
+        <div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="feat-title">Private Messaging</div>
+        <div class="feat-desc">Connect privately with crafters you trust. Friend request limits keep the community high-quality and safe — no spam, no strangers.</div>
+      </div>
+      <div class="feat-card reveal reveal-delay-3">
+        <div class="feat-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="feat-title">Live Events & Webinars</div>
+        <div class="feat-desc">Join craft workshops, pricing strategy sessions, and business skill webinars — scheduled by and for the community.</div>
+      </div>
+      <div class="feat-card reveal reveal-delay-1">
+        <div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <div class="feat-title">Crafter Matching</div>
+        <div class="feat-desc">Find crafters in your niche, your region, or your problem area. Build a genuine support network that understands your world.</div>
+      </div>
+      <div class="feat-card reveal reveal-delay-2">
+        <div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        <div class="feat-title">Resource Library</div>
+        <div class="feat-desc">Invoice templates, pricing calculators, packaging guides, supplier lists — shared by the community, for the community.</div>
+      </div>
+      <div class="feat-card reveal reveal-delay-3">
+        <div class="feat-ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div class="feat-title">Gamified Contributions</div>
+        <div class="feat-desc">Earn ranks like 🏅 Problem Solver, 🧵 Resource Queen, 🎨 Craft Mentor. The more you help, the more you grow — in the community and in your craft.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CATEGORIES ══ -->
+<section id="categories" class="section">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Craft Niches</div>
+      <h2 class="section-title">Built for <em>your</em> kind of craft</h2>
+      <p class="section-sub">Filter SOS posts, find crafters, and get matched by niche — so advice is always relevant to what you actually make.</p>
+    </div>
+    <div class="cats-grid">
+      <div class="cat-card reveal reveal-delay-1"><div class="cat-emoji">🧶</div><div class="cat-name">Crochet & Knitting</div><div class="cat-count">142 crafters</div></div>
+      <div class="cat-card reveal reveal-delay-2"><div class="cat-emoji">🏮</div><div class="cat-name">Resin Art</div><div class="cat-count">87 crafters</div></div>
+      <div class="cat-card reveal reveal-delay-3"><div class="cat-emoji">🍰</div><div class="cat-name">Home Bakery</div><div class="cat-count">103 crafters</div></div>
+      <div class="cat-card reveal reveal-delay-1"><div class="cat-emoji">🪡</div><div class="cat-name">Embroidery & Sewing</div><div class="cat-count">64 crafters</div></div>
+      <div class="cat-card reveal reveal-delay-2"><div class="cat-emoji">🕯</div><div class="cat-name">Candles & Soaps</div><div class="cat-count">58 crafters</div></div>
+      <div class="cat-card reveal reveal-delay-3"><div class="cat-emoji">🏺</div><div class="cat-name">Ceramics & Pottery</div><div class="cat-count">43 crafters</div></div>
+      <div class="cat-card reveal reveal-delay-1"><div class="cat-emoji">🎨</div><div class="cat-name">Painting & Illustration</div><div class="cat-count">76 crafters</div></div>
+      <div class="cat-card reveal reveal-delay-2"><div class="cat-emoji">📦</div><div class="cat-name">Packaging & Print</div><div class="cat-count">31 crafters</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STATS BAND ══ -->
+<div id="stats-band" class="reveal">
+  <div class="stats-band-inner">
+    <div><div class="sband-num">500+</div><div class="sband-label">Craft businesses</div></div>
+    <div><div class="sband-num">1,240</div><div class="sband-label">SOS posts resolved</div></div>
+    <div><div class="sband-num">91%</div><div class="sband-label">Resolution rate</div></div>
+    <div><div class="sband-num">&lt;24h</div><div class="sband-label">Avg. first response</div></div>
+  </div>
+</div>
+
+<!-- ══ TESTIMONIALS ══ -->
+<section id="testimonials" class="section">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Real Stories</div>
+      <h2 class="section-title">Crafters who found their <em>lifeline</em></h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal reveal-delay-1">
+        <span class="testi-quote">"</span>
+        <p class="testi-text">I was about to give up my resin business after a nightmare customer situation. In 4 hours on Craft-SOS I had 6 responses from crafters who'd been through the same thing. I'm still here because of this community.</p>
+        <div class="testi-author">
+          <div class="testi-av" style="background:var(--accent);">ZR</div>
+          <div><div class="testi-name">ZaraResinArt</div><div class="testi-niche">🏮 Resin · Delhi</div></div>
+        </div>
+      </div>
+      <div class="testi-card reveal reveal-delay-2">
+        <span class="testi-quote">"</span>
+        <p class="testi-text">The pricing webinar alone was worth joining. I raised my prices by 40% and didn't lose a single regular client. I just needed the confidence — and this community gave it to me.</p>
+        <div class="testi-author">
+          <div class="testi-av" style="background:#c8932a;">FB</div>
+          <div><div class="testi-name">FlourHouseBakes</div><div class="testi-niche">🍰 Homebakery · Mumbai</div></div>
+        </div>
+      </div>
+      <div class="testi-card reveal reveal-delay-3">
+        <span class="testi-quote">"</span>
+        <p class="testi-text">Being a crochet seller in a small town felt isolating. Now I have a WhatsApp group of 12 crafters I met on Craft-SOS. We share suppliers, troubleshoot together, and celebrate each other's wins.</p>
+        <div class="testi-author">
+          <div class="testi-av" style="background:#5e6e3b;">NK</div>
+          <div><div class="testi-name">NomadKnits</div><div class="testi-niche">🧶 Crochet · Jaipur</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ══ -->
+<section id="cta-section">
+  <div class="cta-box reveal">
+    <div class="cta-eyebrow">✦ Free to join · No credit card</div>
+    <h2 class="cta-title">Your next craft crisis shouldn't<br/>have to wait. <em>Neither should you.</em></h2>
+    <p class="cta-sub">Join 500+ craft business owners who've stopped going it alone. Post your first SOS today — or just look around. You'll feel at home immediately.</p>
+    <div class="cta-btns">
+      <button class="cta-btn-main" onclick="openModal('register')">
+        Join Craft-SOS — It's Free
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <button class="cta-btn-sec" onclick="openModal('login')">I already have an account</button>
+    </div>
+    <div class="cta-note">No spam. No paid promotions. Just crafters helping crafters.</div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div style="display:flex;align-items:center;gap:9px;">
+        <div class="nav-logo-pill" style="width:32px;height:32px;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"/></svg></div>
+        <span class="nav-wordmark">Craft<span>-SOS</span></span>
+      </div>
+      <p class="footer-desc">The community platform where craft businesses get real help from real crafters — fast.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Community</div>
+      <a class="footer-link">SOS Feed</a>
+      <a class="footer-link">Explore Crafters</a>
+      <a class="footer-link">Events & Webinars</a>
+      <a class="footer-link">Resource Library</a>
+    </div>
+    <div>
+      <div class="footer-col-title">Craft Niches</div>
+      <a class="footer-link">Crochet & Knitting</a>
+      <a class="footer-link">Resin Art</a>
+      <a class="footer-link">Home Bakery</a>
+      <a class="footer-link">Candles & Soaps</a>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <a class="footer-link">About Us</a>
+      <a class="footer-link">Community Guidelines</a>
+      <a class="footer-link">Privacy Policy</a>
+      <a class="footer-link">Contact</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 Craft-SOS. All rights reserved.</div>
+    <div class="footer-heart">Made with <span>♥</span> for craft businesses everywhere</div>
+  </div>
+</footer>
+
+<script>
+  /* ── Navbar scroll effect ── */
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 30);
+  });
+
+  /* ── Scroll reveal ── */
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  reveals.forEach(r => io.observe(r));
+
+  /* ── Modal ── */
+  function openModal(tab) {
+    document.getElementById('modal-overlay').classList.add('on');
+    switchTab(tab);
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('on');
+    document.body.style.overflow = '';
+  }
+  function modalClickOut(e) {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  }
+  function switchTab(tab) {
+    document.querySelectorAll('.modal-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+    document.getElementById('form-login').classList.toggle('active', tab==='login');
+    document.getElementById('form-register').classList.toggle('active', tab==='register');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>

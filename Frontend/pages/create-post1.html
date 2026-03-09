@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create Post — CraftSOS</title>
-    <link rel="stylesheet" href="../css/common.css" />
     <link rel="stylesheet" href="../css/create-post.css" />
     <!-- Add your main/global CSS here if you have one -->
   </head>
@@ -79,8 +78,9 @@
     <div id="shell">
       <!-- SIDEBAR -->
       <aside id="sidebar">
+        <!-- Profile strip — filled by initSidebar() from localStorage -->
         <div class="sb-prof">
-          <div class="sb-prof-av" style="cursor: pointer"></div>
+          <div class="sb-prof-av"></div>
           <div class="sb-prof-info">
             <div class="sb-prof-name">Loading…</div>
             <div class="sb-prof-sub"></div>
@@ -89,7 +89,7 @@
 
         <nav>
           <!-- Home -->
-          <div class="nav-item" data-route="index.html">
+          <div class="nav-item" data-route="../index.html">
             <svg class="nav-icon" viewBox="0 0 24 24">
               <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
               <polyline points="9 22 9 12 15 12 15 22" />
@@ -109,7 +109,7 @@
           </div>
 
           <!-- Search -->
-          <div class="nav-item" id="sidebar-search-btn">
+          <div class="nav-item" data-route="explore.html">
             <svg class="nav-icon" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -117,12 +117,8 @@
             <span class="nav-label">Search</span>
           </div>
 
-          <!-- Notifications — badge managed by socket-client.js -->
-          <div
-            class="nav-item"
-            id="sidebar-notif-btn"
-            data-route="notifications"
-          >
+          <!-- Notifications -->
+          <div class="nav-item" data-route="dashboard.html">
             <svg class="nav-icon" viewBox="0 0 24 24">
               <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
               <path d="M13.73 21a2 2 0 01-3.46 0" />
@@ -135,7 +131,7 @@
             ></span>
           </div>
 
-          <!-- Messages — badge managed by socket-client.js -->
+          <!-- Messages -->
           <div class="nav-item" data-route="chat.html">
             <svg class="nav-icon" viewBox="0 0 24 24">
               <path
@@ -150,29 +146,6 @@
             ></span>
           </div>
 
-          <!-- Dashboard -->
-          <div class="nav-item" data-route="dashboard.html">
-            <svg class="nav-icon" viewBox="0 0 24 24">
-              <line x1="18" y1="20" x2="18" y2="10" />
-              <line x1="12" y1="20" x2="12" y2="4" />
-              <line x1="6" y1="20" x2="6" y2="14" />
-            </svg>
-            <span class="nav-label">Dashboard</span>
-          </div>
-
-          <!-- Challenges (coming soon) -->
-          <div class="nav-item sb-coming" data-route="challenges.html">
-            <svg class="nav-icon" viewBox="0 0 24 24">
-              <polygon
-                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-              />
-            </svg>
-            <span class="nav-label">Challenges</span>
-            <span class="nav-pill-soon">Soon</span>
-          </div>
-
-          <div class="sb-divider"></div>
-
           <!-- Profile -->
           <div class="nav-item" data-route="profile.html">
             <svg class="nav-icon" viewBox="0 0 24 24">
@@ -182,24 +155,15 @@
             <span class="nav-label">Profile</span>
           </div>
 
-          <!-- Saved -->
-          <div class="nav-item" id="sidebar-saved-btn">
+          <!-- Settings -->
+          <div class="nav-item" data-route="settings.html">
             <svg class="nav-icon" viewBox="0 0 24 24">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+              />
             </svg>
-            <span class="nav-label">Saved</span>
-          </div>
-
-          <div class="sb-divider"></div>
-
-          <!-- Sign Out -->
-          <div class="nav-item" id="sidebar-logout-btn">
-            <svg class="nav-icon" viewBox="0 0 24 24">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
-            <span class="nav-label">Sign Out</span>
+            <span class="nav-label">Settings</span>
           </div>
         </nav>
       </aside>
@@ -495,159 +459,22 @@
 
                 <div class="editor-wrap">
                   <div class="toolbar">
-                    <!-- Heading / paragraph style dropdown -->
-                    <div class="tb-dropdown" id="dd-heading">
-                      <button
-                        class="tb-btn tb-dd-trigger"
-                        title="Text style"
-                        onclick="toggleDD('dd-heading')"
-                      >
-                        ¶&nbsp;<svg viewBox="0 0 24 24">
-                          <polyline points="6 9 12 15 18 9" />
-                        </svg>
-                      </button>
-                      <div class="tb-dd-menu">
-                        <button
-                          class="tb-dd-item tb-dd-h1"
-                          onclick="
-                            applyBlock('h1');
-                            closeDD('dd-heading');
-                          "
-                        >
-                          Heading 1
-                        </button>
-                        <button
-                          class="tb-dd-item tb-dd-h2"
-                          onclick="
-                            applyBlock('h2');
-                            closeDD('dd-heading');
-                          "
-                        >
-                          Heading 2
-                        </button>
-                        <button
-                          class="tb-dd-item tb-dd-h3"
-                          onclick="
-                            applyBlock('h3');
-                            closeDD('dd-heading');
-                          "
-                        >
-                          Heading 3
-                        </button>
-                        <button
-                          class="tb-dd-item"
-                          onclick="
-                            applyBlock('p');
-                            closeDD('dd-heading');
-                          "
-                        >
-                          Paragraph
-                        </button>
-                      </div>
-                    </div>
-                    <div class="tb-sep"></div>
-                    <button
-                      class="tb-btn"
-                      title="Bold (Ctrl+B)"
-                      onclick="fmt('bold')"
-                    >
+                    <button class="tb-btn" title="Bold" onclick="fmt('bold')">
                       <strong>B</strong>
                     </button>
                     <button
                       class="tb-btn"
-                      title="Italic (Ctrl+I)"
+                      title="Italic"
                       onclick="fmt('italic')"
                     >
-                      <em style="font-family: Georgia">I</em>
+                      <em>I</em>
                     </button>
                     <button
                       class="tb-btn"
-                      title="Underline (Ctrl+U)"
+                      title="Underline"
                       onclick="fmt('underline')"
                     >
                       <u>U</u>
-                    </button>
-                    <button
-                      class="tb-btn"
-                      title="Strikethrough"
-                      onclick="fmt('strikeThrough')"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <line
-                          x1="4"
-                          y1="12"
-                          x2="20"
-                          y2="12"
-                          stroke-width="2.5"
-                        />
-                        <path
-                          d="M9.5 8C9.5 6.3 10.6 5 13 5s3.5 1.3 3.5 2.5"
-                          stroke-linecap="round"
-                        />
-                        <path
-                          d="M8.5 16.5C8.5 18.2 10.1 19.5 13 19.5s4.5-1.3 4.5-3"
-                          stroke-linecap="round"
-                        />
-                      </svg>
-                    </button>
-                    <button
-                      class="tb-btn"
-                      title="Highlight text"
-                      onclick="applyHighlight()"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <rect
-                          x="4"
-                          y="14"
-                          width="16"
-                          height="4"
-                          rx="1"
-                          fill="currentColor"
-                          opacity=".25"
-                        />
-                        <path d="M8 14L12 4l4 10" stroke-width="1.8" />
-                        <line
-                          x1="9.5"
-                          y1="10"
-                          x2="14.5"
-                          y2="10"
-                          stroke-width="1.5"
-                        />
-                      </svg>
-                    </button>
-                    <div class="tb-sep"></div>
-                    <button
-                      class="tb-btn"
-                      title="Align left"
-                      onclick="fmt('justifyLeft')"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <line x1="3" y1="6" x2="21" y2="6" />
-                        <line x1="3" y1="12" x2="15" y2="12" />
-                        <line x1="3" y1="18" x2="18" y2="18" />
-                      </svg>
-                    </button>
-                    <button
-                      class="tb-btn"
-                      title="Centre"
-                      onclick="fmt('justifyCenter')"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <line x1="3" y1="6" x2="21" y2="6" />
-                        <line x1="6" y1="12" x2="18" y2="12" />
-                        <line x1="4" y1="18" x2="20" y2="18" />
-                      </svg>
-                    </button>
-                    <button
-                      class="tb-btn"
-                      title="Align right"
-                      onclick="fmt('justifyRight')"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <line x1="3" y1="6" x2="21" y2="6" />
-                        <line x1="9" y1="12" x2="21" y2="12" />
-                        <line x1="6" y1="18" x2="21" y2="18" />
-                      </svg>
                     </button>
                     <div class="tb-sep"></div>
                     <button
@@ -659,27 +486,9 @@
                         <line x1="9" y1="6" x2="20" y2="6" />
                         <line x1="9" y1="12" x2="20" y2="12" />
                         <line x1="9" y1="18" x2="20" y2="18" />
-                        <circle
-                          cx="4"
-                          cy="6"
-                          r="1.5"
-                          fill="currentColor"
-                          stroke="none"
-                        />
-                        <circle
-                          cx="4"
-                          cy="12"
-                          r="1.5"
-                          fill="currentColor"
-                          stroke="none"
-                        />
-                        <circle
-                          cx="4"
-                          cy="18"
-                          r="1.5"
-                          fill="currentColor"
-                          stroke="none"
-                        />
+                        <circle cx="4" cy="6" r="1.5" fill="currentColor" />
+                        <circle cx="4" cy="12" r="1.5" fill="currentColor" />
+                        <circle cx="4" cy="18" r="1.5" fill="currentColor" />
                       </svg>
                     </button>
                     <button
@@ -693,108 +502,11 @@
                         <line x1="10" y1="18" x2="21" y2="18" />
                         <path
                           d="M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"
-                          stroke-linecap="round"
-                        />
-                      </svg>
-                    </button>
-                    <button
-                      class="tb-btn"
-                      title="Indent"
-                      onclick="fmt('indent')"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <line x1="3" y1="6" x2="21" y2="6" />
-                        <line x1="12" y1="12" x2="21" y2="12" />
-                        <line x1="12" y1="18" x2="21" y2="18" />
-                        <polyline points="3 12 7 15 3 18" />
-                      </svg>
-                    </button>
-                    <button
-                      class="tb-btn"
-                      title="Outdent"
-                      onclick="fmt('outdent')"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <line x1="3" y1="6" x2="21" y2="6" />
-                        <line x1="12" y1="12" x2="21" y2="12" />
-                        <line x1="12" y1="18" x2="21" y2="18" />
-                        <polyline points="7 12 3 15 7 18" />
-                      </svg>
-                    </button>
-                    <div class="tb-sep"></div>
-                    <button
-                      class="tb-btn"
-                      title="Blockquote"
-                      onclick="insertBlockquote()"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <path
-                          d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"
-                        />
-                        <path
-                          d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"
-                        />
-                      </svg>
-                    </button>
-                    <button
-                      class="tb-btn"
-                      title="Code block"
-                      onclick="insertCodeBlock()"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <polyline points="16 18 22 12 16 6" />
-                        <polyline points="8 6 2 12 8 18" />
-                      </svg>
-                    </button>
-                    <button
-                      class="tb-btn"
-                      title="Inline code"
-                      onclick="insertInlineCode()"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <polyline
-                          points="16 18 22 12 16 6"
-                          stroke-width="1.5"
-                        />
-                        <polyline points="8 6 2 12 8 18" stroke-width="1.5" />
-                        <line x1="11" y1="4" x2="13" y2="20" stroke-width="1" />
-                      </svg>
-                    </button>
-                    <button
-                      class="tb-btn"
-                      title="Divider line"
-                      onclick="insertHR()"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <line
-                          x1="3"
-                          y1="12"
-                          x2="21"
-                          y2="12"
-                          stroke-width="2.5"
-                        />
-                        <circle
-                          cx="8"
-                          cy="12"
-                          r="1.5"
-                          fill="currentColor"
-                          stroke="none"
-                        />
-                        <circle
-                          cx="16"
-                          cy="12"
-                          r="1.5"
-                          fill="currentColor"
-                          stroke="none"
                         />
                       </svg>
                     </button>
                     <div class="tb-sep"></div>
-                    <button
-                      class="tb-btn"
-                      title="Insert link (Ctrl+K)"
-                      onclick="insertLink()"
-                    >
+                    <button class="tb-btn" title="Link" onclick="insertLink()">
                       <svg viewBox="0 0 24 24">
                         <path
                           d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"
@@ -806,45 +518,7 @@
                     </button>
                     <button
                       class="tb-btn"
-                      title="Remove link"
-                      onclick="fmt('unlink')"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <path
-                          d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"
-                          opacity=".4"
-                        />
-                        <path
-                          d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"
-                          opacity=".4"
-                        />
-                        <line x1="4" y1="4" x2="20" y2="20" stroke-width="2" />
-                      </svg>
-                    </button>
-                    <div class="tb-sep"></div>
-                    <button
-                      class="tb-btn"
-                      title="Undo (Ctrl+Z)"
-                      onclick="fmt('undo')"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <polyline points="9 14 4 9 9 4" />
-                        <path d="M20 20v-7a4 4 0 00-4-4H4" />
-                      </svg>
-                    </button>
-                    <button
-                      class="tb-btn"
-                      title="Redo (Ctrl+Y)"
-                      onclick="fmt('redo')"
-                    >
-                      <svg viewBox="0 0 24 24">
-                        <polyline points="15 14 20 9 15 4" />
-                        <path d="M4 20v-7a4 4 0 014-4h12" />
-                      </svg>
-                    </button>
-                    <button
-                      class="tb-btn"
-                      title="Clear formatting"
+                      title="Remove formatting"
                       onclick="fmt('removeFormat')"
                     >
                       <svg viewBox="0 0 24 24">
@@ -859,7 +533,6 @@
                     contenteditable="true"
                     data-placeholder="Write your post here… Be specific and clear. The more context you give, the more useful the community's responses will be."
                     oninput="updateEditorStats()"
-                    onkeydown="handleEditorKey(event)"
                     onpaste="cleanPaste(event)"
                   ></div>
                   <div class="editor-footer">

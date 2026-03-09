@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Post — Craft-SOS</title>
+    <link rel="stylesheet" href="../css/post-detail.css" />
+  </head>
+  <body>
+    <div id="read-progress"></div>
+    <div id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- ══ TOPBAR ══ -->
+    <header id="topbar">
+      <button id="hamburger" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+      <div id="topbar-logo-zone">
+        <div class="logo-pill">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"
+            />
+          </svg>
+        </div>
+      </div>
+      <span id="mobile-title">Craft-SOS</span>
+      <nav id="desk-nav">
+        <span class="tnav" onclick="syncNav(this)">Friends</span>
+        <span class="tnav" onclick="syncNav(this)">Explore</span>
+        <span class="tnav" onclick="syncNav(this)">Bookmarked</span>
+      </nav>
+      <div id="topbar-right">
+        <button class="distress-btn">
+          <svg viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>Distress Call</span>
+        </button>
+        <div
+          class="profile-av-btn"
+          onclick="window.location.href = 'dashboard.html'"
+        ></div>
+      </div>
+    </header>
+    <nav id="subnav">
+      <span class="snav" onclick="syncNav(this)">Friends</span>
+      <span class="snav" onclick="syncNav(this)">Explore</span>
+      <span class="snav" onclick="syncNav(this)">Bookmarked</span>
+    </nav>
+
+    <!-- ══ SHELL ══ -->
+    <div id="shell">
+      <!-- SIDEBAR -->
+      <aside id="sidebar">
+        <div class="sb-prof">
+          <div class="sb-prof-av"></div>
+          <div class="sb-prof-info">
+            <div class="sb-prof-name">Loading…</div>
+            <div class="sb-prof-sub"></div>
+          </div>
+        </div>
+        <nav>
+          <div
+            class="nav-item"
+            onclick="
+              pickNav(this);
+              window.location.href = '../index.html';
+            "
+          >
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <span class="nav-label">Home</span>
+          </div>
+          <div
+            class="nav-item"
+            onclick="
+              pickNav(this);
+              window.location.href = 'explore.html';
+            "
+          >
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <span class="nav-label">Explore</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span class="nav-label">Search</span>
+          </div>
+          <!-- <div
+            class="nav-item"
+            onclick="
+              pickNav(this);
+              window.location.href = 'dashboard.html';
+            "
+          >
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <span class="nav-label">Notifications</span>
+          </div> -->
+          <!-- In sidebar nav — the Notifications nav-item -->
+          <div
+            class="nav-item"
+            onclick="
+              pickNav(this);
+              window.location.href = 'dashboard.html';
+            "
+          >
+            <svg class="nav-icon" viewBox="0 0 24 24">...</svg>
+            <span class="nav-label">Notifications</span>
+            <!-- ✅ ADD THIS -->
+            <span
+              id="notif-badge"
+              style="
+                display: none;
+                background: #d35b3a;
+                color: #fff;
+                font-size: 0.65rem;
+                font-weight: 700;
+                border-radius: 50%;
+                width: 18px;
+                height: 18px;
+                align-items: center;
+                justify-content: center;
+                margin-left: auto;
+              "
+              >0</span
+            >
+          </div>
+          <!-- <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path
+                d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+              />
+            </svg>
+            <span class="nav-label">Messages</span>
+          </div> -->
+          <div
+            class="nav-item"
+            onclick="
+              pickNav(this);
+              window.location.href = 'chat.html';
+            "
+          >
+            <svg class="nav-icon" viewBox="0 0 24 24">...</svg>
+            <span class="nav-label">Messages</span>
+            <!-- ✅ ADD THIS -->
+            <span
+              id="chat-badge"
+              style="
+                display: none;
+                background: #3d5a99;
+                color: #fff;
+                font-size: 0.65rem;
+                font-weight: 700;
+                border-radius: 50%;
+                width: 18px;
+                height: 18px;
+                align-items: center;
+                justify-content: center;
+                margin-left: auto;
+              "
+              >0</span
+            >
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span class="nav-label">Profile</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+              />
+            </svg>
+            <span class="nav-label">Settings</span>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- ══ MAIN ══ -->
+      <main id="main">
+        <div id="post-col">
+          <!--
+        BREADCRUMB — fully dynamic.
+        renderBreadcrumb(post) writes:
+          Home → [Post type category] → [Post title (truncated)]
+      -->
+          <nav class="breadcrumb">
+            <div
+              class="loading-shimmer"
+              style="
+                height: 16px;
+                width: 280px;
+                border-radius: 8px;
+                display: inline-block;
+              "
+            ></div>
+          </nav>
+
+          <!-- ══ HERO ══ -->
+          <div class="post-hero">
+            <div class="hero-cover">
+              <div class="hero-cover-inner">
+                <!--
+              hero-cover-type  → renderHero(): post.type label
+              hero-cover-title → renderHero(): post.title
+              hero-cover-meta  → renderHero(): rebuilt from scratch (read time, views, responses, posted)
+              cover-pills      → renderCoverPills(): type pill + status + first 2 tags
+              All are empty containers — JS fills them after the API responds.
+            -->
+                <div class="hero-cover-type">
+                  <div
+                    class="loading-shimmer"
+                    style="
+                      height: 14px;
+                      width: 140px;
+                      border-radius: 6px;
+                      display: inline-block;
+                    "
+                  ></div>
+                </div>
+                <div class="hero-cover-title">
+                  <div
+                    class="loading-shimmer"
+                    style="
+                      height: 28px;
+                      width: 90%;
+                      border-radius: 8px;
+                      margin-bottom: 6px;
+                    "
+                  ></div>
+                  <div
+                    class="loading-shimmer"
+                    style="height: 28px; width: 70%; border-radius: 8px"
+                  ></div>
+                </div>
+                <div class="hero-cover-meta">
+                  <!-- Rebuilt wholesale by renderHero() — no placeholder items needed -->
+                </div>
+                <div class="cover-pills">
+                  <!-- Rebuilt by renderCoverPills() -->
+                </div>
+              </div>
+            </div>
+
+            <!--
+          AUTHOR BAR — renderAuthorBar() writes:
+            .author-av    → avatar image or initials
+            .author-name  → post.author.name
+            .author-sub   → handle · location · points · badge
+            #save-btn     → toggled on if post.isSaved
+            #follow-label → "Following ✓" if already following
+        -->
+            <div class="author-bar">
+              <div class="author-av">
+                <div
+                  class="loading-shimmer"
+                  style="width: 100%; height: 100%; border-radius: 50%"
+                ></div>
+              </div>
+              <div class="author-info">
+                <div class="author-name">
+                  <div
+                    class="loading-shimmer"
+                    style="height: 16px; width: 140px; border-radius: 6px"
+                  ></div>
+                </div>
+                <div class="author-sub"></div>
+              </div>
+              <div class="author-bar-actions">
+                <button class="ab-btn" id="save-btn" onclick="toggleSave(this)">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                  </svg>
+                  Save
+                </button>
+                <button class="ab-btn" onclick="toggleFollow(this)">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="8.5" cy="7" r="4" />
+                    <line x1="20" y1="8" x2="20" y2="14" />
+                    <line x1="23" y1="11" x2="17" y2="11" />
+                  </svg>
+                  <span id="follow-label">Follow</span>
+                </button>
+                <button class="ab-btn" onclick="copyLink(this)">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="18" cy="5" r="3" />
+                    <circle cx="6" cy="12" r="3" />
+                    <circle cx="18" cy="19" r="3" />
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                  </svg>
+                  Share
+                </button>
+              </div>
+            </div>
+
+            <!--
+          POST BODY — renderPostBody() writes:
+            Converts post.body (plain text from DB) into HTML:
+              ## Heading  →  <h3 class="post-section-heading">  (picked up by TOC)
+              #  Heading  →  <h2 class="post-main-heading">
+              **bold**    →  <strong>
+              *italic*    →  <em>
+              blank line  →  new <p>
+              \n          →  <br>
+          Shimmers visible until API responds.
+        -->
+            <div class="post-body" id="post-body">
+              <div
+                class="loading-shimmer"
+                style="
+                  height: 18px;
+                  width: 95%;
+                  border-radius: 6px;
+                  margin-bottom: 12px;
+                "
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="
+                  height: 18px;
+                  width: 80%;
+                  border-radius: 6px;
+                  margin-bottom: 12px;
+                "
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="
+                  height: 18px;
+                  width: 90%;
+                  border-radius: 6px;
+                  margin-bottom: 12px;
+                "
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="
+                  height: 18px;
+                  width: 60%;
+                  border-radius: 6px;
+                  margin-bottom: 28px;
+                "
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="
+                  height: 18px;
+                  width: 95%;
+                  border-radius: 6px;
+                  margin-bottom: 12px;
+                "
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="
+                  height: 18px;
+                  width: 75%;
+                  border-radius: 6px;
+                  margin-bottom: 12px;
+                "
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="
+                  height: 18px;
+                  width: 88%;
+                  border-radius: 6px;
+                  margin-bottom: 12px;
+                "
+              ></div>
+            </div>
+
+            <!-- Tags — renderTags() fills from post.tags[] -->
+            <div class="post-tags" id="post-tags">
+              <div
+                class="loading-shimmer"
+                style="
+                  height: 28px;
+                  width: 260px;
+                  border-radius: 14px;
+                  display: inline-block;
+                "
+              ></div>
+            </div>
+
+            <!-- Reactions — renderReactions() fills from post.reactions[] -->
+            <div class="reactions-bar" id="reactions-bar">
+              <div
+                class="loading-shimmer"
+                style="height: 44px; border-radius: 12px"
+              ></div>
+            </div>
+
+            <!-- Engagement counts — renderEngageCounts() fills from API -->
+            <div class="engage-nums">
+              <div class="en">
+                <svg viewBox="0 0 24 24">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <span id="views-num">—</span> views
+              </div>
+              <div class="en">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                  />
+                </svg>
+                <span id="resp-num">—</span> responses
+              </div>
+              <div class="en">
+                <svg viewBox="0 0 24 24">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                </svg>
+                <span id="save-num">—</span> saves
+              </div>
+            </div>
+          </div>
+          <!-- /post-hero -->
+
+          <!-- ══ RESPONSES ══ -->
+          <div class="responses-section">
+            <div class="resp-header">
+              <div class="resp-header-left">
+                <div class="resp-title">
+                  <div class="resp-title-icon">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                      />
+                    </svg>
+                  </div>
+                  Responses
+                  <span class="resp-count-badge" id="c-count">—</span>
+                </div>
+                <div class="resp-online">
+                  <div class="resp-online-dot"></div>
+                  12 reading now
+                </div>
+              </div>
+              <div class="resp-header-right">
+                <select class="resp-sort" onchange="sortComments(this.value)">
+                  <option value="top">Top Responses</option>
+                  <option value="recent">Most Recent</option>
+                  <option value="oldest">Oldest</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="resp-load-row">
+              <div class="resp-load-line"></div>
+              <button
+                class="resp-load-btn"
+                onclick="loadMore()"
+                style="display: none"
+              >
+                ↑ Load earlier responses
+              </button>
+              <div class="resp-load-line"></div>
+            </div>
+
+            <!-- Replies — loadReplies() fills from GET /api/post-detail/:id/replies -->
+            <div class="resp-feed" id="resp-feed">
+              <div
+                class="loading-shimmer"
+                style="height: 88px; border-radius: 14px; margin-bottom: 12px"
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="height: 88px; border-radius: 14px; margin-bottom: 12px"
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="height: 88px; border-radius: 14px; margin-bottom: 12px"
+              ></div>
+            </div>
+
+            <!-- Composer -->
+            <div class="resp-composer">
+              <div class="resp-composer-inner">
+                <div class="resp-composer-top">
+                  <!-- Avatar written by populateUserAvatar() from localStorage -->
+                  <div class="resp-composer-av"></div>
+                  <textarea
+                    class="resp-composer-ta"
+                    id="reply-ta"
+                    rows="1"
+                    placeholder="Share your experience or ask a question…"
+                    oninput="autoResize(this)"
+                    onkeydown="handleKey(event)"
+                    maxlength="600"
+                  ></textarea>
+                </div>
+                <div class="resp-composer-bottom">
+                  <button class="resp-emoji-btn" onclick="addEmoji('🙌')">
+                    🙌
+                  </button>
+                  <button class="resp-emoji-btn" onclick="addEmoji('🧶')">
+                    🧶
+                  </button>
+                  <button class="resp-emoji-btn" onclick="addEmoji('💚')">
+                    💚
+                  </button>
+                  <button class="resp-emoji-btn" onclick="addEmoji('💰')">
+                    💰
+                  </button>
+                  <span class="resp-char-count" id="char-count">0 / 600</span>
+                  <button
+                    class="resp-send"
+                    id="send-btn"
+                    onclick="postComment()"
+                    disabled
+                  >
+                    <svg viewBox="0 0 24 24">
+                      <line x1="22" y1="2" x2="11" y2="13" />
+                      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                    </svg>
+                    Post
+                  </button>
+                </div>
+              </div>
+              <div class="resp-hint">
+                Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to post · Responding
+                earns +10 pts
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /post-col -->
+
+        <!-- ══ RIGHT COL ══ -->
+        <aside id="right-col">
+          <!-- TOC — renderTOC() builds entries from headings in #post-body -->
+          <div class="widget">
+            <div class="widget-title">
+              <svg viewBox="0 0 24 24">
+                <line x1="8" y1="6" x2="21" y2="6" />
+                <line x1="8" y1="12" x2="21" y2="12" />
+                <line x1="8" y1="18" x2="21" y2="18" />
+                <line x1="3" y1="6" x2="3.01" y2="6" />
+                <line x1="3" y1="12" x2="3.01" y2="12" />
+                <line x1="3" y1="18" x2="3.01" y2="18" />
+              </svg>
+              Contents
+            </div>
+            <div class="toc-list" id="toc-list">
+              <div
+                class="loading-shimmer"
+                style="height: 18px; border-radius: 6px; margin-bottom: 8px"
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="
+                  height: 18px;
+                  width: 80%;
+                  border-radius: 6px;
+                  margin-bottom: 8px;
+                "
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="height: 18px; width: 90%; border-radius: 6px"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Author widget — renderSidebarAuthor() fills from post.author -->
+          <div class="widget">
+            <div class="widget-title">
+              <svg viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              About the author
+            </div>
+            <div class="mini-author">
+              <div class="mini-av"></div>
+              <div class="mini-info">
+                <div class="mini-name">
+                  <div
+                    class="loading-shimmer"
+                    style="height: 14px; width: 100px; border-radius: 6px"
+                  ></div>
+                </div>
+                <div class="mini-handle"></div>
+              </div>
+            </div>
+            <div class="mini-bio"></div>
+            <div class="mini-stats">
+              <div class="ms"><strong>—</strong><span>Friends</span></div>
+              <div class="ms"><strong>—</strong><span>Points</span></div>
+              <div class="ms"><strong>—</strong><span>Posts</span></div>
+            </div>
+            <button
+              class="follow-btn"
+              id="follow-btn"
+              onclick="toggleFollow(this)"
+            >
+              + Follow
+            </button>
+          </div>
+
+          <!-- Resources — renderResources() fills from post.resources[] -->
+          <div class="widget">
+            <div class="widget-title">
+              <svg viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Free Resources
+            </div>
+            <div id="resources-list">
+              <div
+                class="loading-shimmer"
+                style="height: 48px; border-radius: 10px; margin-bottom: 8px"
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="height: 48px; border-radius: 10px"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Related posts — loadRelated() fills from GET /api/post-detail/:id/related -->
+          <div class="widget">
+            <div class="widget-title">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              Related Posts
+            </div>
+            <div id="related-list">
+              <div
+                class="loading-shimmer"
+                style="height: 44px; border-radius: 10px; margin-bottom: 8px"
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="height: 44px; border-radius: 10px"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Tags — renderTags() fills from post.tags[] -->
+          <div class="widget">
+            <div class="widget-title">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"
+                />
+                <line x1="7" y1="7" x2="7.01" y2="7" />
+              </svg>
+              Tags
+            </div>
+            <div class="tags-wrap" id="tags-wrap">
+              <div
+                class="loading-shimmer"
+                style="
+                  height: 28px;
+                  width: 200px;
+                  border-radius: 14px;
+                  display: inline-block;
+                "
+              ></div>
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="../js/socket-client.js"></script>
+    <script src="../js/post-detail.js"></script>
+  </body>
+</html>

@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Post — CraftSOS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+  :root {
+    --bg:#edf0e6; --surface:#ffffff; --surface2:#f4f6ef; --surface3:#eaede3;
+    --border:rgba(90,108,54,.16); --border-d:rgba(90,108,54,.30);
+    --accent:#7a8f52; --accent-dk:#5e6e3b; --accent-lt:rgba(122,143,82,.10);
+    --tx:#242e14; --tx-mid:#445228; --tx-dim:#7a9068;
+    --red:#c03828; --red-bg:rgba(192,56,40,.08);
+    --amber:#a46818; --amber-bg:rgba(164,104,24,.09);
+    --green:#347834; --green-bg:rgba(52,120,52,.09);
+    --blue:#3468a4; --blue-bg:rgba(52,104,164,.09);
+    --sh:0 1px 3px rgba(36,46,20,.06),0 4px 12px rgba(36,46,20,.07);
+    --sh-lg:0 8px 28px rgba(36,46,20,.13);
+    --r:14px; --topbar-h:58px; --sb-w:244px;
+    --ease:cubic-bezier(.4,0,.2,1);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.025;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Ccircle cx='60' cy='60' r='28' fill='none' stroke='%237a8f52' stroke-width='2'/%3E%3Cellipse cx='340' cy='100' rx='20' ry='30' fill='none' stroke='%237a8f52' stroke-width='2' transform='rotate(-20 340 100)'/%3E%3Crect x='290' y='280' width='40' height='54' rx='5' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3C/svg%3E")}
+
+  #overlay{display:none;position:fixed;inset:0;z-index:299;background:rgba(36,46,20,.45);backdrop-filter:blur(4px)}
+  #overlay.on{display:block}
+
+  #toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--tx);color:#fff;border-radius:12px;padding:12px 20px;font-size:.86rem;font-weight:600;display:flex;align-items:center;gap:10px;box-shadow:var(--sh-lg);transform:translateY(80px);opacity:0;transition:all .3s var(--ease);pointer-events:none}
+  #toast.show{transform:translateY(0);opacity:1}
+  #toast.success{background:var(--green)}
+  #toast svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+
+  #success-overlay{display:none;position:fixed;inset:0;z-index:900;background:rgba(36,46,20,.65);backdrop-filter:blur(12px);align-items:center;justify-content:center;flex-direction:column;gap:14px}
+  #success-overlay.on{display:flex}
+  .success-icon{width:72px;height:72px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 12px rgba(52,120,52,.18)}
+  .success-icon svg{width:32px;height:32px;stroke:#fff;fill:none;stroke-width:2.8;stroke-linecap:round}
+  .success-title{font-family:'Lora',serif;font-size:1.6rem;font-weight:700;color:#fff}
+  .success-sub{font-size:.9rem;color:rgba(255,255,255,.8);text-align:center;max-width:320px}
+  .success-btns{display:flex;gap:10px;margin-top:6px}
+  .suc-btn{padding:10px 22px;border-radius:10px;border:none;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .15s}
+  .suc-btn.primary{background:var(--accent);color:#fff}.suc-btn.primary:hover{background:var(--accent-dk)}
+  .suc-btn.secondary{background:rgba(255,255,255,.18);color:#fff;border:1.5px solid rgba(255,255,255,.3)}.suc-btn.secondary:hover{background:rgba(255,255,255,.28)}
+
+  #topbar{position:sticky;top:0;z-index:300;height:var(--topbar-h);background:var(--surface);border-bottom:1.5px solid var(--border);box-shadow:0 1px 8px rgba(36,46,20,.06);display:flex;align-items:center;padding:0 16px;gap:12px}
+  #hamburger{width:38px;height:38px;border-radius:9px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--tx-mid)}
+  #hamburger svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+  .logo-pill{width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .logo-pill svg{width:16px;height:16px;fill:#fff}
+  #mobile-title{font-family:'Lora',serif;font-weight:700;font-size:.94rem;color:var(--tx)}
+  #desk-nav{display:flex;gap:4px;margin-left:auto}
+  .tnav{padding:6px 13px;border-radius:8px;font-size:.85rem;font-weight:500;color:var(--tx-mid);cursor:pointer;transition:background .14s}.tnav:hover{background:var(--surface2)}
+  #topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+  .distress-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;border:1.5px solid rgba(192,56,40,.2);background:var(--red-bg);color:var(--red);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer}
+  .distress-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5}
+  .profile-av-btn{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-dk));cursor:pointer;border:2px solid var(--accent)}
+
+  #subnav{display:none;background:var(--surface);border-bottom:1.5px solid var(--border);padding:0 16px;gap:4px}
+  .snav{padding:10px 12px;font-size:.84rem;font-weight:500;color:var(--tx-dim);cursor:pointer}
+
+  #shell{position:relative;z-index:1;display:flex;min-height:calc(100vh - var(--topbar-h))}
+
+  #sidebar{width:var(--sb-w);flex-shrink:0;background:#f8faf5;border-right:1.5px solid var(--border);position:sticky;top:var(--topbar-h);height:calc(100vh - var(--topbar-h));overflow-y:auto;box-shadow:2px 0 12px rgba(36,46,20,.05);padding:16px 12px}
+  .sb-prof{display:flex;align-items:center;gap:10px;padding:10px 8px 16px;border-bottom:1.5px solid var(--border);margin-bottom:10px}
+  .sb-prof-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-dk));flex-shrink:0;border:2px solid var(--accent)}
+  .sb-prof-name{font-weight:700;font-size:.88rem;color:var(--tx)}
+  .sb-prof-sub{font-size:.75rem;color:var(--tx-dim);margin-top:2px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;transition:background .14s;margin-bottom:2px;position:relative}
+  .nav-item:hover{background:var(--surface3)}
+  .nav-item.active{background:var(--accent-lt)}
+  .nav-icon{width:18px;height:18px;stroke:var(--tx-dim);fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0}
+  .nav-item.active .nav-icon{stroke:var(--accent)}
+  .nav-label{font-size:.86rem;font-weight:500;color:var(--tx-mid)}
+  .nav-item.active .nav-label{color:var(--accent);font-weight:700}
+  .nav-badge-live{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%;border:2px solid #f8faf5}
+
+  #main{flex:1;min-width:0;padding:24px 28px 60px}
+
+  .page-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+  .page-back{width:38px;height:38px;border-radius:10px;background:var(--surface);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:var(--sh);transition:background .14s}
+  .page-back:hover{background:var(--surface3)}
+  .page-back svg{width:16px;height:16px;stroke:var(--tx-mid);fill:none;stroke-width:2;stroke-linecap:round}
+  .page-header-text{flex:1;min-width:0}
+  .page-title{font-family:'Lora',serif;font-weight:700;font-size:1.35rem;color:var(--tx);display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+  .page-sub{font-size:.83rem;color:var(--tx-dim);margin-top:4px}
+  .page-header-actions{display:flex;gap:8px}
+  .draft-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface);color:var(--tx-mid);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:background .14s}
+  .draft-btn:hover{background:var(--surface3)}
+  .draft-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+  .change-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(164,104,24,.12);border:1.5px solid rgba(164,104,24,.25);border-radius:20px;padding:3px 10px;font-size:.72rem;font-weight:700;color:var(--amber);font-family:'DM Sans',sans-serif}
+
+  .edit-notice{display:flex;align-items:center;gap:12px;background:var(--amber-bg);border:1.5px solid rgba(164,104,24,.25);border-radius:12px;padding:12px 16px;margin-bottom:20px}
+  .en-icon{width:36px;height:36px;border-radius:9px;background:rgba(164,104,24,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .en-icon svg{width:16px;height:16px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round}
+  .en-text{flex:1}
+  .en-title{font-size:.86rem;font-weight:700;color:var(--amber);margin-bottom:2px}
+  .en-sub{font-size:.77rem;color:var(--amber);opacity:.8}
+  .en-meta{font-size:.77rem;font-weight:600;color:var(--amber);white-space:nowrap}
+
+  .progress-steps{display:flex;align-items:center;margin-bottom:22px;overflow-x:auto;padding-bottom:4px}
+  .step-item{display:flex;align-items:center;gap:7px;flex-shrink:0}
+  .step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;transition:all .2s}
+  .step-num.active{background:var(--accent);color:#fff;box-shadow:0 0 0 4px var(--accent-lt)}
+  .step-num.done{background:var(--green);color:#fff}
+  .step-num.pending{background:var(--surface);color:var(--tx-dim);border:1.5px solid var(--border)}
+  .step-label{font-size:.78rem;font-weight:600;color:var(--tx-dim)}
+  .step-label.active{color:var(--accent)}
+  .step-label.done{color:var(--green)}
+  .step-connector{flex:1;height:2px;background:var(--border);margin:0 10px;min-width:18px;transition:background .3s}
+  .step-connector.done{background:var(--green)}
+
+  .form-row{display:flex;gap:22px;align-items:flex-start}
+  .form-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:18px}
+
+  .section{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;animation:fadeUp .35s var(--ease) both}
+  .section:nth-child(1){animation-delay:.04s}.section:nth-child(2){animation-delay:.08s}.section:nth-child(3){animation-delay:.12s}.section:nth-child(4){animation-delay:.16s}.section:nth-child(5){animation-delay:.20s}
+  .section-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1.5px solid var(--border);background:var(--surface2)}
+  .section-icon{width:36px;height:36px;border-radius:9px;background:var(--accent-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .section-icon svg{width:16px;height:16px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round}
+  .section-title{font-weight:700;font-size:.92rem;color:var(--tx)}
+  .section-sub{font-size:.77rem;color:var(--tx-dim);margin-top:2px}
+  .section-body{padding:18px 20px}
+
+  .type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .type-card{border:1.5px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .18s;position:relative;background:var(--surface2)}
+  .type-card:hover{border-color:var(--accent);background:var(--accent-lt)}
+  .type-card.selected{border-color:var(--accent);background:var(--accent-lt);box-shadow:0 0 0 3px rgba(122,143,82,.12)}
+  .type-sos.selected{border-color:var(--red);background:var(--red-bg);box-shadow:0 0 0 3px rgba(192,56,40,.08)}
+  .tc-icon{font-size:1.5rem;margin-bottom:6px}
+  .tc-label{font-weight:700;font-size:.87rem;color:var(--tx);margin-bottom:3px}
+  .tc-desc{font-size:.75rem;color:var(--tx-dim);line-height:1.5}
+  .tc-check{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--accent);display:none;align-items:center;justify-content:center}
+  .tc-check svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
+  .type-card.selected .tc-check{display:flex}
+  .type-sos.selected .tc-check{background:var(--red)}
+
+  .pill-row{display:flex;flex-wrap:wrap;gap:7px}
+  .pill-opt{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);font-size:.82rem;font-weight:500;color:var(--tx-mid);cursor:pointer;transition:all .14s;background:var(--surface2)}
+  .pill-opt:hover{border-color:var(--accent);background:var(--accent-lt)}
+  .pill-opt.selected{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .p-high.selected{background:var(--red);border-color:var(--red)}
+  .p-med.selected{background:var(--amber);border-color:var(--amber)}
+  .p-low.selected{background:var(--green);border-color:var(--green)}
+  .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .cat-pill{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);font-size:.8rem;font-weight:500;color:var(--tx-mid);cursor:pointer;transition:all .14s;background:var(--surface2)}
+  .cat-pill:hover{border-color:var(--accent)}
+  .cat-pill.on{background:var(--accent-lt);border-color:var(--accent);color:var(--accent-dk);font-weight:700}
+
+  .title-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Lora',serif;font-size:1.05rem;font-weight:600;color:var(--tx);background:var(--surface2);outline:none;transition:border-color .2s,box-shadow .2s}
+  .title-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(122,143,82,.11);background:#fff}
+  .title-input::placeholder{color:var(--tx-dim);font-weight:400}
+  .char-hint{font-size:.74rem;color:var(--tx-dim);margin-top:4px;text-align:right}
+
+  /* ══ EDITOR ══ */
+  .editor-wrap{border:1.5px solid var(--border);border-radius:12px;overflow:visible;background:var(--surface)}
+  .editor-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(122,143,82,.11)}
+
+  .toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:1px;padding:6px 8px;background:var(--surface2);border-bottom:1.5px solid var(--border);border-radius:12px 12px 0 0}
+
+  .tb-btn{width:30px;height:30px;border-radius:7px;border:none;background:transparent;color:var(--tx-mid);font-family:'DM Sans',sans-serif;font-size:.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s;flex-shrink:0;position:relative}
+  .tb-btn:hover{background:var(--surface3);color:var(--tx)}
+  .tb-btn.active{background:var(--accent-lt);color:var(--accent-dk)}
+  .tb-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;pointer-events:none}
+  .tb-btn::after{content:attr(title);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--tx);color:#fff;font-size:.68rem;padding:3px 7px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;font-family:'DM Sans',sans-serif;font-weight:500;z-index:100}
+  .tb-btn:hover::after{opacity:1}
+  .tb-sep{width:1.5px;height:20px;background:var(--border-d);margin:0 3px;flex-shrink:0}
+
+  /* heading dropdown */
+  .tb-dropdown{position:relative}
+  .tb-dd-trigger{min-width:54px;width:auto;padding:0 8px;font-size:.74rem;font-weight:700;gap:3px}
+  .tb-dd-trigger svg{width:10px;height:10px}
+  .tb-dd-menu{display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:200;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;box-shadow:var(--sh-lg);overflow:hidden;min-width:165px}
+  .tb-dropdown.open .tb-dd-menu{display:block}
+  .tb-dd-item{display:block;width:100%;padding:9px 13px;border:none;background:transparent;text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--tx-mid);font-size:.82rem;transition:background .12s}
+  .tb-dd-item:hover{background:var(--surface2);color:var(--tx)}
+  .tb-dd-h1{font-family:'Lora',serif;font-size:1.05rem;font-weight:700;color:var(--tx)}
+  .tb-dd-h2{font-family:'Lora',serif;font-size:.92rem;font-weight:700;color:var(--tx)}
+  .tb-dd-h3{font-family:'Lora',serif;font-size:.82rem;font-weight:700;color:var(--tx)}
+
+  .editor-area{min-height:240px;padding:16px 18px;outline:none;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--tx);line-height:1.8;overflow-y:auto;background:#fff;border-radius:0 0 12px 12px}
+  .editor-area[data-placeholder]:empty::before{content:attr(data-placeholder);color:var(--tx-dim);pointer-events:none}
+  .editor-area h1{font-family:'Lora',serif;font-size:1.5rem;font-weight:700;color:var(--tx);margin:12px 0 7px;line-height:1.3}
+  .editor-area h2{font-family:'Lora',serif;font-size:1.15rem;font-weight:700;color:var(--tx);margin:10px 0 6px;line-height:1.35}
+  .editor-area h3{font-family:'Lora',serif;font-size:.98rem;font-weight:700;color:var(--tx);margin:9px 0 4px}
+  .editor-area blockquote{border-left:3px solid var(--accent);padding:8px 16px;margin:10px 0;color:var(--tx-mid);font-style:italic;background:var(--accent-lt);border-radius:0 8px 8px 0}
+  .editor-area code{font-family:'Courier New',monospace;background:var(--surface2);border:1.5px solid var(--border);border-radius:5px;padding:1px 6px;font-size:.83rem;color:var(--accent-dk)}
+  .editor-area pre{font-family:'Courier New',monospace;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:12px 16px;margin:10px 0;font-size:.83rem;color:var(--accent-dk);overflow-x:auto;white-space:pre-wrap}
+  .editor-area hr{border:none;border-top:2px solid var(--border);margin:16px 0}
+  .editor-area ul,.editor-area ol{padding-left:22px;margin:6px 0}
+  .editor-area li{margin-bottom:3px}
+  .editor-area a{color:var(--accent-dk);text-decoration:underline}
+  .editor-area mark{background:rgba(255,234,0,.4);border-radius:3px;padding:0 2px}
+  .editor-area p{margin-bottom:4px}
+
+  .editor-footer{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:var(--surface2);border-top:1.5px solid var(--border)}
+  .editor-stats{display:flex;gap:14px;font-size:.75rem;color:var(--tx-dim);font-weight:500}
+  .editor-tip{font-size:.72rem;color:var(--tx-dim)}
+
+  .tags-input-wrap{display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px;border:1.5px solid var(--border);border-radius:10px;min-height:44px;cursor:text;background:var(--surface2);transition:border-color .2s}
+  .tags-input-wrap:focus-within{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(122,143,82,.11)}
+  .tag-chip{display:inline-flex;align-items:center;gap:5px;background:var(--accent-lt);border:1.5px solid rgba(122,143,82,.25);border-radius:20px;padding:3px 10px;font-size:.78rem;font-weight:600;color:var(--accent-dk)}
+  .tag-chip button{border:none;background:transparent;cursor:pointer;color:var(--accent);font-size:.9rem;line-height:1;padding:0;display:flex}
+  .tag-input{border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--tx);flex:1;min-width:120px}
+  .tag-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+  .tag-sug{padding:4px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);font-size:.78rem;color:var(--tx-dim);cursor:pointer;transition:all .14s}
+  .tag-sug:hover{border-color:var(--accent);background:var(--accent-lt);color:var(--accent-dk)}
+
+  .settings-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .setting-card{border:1.5px solid var(--border);border-radius:11px;padding:12px 14px;cursor:pointer;transition:all .15s;background:var(--surface2)}
+  .setting-card:hover{border-color:var(--accent)}
+  .setting-card.active{border-color:var(--accent);background:var(--accent-lt)}
+  .setting-card-label{font-size:.72rem;font-weight:600;color:var(--tx-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+  .setting-card-val{display:flex;align-items:center;gap:7px;font-size:.85rem;font-weight:600;color:var(--tx)}
+  .setting-card-val svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+  .toggle-wrap{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1.5px solid var(--border)}
+  .toggle-wrap:last-child{border-bottom:none}
+  .toggle-label{font-size:.87rem;font-weight:600;color:var(--tx)}
+  .toggle-sub{font-size:.76rem;color:var(--tx-dim);margin-top:2px}
+  .toggle{width:42px;height:24px;border-radius:12px;background:var(--surface3);border:1.5px solid var(--border-d);cursor:pointer;flex-shrink:0;position:relative;transition:background .22s}
+  .toggle.on{background:var(--accent);border-color:var(--accent)}
+  .toggle::after{content:'';position:absolute;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.14);transition:left .22s}
+  .toggle.on::after{left:22px}
+  .toggle:not(.on)::after{left:3px}
+
+  .publish-bar{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);display:flex;align-items:center;gap:10px;padding:14px 18px;flex-wrap:wrap}
+  .publish-info{flex:1;min-width:160px}
+  .publish-info-title{font-weight:700;font-size:.92rem;color:var(--tx)}
+  .publish-info-sub{font-size:.77rem;color:var(--tx-dim);margin-top:2px}
+  .act-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;border-radius:10px;border:none;font-family:'DM Sans',sans-serif;font-size:.84rem;font-weight:700;cursor:pointer;transition:all .16s;white-space:nowrap}
+  .act-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+  .btn-draft{background:var(--surface2);color:var(--tx-mid);border:1.5px solid var(--border)}.btn-draft:hover{background:var(--surface3)}
+  .btn-preview{background:var(--blue-bg);color:var(--blue);border:1.5px solid rgba(52,104,164,.2)}.btn-preview:hover{background:rgba(52,104,164,.15)}
+  .btn-update{background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(122,143,82,.3)}.btn-update:hover{background:var(--accent-dk);transform:translateY(-1px)}
+  .btn-update:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+  .form-aside{width:272px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;position:sticky;top:calc(var(--topbar-h) + 20px)}
+  .aside-widget{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
+  .aw-title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.85rem;color:var(--tx);margin-bottom:12px}
+  .aw-title svg{width:15px;height:15px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+
+  #preview-card{background:var(--surface2);border-radius:10px;padding:12px;border:1.5px solid var(--border);min-height:80px}
+  .pc-type{font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+  .pc-title{font-family:'Lora',serif;font-weight:700;font-size:.9rem;color:var(--tx);margin-bottom:6px;line-height:1.4}
+  .pc-body{font-size:.78rem;color:var(--tx-mid);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .pc-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+  .pc-tag{font-size:.7rem;background:var(--accent-lt);color:var(--accent-dk);border-radius:20px;padding:2px 8px;font-weight:600}
+
+  .checklist{display:flex;flex-direction:column;gap:8px}
+  .check-item{display:flex;align-items:center;gap:9px;font-size:.82rem;color:var(--tx-dim);transition:color .2s}
+  .check-item.done{color:var(--green)}
+  .chk{width:16px;height:16px;border-radius:50%;border:2px solid var(--border-d);flex-shrink:0;transition:all .2s;display:flex;align-items:center;justify-content:center}
+  .check-item.done .chk{background:var(--green);border-color:var(--green)}
+  .check-item.done .chk::after{content:'✓';color:#fff;font-size:.65rem;font-weight:700}
+
+  .hist-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1.5px solid var(--border);font-size:.8rem}
+  .hist-item:last-child{border-bottom:none}
+  .hist-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .hist-label{color:var(--tx-mid);flex:1}
+  .hist-time{color:var(--tx-dim);font-size:.74rem;white-space:nowrap}
+
+  .tip-list{display:flex;flex-direction:column;gap:7px}
+  .tip-item{display:flex;align-items:flex-start;gap:8px;font-size:.8rem;color:var(--tx-mid);line-height:1.5}
+  .tip-mono{font-family:monospace;background:var(--surface2);border:1.5px solid var(--border);border-radius:4px;padding:1px 6px;font-size:.72rem;font-weight:700;color:var(--accent-dk);flex-shrink:0;margin-top:2px}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  @media(max-width:1100px){.form-aside{width:232px}}
+  @media(max-width:900px){.form-row{flex-direction:column}.form-aside{width:100%;position:static}}
+  @media(max-width:700px){
+    #sidebar{display:none;position:fixed;top:var(--topbar-h);left:0;bottom:0;z-index:300;width:var(--sb-w)}
+    #sidebar.open{display:block}
+    #subnav{display:flex}
+    #main{padding:16px 14px 50px}
+    #desk-nav{display:none}
+    .type-grid{grid-template-columns:1fr}
+    .settings-row{grid-template-columns:1fr}
+    .publish-bar{flex-direction:column;align-items:stretch}
+  }
+  </style>
+</head>
+<body>
+
+<div id="toast"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span id="toast-msg">Saved!</span></div>
+
+<div id="success-overlay">
+  <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+  <div class="success-title">Post updated! 🌿</div>
+  <div class="success-sub">Your changes are live and visible to the community.</div>
+  <div class="success-btns">
+    <button class="suc-btn primary" onclick="window.location.href='post-detail.html'">View Post</button>
+    <button class="suc-btn secondary" onclick="document.getElementById('success-overlay').classList.remove('on')">Keep Editing</button>
+  </div>
+</div>
+
+<div id="overlay" onclick="closeSidebar()"></div>
+
+<!-- TOPBAR -->
+<header id="topbar">
+  <button id="hamburger" onclick="toggleSidebar()">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div id="topbar-logo-zone"><div class="logo-pill"><svg viewBox="0 0 24 24"><path d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"/></svg></div></div>
+  <span id="mobile-title">Edit Post</span>
+  <nav id="desk-nav">
+    <span class="tnav">Friends</span><span class="tnav">Explore</span><span class="tnav">Bookmarked</span>
+  </nav>
+  <div id="topbar-right">
+    <button class="distress-btn"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Distress Call</span></button>
+    <div class="profile-av-btn"></div>
+  </div>
+</header>
+
+<nav id="subnav">
+  <span class="snav">Friends</span><span class="snav">Explore</span><span class="snav">Bookmarked</span>
+</nav>
+
+<div id="shell">
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sb-prof">
+      <div class="sb-prof-av"></div>
+      <div class="sb-prof-info"><div class="sb-prof-name">ResinQueenDelhi</div><div class="sb-prof-sub">🏮 Resin Art · 840 pts</div></div>
+    </div>
+    <nav>
+      <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="nav-label">Home</span></div>
+      <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label">Explore</span></div>
+      <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="nav-label">Search</span></div>
+      <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="nav-label">Notifications</span><span id="notif-badge" class="nav-badge-live" style="background:#d35b3a"></span></div>
+      <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span class="nav-label">Messages</span><span id="chat-badge" class="nav-badge-live" style="background:#3d5a99"></span></div>
+      <div class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="nav-label">My Posts</span></div>
+      <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="nav-label">Profile</span></div>
+      <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="nav-label">Settings</span></div>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main id="main">
+
+    <div class="page-header">
+      <div class="page-back" onclick="history.back()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+      <div class="page-header-text">
+        <div class="page-title">Edit post <span class="change-badge" id="change-badge" style="display:none">● Unsaved changes</span></div>
+        <div class="page-sub">Update your post — changes are visible to the community immediately</div>
+      </div>
+      <div class="page-header-actions">
+        <button class="draft-btn" onclick="saveDraft()"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>Save Draft</button>
+      </div>
+    </div>
+
+    <!-- Edit notice -->
+    <div class="edit-notice">
+      <div class="en-icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+      <div class="en-text">
+        <div class="en-title">You are editing a published post</div>
+        <div class="en-sub">Respondents who already replied may be notified of major changes. Editing does not reset response count or votes.</div>
+      </div>
+      <div class="en-meta">Posted Feb 25, 2025</div>
+    </div>
+
+    <!-- Progress steps -->
+    <div class="progress-steps">
+      <div class="step-item"><div class="step-num done">✓</div><span class="step-label done">Post Type</span></div>
+      <div class="step-connector done"></div>
+      <div class="step-item"><div class="step-num active">2</div><span class="step-label active">Content</span></div>
+      <div class="step-connector"></div>
+      <div class="step-item"><div class="step-num pending">3</div><span class="step-label pending">Media & Tags</span></div>
+      <div class="step-connector"></div>
+      <div class="step-item"><div class="step-num pending">4</div><span class="step-label pending">Settings</span></div>
+      <div class="step-connector"></div>
+      <div class="step-item"><div class="step-num pending">5</div><span class="step-label pending">Update</span></div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-main">
+
+        <!-- § 1 Post Type -->
+        <div class="section">
+          <div class="section-head">
+            <div class="section-icon"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+            <div><div class="section-title">Post type</div><div class="section-sub">What kind of post is this?</div></div>
+          </div>
+          <div class="section-body">
+            <div class="type-grid">
+              <div class="type-card type-sos selected" data-type="sos" onclick="selectType('sos',this)"><div class="tc-icon">🆘</div><div class="tc-label">Distress Call</div><div class="tc-desc">Urgent help needed — business crisis, financial stress, or supplier emergency</div><div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+              <div class="type-card type-tutorial" data-type="tutorial" onclick="selectType('tutorial',this)"><div class="tc-icon">📚</div><div class="tc-label">Tutorial</div><div class="tc-desc">Share craft knowledge, techniques, or business lessons with step-by-step guidance</div><div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+              <div class="type-card type-community" data-type="community" onclick="selectType('community',this)"><div class="tc-icon">💬</div><div class="tc-label">Community Update</div><div class="tc-desc">Share news, wins, questions, or start a discussion with your craft community</div><div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+              <div class="type-card type-resource" data-type="resource" onclick="selectType('resource',this)"><div class="tc-icon">🗂️</div><div class="tc-label">Resource Share</div><div class="tc-desc">Link to a useful tool, template, supplier, or external resource for other crafters</div><div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- § 2 Category -->
+        <div class="section">
+          <div class="section-head">
+            <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div>
+            <div><div class="section-title">Category</div><div class="section-sub">Help others find your post</div></div>
+          </div>
+          <div class="section-body">
+            <div id="priority-row" style="margin-bottom:14px">
+              <div style="font-size:.8rem;font-weight:600;color:var(--tx-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Urgency level</div>
+              <div class="pill-row" id="priority-pills">
+                <div class="pill-opt p-high selected" data-p="high" onclick="selectPriority('high',this)"><div class="dot" style="background:#d35b3a"></div>High — I need help now</div>
+                <div class="pill-opt p-med" data-p="med" onclick="selectPriority('med',this)"><div class="dot" style="background:#9a6d1e"></div>Medium — Within a few days</div>
+                <div class="pill-opt p-low" data-p="low" onclick="selectPriority('low',this)"><div class="dot" style="background:#7a8f52"></div>Low — Whenever you can</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:.8rem;font-weight:600;color:var(--tx-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Topic category</div>
+              <div class="pill-row" id="cat-pills">
+                <div class="cat-pill on" onclick="toggleCat(this)">💰 Financial</div>
+                <div class="cat-pill on" onclick="toggleCat(this)">🧵 Suppliers</div>
+                <div class="cat-pill" onclick="toggleCat(this)">📦 Orders & Fulfilment</div>
+                <div class="cat-pill" onclick="toggleCat(this)">🏪 Marketplace</div>
+                <div class="cat-pill" onclick="toggleCat(this)">📚 Tutorials</div>
+                <div class="cat-pill" onclick="toggleCat(this)">🚚 Courier & Shipping</div>
+                <div class="cat-pill" onclick="toggleCat(this)">💼 Business Strategy</div>
+                <div class="cat-pill" onclick="toggleCat(this)">🎨 Craft Techniques</div>
+                <div class="cat-pill" onclick="toggleCat(this)">💬 Community</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- § 3 Content -->
+        <div class="section">
+          <div class="section-head">
+            <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+            <div><div class="section-title">Your post</div><div class="section-sub">Edit title and main content</div></div>
+          </div>
+          <div class="section-body">
+            <input class="title-input" id="title-input" type="text" maxlength="140"
+              value="Supplier took ₹22,000 and gone completely offline — 4 days now"
+              oninput="updateTitle(this)"/>
+            <div class="char-hint" id="title-chars">60 / 140 characters</div>
+
+            <div style="height:14px"></div>
+
+            <!-- ═══ RICH TEXT EDITOR ═══ -->
+            <div class="editor-wrap">
+              <div class="toolbar">
+
+                <!-- Heading style dropdown -->
+                <div class="tb-dropdown" id="dd-heading">
+                  <button class="tb-btn tb-dd-trigger" title="Text style" onclick="toggleDD('dd-heading')">
+                    ¶&nbsp;<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="tb-dd-menu">
+                    <button class="tb-dd-item tb-dd-h1" onclick="applyBlock('h1');closeDD('dd-heading')">Heading 1</button>
+                    <button class="tb-dd-item tb-dd-h2" onclick="applyBlock('h2');closeDD('dd-heading')">Heading 2</button>
+                    <button class="tb-dd-item tb-dd-h3" onclick="applyBlock('h3');closeDD('dd-heading')">Heading 3</button>
+                    <button class="tb-dd-item" onclick="applyBlock('p');closeDD('dd-heading')">Paragraph</button>
+                  </div>
+                </div>
+
+                <div class="tb-sep"></div>
+
+                <!-- Inline -->
+                <button class="tb-btn" title="Bold (Ctrl+B)" onclick="fmt('bold')"><strong>B</strong></button>
+                <button class="tb-btn" title="Italic (Ctrl+I)" onclick="fmt('italic')"><em style="font-family:Georgia">I</em></button>
+                <button class="tb-btn" title="Underline (Ctrl+U)" onclick="fmt('underline')"><u>U</u></button>
+                <button class="tb-btn" title="Strikethrough" onclick="fmt('strikeThrough')">
+                  <svg viewBox="0 0 24 24"><line x1="4" y1="12" x2="20" y2="12" stroke-width="2.5"/><path d="M9.5 8C9.5 6.3 10.6 5 13 5s3.5 1.3 3.5 2.5" stroke-linecap="round"/><path d="M8.5 16.5C8.5 18.2 10.1 19.5 13 19.5s4.5-1.3 4.5-3" stroke-linecap="round"/></svg>
+                </button>
+                <button class="tb-btn" title="Highlight text" onclick="applyHighlight()">
+                  <svg viewBox="0 0 24 24"><rect x="4" y="14" width="16" height="4" rx="1" fill="currentColor" opacity=".25"/><path d="M8 14L12 4l4 10" stroke-width="1.8"/><line x1="9.5" y1="10" x2="14.5" y2="10" stroke-width="1.5"/></svg>
+                </button>
+
+                <div class="tb-sep"></div>
+
+                <!-- Alignment -->
+                <button class="tb-btn" title="Align left" onclick="fmt('justifyLeft')">
+                  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+                </button>
+                <button class="tb-btn" title="Centre" onclick="fmt('justifyCenter')">
+                  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                </button>
+                <button class="tb-btn" title="Align right" onclick="fmt('justifyRight')">
+                  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>
+                </button>
+
+                <div class="tb-sep"></div>
+
+                <!-- Lists -->
+                <button class="tb-btn" title="Bullet list" onclick="fmt('insertUnorderedList')">
+                  <svg viewBox="0 0 24 24"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg>
+                </button>
+                <button class="tb-btn" title="Numbered list" onclick="fmt('insertOrderedList')">
+                  <svg viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" stroke-linecap="round"/></svg>
+                </button>
+                <button class="tb-btn" title="Indent" onclick="fmt('indent')">
+                  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="12" y1="12" x2="21" y2="12"/><line x1="12" y1="18" x2="21" y2="18"/><polyline points="3 12 7 15 3 18"/></svg>
+                </button>
+                <button class="tb-btn" title="Outdent" onclick="fmt('outdent')">
+                  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="12" y1="12" x2="21" y2="12"/><line x1="12" y1="18" x2="21" y2="18"/><polyline points="7 12 3 15 7 18"/></svg>
+                </button>
+
+                <div class="tb-sep"></div>
+
+                <!-- Block elements -->
+                <button class="tb-btn" title="Blockquote" onclick="insertBlockquote()">
+                  <svg viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+                </button>
+                <button class="tb-btn" title="Code block" onclick="insertCodeBlock()">
+                  <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                </button>
+                <button class="tb-btn" title="Inline code" onclick="insertInlineCode()">
+                  <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6" stroke-width="1.5"/><polyline points="8 6 2 12 8 18" stroke-width="1.5"/><line x1="11" y1="4" x2="13" y2="20" stroke-width="1"/></svg>
+                </button>
+                <button class="tb-btn" title="Divider line" onclick="insertHR()">
+                  <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12" stroke-width="2.5"/><circle cx="8" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
+                </button>
+
+                <div class="tb-sep"></div>
+
+                <!-- Link -->
+                <button class="tb-btn" title="Insert link (Ctrl+K)" onclick="insertLink()">
+                  <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                </button>
+                <button class="tb-btn" title="Remove link" onclick="fmt('unlink')">
+                  <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" opacity=".4"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" opacity=".4"/><line x1="4" y1="4" x2="20" y2="20" stroke-width="2"/></svg>
+                </button>
+
+                <div class="tb-sep"></div>
+
+                <!-- Undo/Redo -->
+                <button class="tb-btn" title="Undo (Ctrl+Z)" onclick="fmt('undo')">
+                  <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>
+                </button>
+                <button class="tb-btn" title="Redo (Ctrl+Y)" onclick="fmt('redo')">
+                  <svg viewBox="0 0 24 24"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 014-4h12"/></svg>
+                </button>
+                <button class="tb-btn" title="Clear formatting" onclick="fmt('removeFormat')">
+                  <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+
+              </div><!-- /toolbar -->
+
+              <div class="editor-area" id="editor-area" contenteditable="true"
+                data-placeholder="Write your post here… Be specific and clear. The more context you give, the more useful the community's responses will be."
+                oninput="updateEditorStats();markChanged()"
+                onkeydown="handleEditorKey(event)"
+                onpaste="cleanPaste(event)"></div>
+
+              <div class="editor-footer">
+                <div class="editor-stats">
+                  <span id="word-count">0 words</span>
+                  <span id="char-count-body">0 chars</span>
+                </div>
+                <div class="editor-tip">Ctrl+B Bold · Ctrl+I Italic · Ctrl+K Link</div>
+              </div>
+            </div><!-- /editor-wrap -->
+          </div>
+        </div>
+
+        <!-- § 4 Tags -->
+        <div class="section">
+          <div class="section-head">
+            <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div>
+            <div><div class="section-title">Tags</div><div class="section-sub">Help people find this post · up to 8 tags</div></div>
+          </div>
+          <div class="section-body">
+            <div class="tags-input-wrap" id="tags-wrap" onclick="focusTagInput()">
+              <input class="tag-input" id="tag-input" type="text" maxlength="40"
+                placeholder="Type a tag and press Enter or comma…"
+                onkeydown="handleTagKey(event)"
+                oninput="filterTagSugs(this.value)"/>
+            </div>
+            <div class="tag-suggestions" id="tag-sug-row"></div>
+          </div>
+        </div>
+
+        <!-- § 5 Settings -->
+        <div class="section">
+          <div class="section-head">
+            <div class="section-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+            <div><div class="section-title">Post settings</div><div class="section-sub">Audience, visibility, and notifications</div></div>
+          </div>
+          <div class="section-body">
+            <div class="settings-row">
+              <div class="setting-card active" id="aud-friends" onclick="setAudience('friends',this)">
+                <div class="setting-card-label">Audience</div>
+                <div class="setting-card-val"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Friends only</div>
+              </div>
+              <div class="setting-card" id="aud-community" onclick="setAudience('community',this)">
+                <div class="setting-card-label">Audience</div>
+                <div class="setting-card-val"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>Full community</div>
+              </div>
+            </div>
+            <div class="toggle-wrap"><div><div class="toggle-label">Allow responses</div><div class="toggle-sub">Let community members reply to your post</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-wrap"><div><div class="toggle-label">Notify respondents of edits</div><div class="toggle-sub">Send a notification to people who already replied</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-wrap"><div><div class="toggle-label">Notify when resolved</div><div class="toggle-sub">Get notified when someone marks this as resolved</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-wrap"><div><div class="toggle-label">Show in Explore feed</div><div class="toggle-sub">Appear in the discovery section for wider reach</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-wrap"><div><div class="toggle-label">Mark as Solved</div><div class="toggle-sub">Close this post — community helped resolve the issue</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+        </div>
+
+        <!-- UPDATE BAR -->
+        <div class="publish-bar">
+          <div class="publish-info">
+            <div class="publish-info-title" id="pub-status">Ready to update</div>
+            <div class="publish-info-sub" id="pub-sub">All required fields are complete</div>
+          </div>
+          <button class="act-btn btn-draft" onclick="saveDraft()"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>Save Draft</button>
+          <button class="act-btn btn-preview" onclick="previewPost()"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Preview</button>
+          <button class="act-btn btn-update" id="update-btn" onclick="updatePost()"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Update Post</button>
+        </div>
+
+      </div><!-- /form-main -->
+
+      <!-- ASIDE -->
+      <aside class="form-aside">
+
+        <div class="aside-widget">
+          <div class="aw-title"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Live preview</div>
+          <div id="preview-card">
+            <div class="pc-type" id="pc-type">🆘 Distress Call</div>
+            <div class="pc-title" id="pc-title">Supplier took ₹22,000 and gone completely offline — 4 days now</div>
+            <div class="pc-body" id="pc-body">Preview appears as you type…</div>
+            <div class="pc-tags" id="pc-tags"><span class="pc-tag">#supplierscam</span><span class="pc-tag">#financialdistress</span><span class="pc-tag">#UPIfraud</span></div>
+          </div>
+        </div>
+
+        <div class="aside-widget">
+          <div class="aw-title"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Update checklist</div>
+          <div class="checklist">
+            <div class="check-item done" id="chk-type"><div class="chk"></div>Post type selected</div>
+            <div class="check-item done" id="chk-cat"><div class="chk"></div>Category chosen</div>
+            <div class="check-item done" id="chk-title"><div class="chk"></div>Title added (min 10 chars)</div>
+            <div class="check-item" id="chk-body"><div class="chk"></div>Body written (min 30 chars)</div>
+            <div class="check-item done" id="chk-tags"><div class="chk"></div>At least 1 tag added</div>
+          </div>
+        </div>
+
+        <div class="aside-widget">
+          <div class="aw-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Edit history</div>
+          <div class="hist-item"><div class="hist-dot" style="background:var(--green)"></div><div class="hist-label">Original published</div><div class="hist-time">Feb 25</div></div>
+          <div class="hist-item"><div class="hist-dot" style="background:var(--amber)"></div><div class="hist-label">Tags updated</div><div class="hist-time">Feb 25</div></div>
+          <div class="hist-item"><div class="hist-dot" style="background:var(--blue)"></div><div class="hist-label">Description clarified</div><div class="hist-time">Feb 26</div></div>
+          <div class="hist-item" style="opacity:.5"><div class="hist-dot" style="background:var(--tx-dim)"></div><div class="hist-label" style="font-style:italic">Current edit (unsaved)</div><div class="hist-time">Now</div></div>
+        </div>
+
+        <div class="aside-widget">
+          <div class="aw-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Formatting guide</div>
+          <div class="tip-list">
+            <div class="tip-item"><span class="tip-mono">H1</span>Main section headings</div>
+            <div class="tip-item"><span class="tip-mono">H2</span>Subheadings &amp; sub-sections</div>
+            <div class="tip-item"><span class="tip-mono">H3</span>Smaller sub-points</div>
+            <div class="tip-item"><span class="tip-mono">❝</span>Blockquote — highlight key info</div>
+            <div class="tip-item"><span class="tip-mono">&lt;/&gt;</span>Code block — UPI IDs, order nos.</div>
+            <div class="tip-item"><span class="tip-mono">—</span>Divider — separate major sections</div>
+            <div class="tip-item"><span class="tip-mono">≡</span>Lists — steps, evidence, options</div>
+            <div class="tip-item"><span class="tip-mono">🖊</span>Ctrl+B · Ctrl+I · Ctrl+K</div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ════ STATE ════ */
+let selectedType = 'sos';
+let activeTags = ['#supplierscam','#financialdistress','#UPIfraud'];
+let hasChanges = false;
+
+const ALL_TAGS = ['#pricing','#supplier','#etsy','#refund','#gst','#customorder',
+  '#resin','#courier','#dispute','#UPI','#financial','#copyright','#packaging',
+  '#bakery','#crochet','#embroidery','#candles','#ceramics','#tutorial'];
+
+/* ── INIT ── */
+window.addEventListener('DOMContentLoaded', ()=>{
+  renderTags();
+  filterTagSugs('');
+  document.getElementById('editor-area').innerHTML =
+    `<p>I paid a resin pigment supplier ₹22,000 for a bulk order two weeks ago.</p>`+
+    `<p>Now they've blocked me on WhatsApp and their Instagram is deactivated. I have the payment proof (UPI).</p>`+
+    `<h2>What I've already tried</h2><ul><li>Called the phone number — <strong>switched off</strong></li><li>Sent emails — <strong>no reply for 4 days</strong></li><li>Checked Instagram DMs — <strong>account deactivated</strong></li></ul>`+
+    `<h2>Evidence I have</h2><ul><li>UPI transaction ID and screenshot</li><li>Order confirmation message (before block)</li></ul>`+
+    `<blockquote>I'm a small home-based resin artist and ₹22k is a significant loss — I need this resolved urgently.</blockquote>`+
+    `<p>What are my legal options? Has anyone used the National Consumer Helpline for this?</p>`;
+  updateEditorStats();
+  updateTitle(document.getElementById('title-input'));
+  updateChecklist();
+  updatePreview();
+});
+
+/* ── SIDEBAR ── */
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('on'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('on'); }
+
+/* ── MARK CHANGED ── */
+function markChanged(){
+  hasChanges = true;
+  document.getElementById('change-badge').style.display = '';
+}
+
+/* ── TYPE ── */
+function selectType(type, el){
+  selectedType = type;
+  document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  markChanged(); updateChecklist(); updatePreview();
+}
+
+/* ── PRIORITY ── */
+function selectPriority(p, el){
+  document.querySelectorAll('#priority-pills .pill-opt').forEach(x=>x.classList.remove('selected'));
+  el.classList.add('selected');
+  markChanged();
+}
+
+/* ── CAT ── */
+function toggleCat(el){ el.classList.toggle('on'); markChanged(); updateChecklist(); }
+
+/* ── TITLE ── */
+function updateTitle(inp){
+  document.getElementById('title-chars').textContent = `${inp.value.length} / 140 characters`;
+  markChanged(); updateChecklist(); updatePreview();
+}
+
+/* ════ TOOLBAR ════ */
+function fmt(cmd, val){
+  document.getElementById('editor-area').focus();
+  document.execCommand(cmd, false, val||null);
+  updateEditorStats(); markChanged();
+}
+
+function applyBlock(tag){
+  document.getElementById('editor-area').focus();
+  document.execCommand('formatBlock', false, tag);
+  updateEditorStats(); markChanged();
+}
+
+function applyHighlight(){
+  document.getElementById('editor-area').focus();
+  document.execCommand('hiliteColor', false, '#FFF176');
+  updateEditorStats(); markChanged();
+}
+
+/* Dropdown */
+function toggleDD(id){
+  document.querySelectorAll('.tb-dropdown').forEach(d=>{ if(d.id!==id) d.classList.remove('open'); });
+  document.getElementById(id).classList.toggle('open');
+}
+function closeDD(id){ document.getElementById(id).classList.remove('open'); }
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.tb-dropdown')) document.querySelectorAll('.tb-dropdown').forEach(d=>d.classList.remove('open'));
+});
+
+/* Blockquote */
+function insertBlockquote(){
+  const ea = document.getElementById('editor-area'); ea.focus();
+  const sel = window.getSelection();
+  if(sel && sel.toString().trim()){
+    const text = sel.toString();
+    sel.deleteFromDocument();
+    document.execCommand('insertHTML',false,`<blockquote>${text}</blockquote><p><br></p>`);
+  } else {
+    document.execCommand('insertHTML',false,`<blockquote>Quote text here…</blockquote><p><br></p>`);
+  }
+  updateEditorStats(); markChanged();
+}
+
+/* Code block */
+function insertCodeBlock(){
+  document.getElementById('editor-area').focus();
+  document.execCommand('insertHTML',false,`<pre><code>// paste your code or reference here</code></pre><p><br></p>`);
+  updateEditorStats(); markChanged();
+}
+
+/* Inline code */
+function insertInlineCode(){
+  document.getElementById('editor-area').focus();
+  const sel = window.getSelection();
+  const text = sel ? sel.toString() : '';
+  document.execCommand('insertHTML',false,`<code>${text||'code'}</code>`);
+  updateEditorStats(); markChanged();
+}
+
+/* HR */
+function insertHR(){
+  document.getElementById('editor-area').focus();
+  document.execCommand('insertHTML',false,`<hr/><p><br></p>`);
+  updateEditorStats(); markChanged();
+}
+
+/* Link */
+function insertLink(){
+  document.getElementById('editor-area').focus();
+  const sel = window.getSelection();
+  const linkText = sel && sel.toString();
+  const url = prompt('Enter URL:', 'https://');
+  if(!url) return;
+  if(linkText){
+    document.execCommand('createLink',false,url);
+  } else {
+    const text = prompt('Link text:', url)||url;
+    document.execCommand('insertHTML',false,`<a href="${url}" target="_blank">${text}</a>`);
+  }
+  updateEditorStats(); markChanged();
+}
+
+/* Keyboard shortcuts */
+function handleEditorKey(e){
+  if((e.ctrlKey||e.metaKey) && e.key==='k'){ e.preventDefault(); insertLink(); }
+}
+
+/* Clean paste */
+function cleanPaste(e){
+  e.preventDefault();
+  const text = (e.clipboardData||window.clipboardData).getData('text/plain');
+  document.execCommand('insertText',false,text);
+}
+
+/* Stats */
+function updateEditorStats(){
+  const text = document.getElementById('editor-area').innerText||'';
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  document.getElementById('word-count').textContent = words+' word'+(words!==1?'s':'');
+  document.getElementById('char-count-body').textContent = text.length+' chars';
+  updateChecklist(); updatePreview();
+}
+
+/* ════ TAGS ════ */
+function renderTags(){
+  const wrap = document.getElementById('tags-wrap');
+  const inp  = document.getElementById('tag-input');
+  wrap.querySelectorAll('.tag-chip').forEach(c=>c.remove());
+  activeTags.forEach(t=>{
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.innerHTML = `${t} <button onclick="removeTag('${t}')">×</button>`;
+    wrap.insertBefore(chip, inp);
+  });
+  updateChecklist(); updatePreview();
+}
+function removeTag(t){ activeTags = activeTags.filter(x=>x!==t); renderTags(); markChanged(); }
+function focusTagInput(){ document.getElementById('tag-input').focus(); }
+function handleTagKey(e){
+  const inp = e.target, val = inp.value.trim();
+  if((e.key==='Enter'||e.key===','||e.key===' ')&&val){
+    e.preventDefault();
+    if(activeTags.length>=8){ showToast('Max 8 tags',''); return; }
+    const tag = (val.startsWith('#')?val:'#'+val).replace(/,/g,'');
+    if(!activeTags.includes(tag)){ activeTags.push(tag); renderTags(); markChanged(); }
+    inp.value=''; filterTagSugs('');
+  }
+  if(e.key==='Backspace'&&!val&&activeTags.length){ activeTags.pop(); renderTags(); markChanged(); }
+}
+function filterTagSugs(q){
+  const row = document.getElementById('tag-sug-row');
+  const matches = ALL_TAGS.filter(t=>!activeTags.includes(t)&&(q===''||t.includes(q.replace('#','')))).slice(0,8);
+  row.innerHTML = matches.map(t=>`<div class="tag-sug" onclick="addSugTag('${t}')">${t}</div>`).join('');
+}
+function addSugTag(t){
+  if(activeTags.length>=8) return;
+  if(!activeTags.includes(t)){ activeTags.push(t); renderTags(); markChanged(); }
+  filterTagSugs('');
+}
+
+/* Audience */
+function setAudience(a,el){
+  document.querySelectorAll('.setting-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); markChanged();
+}
+
+/* Checklist */
+function updateChecklist(){
+  const title = document.getElementById('title-input').value.trim();
+  const body  = (document.getElementById('editor-area').innerText||'').trim();
+  const cats  = document.querySelectorAll('.cat-pill.on').length;
+  setChk('chk-type',  !!selectedType);
+  setChk('chk-cat',   cats>0);
+  setChk('chk-title', title.length>=10);
+  setChk('chk-body',  body.length>=30);
+  setChk('chk-tags',  activeTags.length>=1);
+  const allDone = ['chk-type','chk-cat','chk-title','chk-body','chk-tags'].every(id=>document.getElementById(id).classList.contains('done'));
+  document.getElementById('update-btn').disabled = !allDone;
+  document.getElementById('pub-status').textContent = allDone ? (hasChanges?'Unsaved changes':'Ready to update') : 'Incomplete';
+  document.getElementById('pub-sub').textContent   = allDone ? 'All required fields are complete' : 'Fill in required fields to unlock update';
+}
+function setChk(id,done){ document.getElementById(id).classList.toggle('done',done); }
+
+/* Preview */
+function updatePreview(){
+  const typeMap = {sos:'🆘 Distress Call',tutorial:'📚 Tutorial',community:'💬 Community Update',resource:'🗂️ Resource'};
+  document.getElementById('pc-type').textContent = typeMap[selectedType]||'';
+  document.getElementById('pc-title').textContent = document.getElementById('title-input').value||'Your title…';
+  document.getElementById('pc-body').textContent = (document.getElementById('editor-area').innerText||'').trim()||'Your content preview will appear here…';
+  document.getElementById('pc-tags').innerHTML = activeTags.map(t=>`<span class="pc-tag">${t}</span>`).join('');
+}
+
+/* Actions */
+function saveDraft(){ showToast('Draft saved!','success'); hasChanges=false; document.getElementById('change-badge').style.display='none'; }
+function previewPost(){ showToast('Preview — coming soon',''); }
+function updatePost(){
+  showToast('Updating…','');
+  setTimeout(()=>{ hasChanges=false; document.getElementById('change-badge').style.display='none'; document.getElementById('success-overlay').classList.add('on'); },900);
+}
+
+/* Toast */
+let tt;
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.className='toast show'+(type?' '+type:'');
+  clearTimeout(tt); tt=setTimeout(()=>t.className='toast',3000);
+}
+
+window.addEventListener('beforeunload',e=>{ if(hasChanges){e.preventDefault();e.returnValue='';} });
+</script>
+</body>
+</html>

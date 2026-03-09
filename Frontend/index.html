@@ -2,14 +2,127 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Craft-SOS Home</title>
-    <link rel="stylesheet" href="../css/index.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Craft-SOS — Home</title>
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/index.css" />
+    <style>
+      @keyframes cardIn {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .shimmer {
+        background: linear-gradient(
+          90deg,
+          #f0efe9 25%,
+          #e8e7e0 50%,
+          #f0efe9 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.4s infinite;
+        border-radius: 8px;
+      }
+
+      /* Nav badge — inline flex (works with socket-client.js) */
+      .nav-badge-live {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 4px;
+        border-radius: 50%;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #fff;
+        margin-left: auto;
+      }
+
+      /* Liked state for icon buttons */
+      .icon-btn.liked svg {
+        fill: #d35b3a;
+        stroke: #d35b3a;
+      }
+
+      /* Quick-reply input row */
+      .card-footer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .msg-input {
+        flex: 1;
+        padding: 7px 12px;
+        border: 1.5px solid #e0dfd6;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        background: #fafaf7;
+        outline: none;
+        transition: border 0.2s;
+      }
+      .msg-input:focus {
+        border-color: var(--accent, #7a8f52);
+      }
+
+      /* Severity stripe on card left edge */
+      .sos-card.urgent {
+        border-left: 3px solid #c0392b;
+      }
+      .sos-card.medium {
+        border-left: 3px solid #e07b39;
+      }
+      .sos-card {
+        border-left: 3px solid #4a6741;
+      }
+
+      /* "Live" label on socket-pushed cards */
+      .live-badge {
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--accent, #7a8f52);
+        background: rgba(122, 143, 82, 0.1);
+        border-radius: 10px;
+        padding: 2px 7px;
+        margin-left: 6px;
+      }
+
+      a.nav-item-a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+    </style>
   </head>
   <body>
-    <!-- Single overlay (was duplicated before) -->
     <div id="overlay" onclick="closeSidebar()"></div>
 
-    <!-- ══ TOPBAR ══ (only one — was duplicated before) -->
+    <!-- ══════════════════════════════════════════
+     TOPBAR
+══════════════════════════════════════════ -->
     <header id="topbar">
       <button id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
         <svg viewBox="0 0 24 24">
@@ -37,130 +150,737 @@
         <span class="tnav" onclick="syncNav(this)">Bookmarked</span>
       </nav>
 
+      <div id="topbar-center">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Search crafters, topics, SOS…"
+            oninput="handleSearch(this.value)"
+          />
+        </div>
+      </div>
+
       <div id="topbar-right">
         <button class="distress-btn" onclick="distressCall()">
           <svg viewBox="0 0 24 24">
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          <span>Distress Call</span>
+          <span>Post SOS</span>
         </button>
-        <button class="icon-btn" onclick="logout()" title="Logout">
-          Sign out
+        <!-- Bell button — opens notification panel (index.js initNotifPanel) -->
+        <button class="notif-btn" id="notif-bell-btn" title="Notifications">
+          <svg viewBox="0 0 24 24">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 01-3.46 0" />
+          </svg>
+          <!-- Dot goes visible when unread count > 0 (controlled by socket-client.js + loadWelcome) -->
+          <div
+            class="notif-dot"
+            id="topbar-notif-dot"
+            style="display: none"
+          ></div>
         </button>
-        <div class="profile-avatar"></div>
+        <!-- Profile avatar filled by loadWelcome() -->
+        <div
+          class="profile-avatar"
+          id="topbar-profile-av"
+          onclick="window.location.href = 'pages/profile.html'"
+          style="cursor: pointer"
+          title="My Profile"
+        ></div>
       </div>
     </header>
 
-    <!-- Sub-nav strip -->
+    <!-- Sub-nav strip (mobile) -->
     <nav id="subnav">
       <span class="snav active" onclick="syncNav(this)">Friends</span>
       <span class="snav" onclick="syncNav(this)">Explore</span>
       <span class="snav" onclick="syncNav(this)">Bookmarked</span>
     </nav>
 
-    <!-- ══ SHELL ══ (only one — was duplicated before) -->
+    <!-- ══════════════════════════════════════════
+     SHELL
+══════════════════════════════════════════ -->
     <div id="shell">
-      <!-- SIDEBAR -->
+      <!-- ════════════════════════════
+       SIDEBAR
+  ════════════════════════════ -->
+
       <aside id="sidebar">
         <div class="sb-prof">
-          <div class="sb-prof-av"></div>
+          <div class="sb-prof-av" style="cursor: pointer"></div>
           <div class="sb-prof-info">
-            <div class="sb-prof-name">Pebble yarn Studio</div>
-            <div class="sb-prof-sub">@pebbleyarn</div>
+            <div class="sb-prof-name">Loading…</div>
+            <div class="sb-prof-sub"></div>
           </div>
         </div>
+
         <nav>
-          <div class="nav-item active" onclick="pickNav(this)">
+          <!-- Home -->
+          <div class="nav-item" data-route="index.html">
             <svg class="nav-icon" viewBox="0 0 24 24">
               <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
             <span class="nav-label">Home</span>
           </div>
-          <a href="pages/explore.html" class="nav-item-a">
-            <div class="nav-item" onclick="pickNav(this)">
-              <svg class="nav-icon" viewBox="0 0 24 24">
-                <rect x="3" y="3" width="7" height="7" rx="1" />
-                <rect x="14" y="3" width="7" height="7" rx="1" />
-                <rect x="3" y="14" width="7" height="7" rx="1" />
-                <rect x="14" y="14" width="7" height="7" rx="1" />
-              </svg>
-              <span class="nav-label">Explore</span>
-            </div>
-          </a>
-          <div class="nav-item" onclick="pickNav(this)">
+
+          <!-- Explore -->
+          <div class="nav-item" data-route="explore.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <span class="nav-label">Explore</span>
+          </div>
+
+          <!-- Search -->
+          <div class="nav-item" id="sidebar-search-btn">
             <svg class="nav-icon" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
             <span class="nav-label">Search</span>
           </div>
-          <div class="nav-item" onclick="pickNav(this)">
+
+          <!-- Notifications — badge managed by socket-client.js -->
+          <div
+            class="nav-item"
+            id="sidebar-notif-btn"
+            data-route="notifications"
+          >
             <svg class="nav-icon" viewBox="0 0 24 24">
               <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
               <path d="M13.73 21a2 2 0 01-3.46 0" />
             </svg>
             <span class="nav-label">Notifications</span>
+            <span
+              id="notif-badge"
+              class="nav-badge-live"
+              style="background: #d35b3a"
+            ></span>
           </div>
-          <div class="nav-item" onclick="pickNav(this)">
+
+          <!-- Messages — badge managed by socket-client.js -->
+          <div class="nav-item" data-route="chat.html">
             <svg class="nav-icon" viewBox="0 0 24 24">
               <path
                 d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
               />
             </svg>
             <span class="nav-label">Messages</span>
+            <span
+              id="chat-badge"
+              class="nav-badge-live"
+              style="background: #3d5a99"
+            ></span>
           </div>
-          <a href="pages/profile.html" class="nav-item-a">
-            <div class="nav-item" onclick="pickNav(this)">
-              <svg class="nav-icon" viewBox="0 0 24 24">
-                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-              <span class="nav-label">Profile</span>
-            </div>
-          </a>
-          <a href="pages/dashboard.html" class="nav-item-a">
-            <div class="nav-item" onclick="pickNav(this)">
-              <svg class="nav-icon" viewBox="0 0 24 24">
-                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-              <span class="nav-label">dashboard</span>
-            </div>
-          </a>
-          <div class="nav-item" onclick="pickNav(this)">
+
+          <!-- Dashboard -->
+          <div class="nav-item" data-route="dashboard.html">
             <svg class="nav-icon" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="3" />
-              <path
-                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            <span class="nav-label">Dashboard</span>
+          </div>
+
+          <!-- Challenges (coming soon) -->
+          <div class="nav-item sb-coming" data-route="challenges.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
               />
             </svg>
-            <span class="nav-label">Settings</span>
+            <span class="nav-label">Challenges</span>
+            <span class="nav-pill-soon">Soon</span>
+          </div>
+
+          <div class="sb-divider"></div>
+
+          <!-- Profile -->
+          <div class="nav-item" data-route="profile.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span class="nav-label">Profile</span>
+          </div>
+
+          <!-- Saved -->
+          <div class="nav-item" id="sidebar-saved-btn">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+            </svg>
+            <span class="nav-label">Saved</span>
+          </div>
+
+          <div class="sb-divider"></div>
+
+          <!-- Sign Out -->
+          <div class="nav-item" id="sidebar-logout-btn">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            <span class="nav-label">Sign Out</span>
           </div>
         </nav>
       </aside>
 
-      <!-- ══ MAIN ══ -->
+      <!-- ════════════════════════════
+       MAIN
+  ════════════════════════════ -->
       <main id="main">
-        <!-- Posts injected here by loadFeed() in index.js -->
-        <div id="feed"></div>
-        <!-- <aside id="right-panel">
-          <div class="sugg-box">
-            <div class="sugg-title">Suggestions</div>
-            <div id="sugg-list"></div>
+        <div id="feed">
+          <!-- ── WELCOME BANNER ── -->
+          <div
+            class="welcome-banner"
+            id="welcome-banner"
+            style="animation: cardIn 0.35s ease both"
+          >
+            <div class="wb-left">
+              <div class="wb-greeting" id="wb-greeting">
+                <span
+                  class="shimmer"
+                  style="
+                    display: inline-block;
+                    width: 220px;
+                    height: 22px;
+                    border-radius: 6px;
+                  "
+                ></span>
+              </div>
+              <div class="wb-sub" id="wb-sub">
+                <span
+                  class="shimmer"
+                  style="
+                    display: inline-block;
+                    width: 280px;
+                    height: 16px;
+                    border-radius: 6px;
+                    margin-top: 4px;
+                  "
+                ></span>
+              </div>
+              <!-- Quick-stat pills — filled by loadWelcome() -->
+              <div
+                id="wb-pills"
+                style="
+                  display: flex;
+                  gap: 14px;
+                  margin-top: 12px;
+                  flex-wrap: wrap;
+                "
+              ></div>
+            </div>
+            <div class="wb-fire" id="wb-rank-widget">
+              <div class="wb-fire-num" id="wb-rank-icon">🏅</div>
+              <div
+                style="
+                  font-size: 0.78rem;
+                  color: rgba(255, 255, 255, 0.9);
+                  font-weight: 600;
+                  margin-top: 4px;
+                "
+                id="wb-rank-label"
+              >
+                —
+              </div>
+              <div class="wb-fire-label">Community Rank</div>
+            </div>
           </div>
-        </aside> -->
-      </main>
-      <aside id="right-panel">
-        <div class="sugg-box">
-          <div class="sugg-title">Suggestions</div>
-          <div id="sugg-list"></div>
-        </div>
-      </aside>
-    </div>
-    <!-- /#shell -->
 
-    <script src="../js/index.js"></script>
+          <!-- ── STATS ROW ── (filled by loadWelcome) -->
+          <div
+            class="stats-row"
+            style="animation: cardIn 0.35s ease 0.05s both"
+          >
+            <div class="stat-tile">
+              <div class="stat-ico">
+                <svg viewBox="0 0 24 24">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+              </div>
+              <div>
+                <div class="stat-num" id="st-sos">—</div>
+                <div class="stat-lbl">SOS Posted</div>
+              </div>
+              <div class="stat-dot"></div>
+            </div>
+            <div class="stat-tile">
+              <div class="stat-ico">
+                <svg viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div>
+                <div class="stat-num" id="st-solved">—</div>
+                <div class="stat-lbl">SOS Solved</div>
+              </div>
+            </div>
+            <div class="stat-tile">
+              <div class="stat-ico">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 20h9" />
+                  <path
+                    d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <div class="stat-num" id="st-tut">—</div>
+                <div class="stat-lbl">Tutorials Shared</div>
+              </div>
+            </div>
+            <div class="stat-tile">
+              <div class="stat-ico">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <div class="stat-num" id="st-pts">—</div>
+                <div class="stat-lbl">Helpful Votes</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── ACTIVE SOS FEED ── -->
+          <div style="animation: cardIn 0.4s ease 0.1s both">
+            <div class="sec-header">
+              <div class="sec-title">
+                <span class="sec-title-icon">🚨</span> Active SOS Feed
+              </div>
+              <a href="pages/explore.html?type=sos" class="sec-link"
+                >View all →</a
+              >
+            </div>
+
+            <!-- Filter pills -->
+            <div class="filter-row" id="filter-row">
+              <span
+                class="fpill active"
+                data-type="all"
+                onclick="filterFeedPill(this, 'all')"
+                >All</span
+              >
+              <span
+                class="fpill"
+                data-type="sos"
+                onclick="filterFeedPill(this, 'sos')"
+                >🔴 Urgent</span
+              >
+              <span
+                class="fpill"
+                data-type="tut"
+                onclick="filterFeedPill(this, 'tut')"
+                >📚 Tutorials</span
+              >
+              <span
+                class="fpill"
+                data-type="com"
+                onclick="filterFeedPill(this, 'com')"
+                >💬 Community</span
+              >
+              <span
+                class="fpill"
+                data-type="res"
+                onclick="filterFeedPill(this, 'res')"
+                >📦 Resources</span
+              >
+              <span
+                class="fpill"
+                data-sev="High"
+                onclick="filterFeedPill(this, null, 'High')"
+                >🔴 High</span
+              >
+              <span
+                class="fpill"
+                data-sev="Medium"
+                onclick="filterFeedPill(this, null, 'Medium')"
+                >🟡 Medium</span
+              >
+              <span
+                class="fpill"
+                data-tag="near"
+                onclick="filterFeedPill(this, null, null, 'near')"
+                >📍 Near Me</span
+              >
+            </div>
+
+            <!-- Cards injected by index.js → loadFeed() -->
+            <div
+              id="sos-feed"
+              style="display: flex; flex-direction: column; gap: 12px"
+            >
+              <div class="shimmer" style="height: 188px"></div>
+              <div class="shimmer" style="height: 188px"></div>
+              <div class="shimmer" style="height: 188px"></div>
+            </div>
+
+            <!-- Load more -->
+            <div style="text-align: center; margin-top: 18px">
+              <button
+                id="load-more-btn"
+                style="
+                  display: none;
+                  padding: 10px 28px;
+                  border: 1.5px solid var(--accent, #7a8f52);
+                  background: transparent;
+                  color: var(--accent, #7a8f52);
+                  border-radius: 20px;
+                  font-size: 0.85rem;
+                  font-weight: 600;
+                  cursor: pointer;
+                "
+                onclick="loadMoreFeed()"
+              >
+                ↓ Load more posts
+              </button>
+            </div>
+          </div>
+
+          <!-- ── NEEDS YOUR HELP ── (filled by loadNeedsHelp) -->
+          <div class="needs-card">
+            <div class="sec-header">
+              <div class="sec-title" style="color: #7a3820">
+                👉 Needs Your Help
+              </div>
+              <a
+                href="pages/explore.html?type=sos"
+                class="sec-link"
+                style="color: #d35b3a"
+                >See more →</a
+              >
+            </div>
+            <p style="font-size: 0.81rem; color: #9a6050; margin-bottom: 10px">
+              SOS posts with 0 replies — matched to your crafts
+            </p>
+            <div id="needs-list">
+              <div
+                class="shimmer"
+                style="height: 54px; margin-bottom: 8px; border-radius: 10px"
+              ></div>
+              <div
+                class="shimmer"
+                style="height: 54px; margin-bottom: 8px; border-radius: 10px"
+              ></div>
+              <div
+                class="shimmer"
+                style="height: 54px; border-radius: 10px"
+              ></div>
+            </div>
+          </div>
+
+          <!-- ── COMMUNITY ACTIVITY ── (filled by loadActivity) -->
+          <div style="animation: cardIn 0.4s ease 0.16s both">
+            <div class="sec-header">
+              <div class="sec-title">
+                <span class="sec-title-icon">🌱</span> Recent Community Activity
+              </div>
+              <a href="pages/explore.html" class="sec-link">View all →</a>
+            </div>
+            <div class="activity-card" id="activity-list">
+              <div
+                class="shimmer"
+                style="height: 74px; margin-bottom: 10px; border-radius: 12px"
+              ></div>
+              <div
+                class="shimmer"
+                style="height: 74px; margin-bottom: 10px; border-radius: 12px"
+              ></div>
+              <div
+                class="shimmer"
+                style="height: 74px; border-radius: 12px"
+              ></div>
+            </div>
+          </div>
+
+          <!-- ── YOUR CONTRIBUTIONS ── (filled by loadWelcome) -->
+          <div class="contrib-card">
+            <div class="sec-header">
+              <div class="sec-title">
+                <span class="sec-title-icon">⭐</span> Your Contributions
+              </div>
+              <a href="pages/profile.html" class="sec-link">Full stats →</a>
+            </div>
+            <div class="contrib-grid" id="contrib-grid">
+              <div class="contrib-tile">
+                <div
+                  class="contrib-num shimmer"
+                  style="height: 28px; width: 36px"
+                ></div>
+                <div class="contrib-lbl">SOS Posted</div>
+              </div>
+              <div class="contrib-tile">
+                <div
+                  class="contrib-num shimmer"
+                  style="height: 28px; width: 36px"
+                ></div>
+                <div class="contrib-lbl">SOS Solved</div>
+              </div>
+              <div class="contrib-tile">
+                <div
+                  class="contrib-num shimmer"
+                  style="height: 28px; width: 36px"
+                ></div>
+                <div class="contrib-lbl">Tutorials</div>
+              </div>
+              <div class="contrib-tile">
+                <div
+                  class="contrib-num shimmer"
+                  style="height: 28px; width: 36px"
+                ></div>
+                <div class="contrib-lbl">Helpful Votes</div>
+              </div>
+              <div class="contrib-tile">
+                <div
+                  class="contrib-num shimmer"
+                  style="height: 28px; width: 36px"
+                ></div>
+                <div class="contrib-lbl">Friends</div>
+              </div>
+              <div class="contrib-tile">
+                <div
+                  class="contrib-num shimmer"
+                  style="height: 28px; width: 36px"
+                ></div>
+                <div class="contrib-lbl">Day Streak 🔥</div>
+              </div>
+            </div>
+            <div class="rank-badge" id="rank-badge"></div>
+          </div>
+
+          <!-- ── ANNOUNCEMENTS (static) ── -->
+          <div class="announce-card">
+            <div class="sec-header">
+              <div class="sec-title">
+                <span class="sec-title-icon">📢</span> Community Announcements
+              </div>
+            </div>
+            <div class="announce-item">
+              <div class="announce-dot"></div>
+              <div>
+                <div class="announce-text">
+                  🎨 April Craft Challenge: "Upcycle it!" — submit your entry by
+                  April 30th
+                </div>
+                <div class="announce-sub">Admin · 1 day ago</div>
+              </div>
+            </div>
+            <div class="announce-item">
+              <div class="announce-dot"></div>
+              <div>
+                <div class="announce-text">
+                  ✨ New feature: Private chat now live! Start connecting with
+                  your craft friends
+                </div>
+                <div class="announce-sub">Admin · 3 days ago</div>
+              </div>
+            </div>
+            <div class="announce-item">
+              <div class="announce-dot"></div>
+              <div>
+                <div class="announce-text">
+                  🌟 Monthly Spotlight: NomadClay — Ceramic artist of the month
+                </div>
+                <div class="announce-sub">Admin · 5 days ago</div>
+              </div>
+            </div>
+            <div class="announce-item">
+              <div class="announce-dot"></div>
+              <div>
+                <div class="announce-text">
+                  📋 Community guidelines updated — please review before posting
+                  SOS
+                </div>
+                <div class="announce-sub">Admin · 1 week ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /feed -->
+
+        <!-- ════════════════════════════
+         RIGHT PANEL
+    ════════════════════════════ -->
+        <aside id="right-panel">
+          <div class="rp-scroll">
+            <!-- Trending Tags -->
+            <div class="rp-box">
+              <div class="rp-title">🔖 Trending Tags</div>
+              <div class="tags-wrap">
+                <span class="tag-pill" onclick="filterFeedByTag('crochet')"
+                  >#crochet</span
+                >
+                <span class="tag-pill" onclick="filterFeedByTag('resin')"
+                  >#resin</span
+                >
+                <span class="tag-pill" onclick="filterFeedByTag('homebakery')"
+                  >#homebakery</span
+                >
+                <span
+                  class="tag-pill"
+                  onclick="filterFeedByTag('packaginghelp')"
+                  >#packaginghelp</span
+                >
+                <span class="tag-pill" onclick="filterFeedByTag('pricing')"
+                  >#pricing</span
+                >
+                <span class="tag-pill" onclick="filterFeedByTag('etsy')"
+                  >#etsy</span
+                >
+                <span class="tag-pill" onclick="filterFeedByTag('macrame')"
+                  >#macrame</span
+                >
+                <span class="tag-pill" onclick="filterFeedByTag('candles')"
+                  >#candles</span
+                >
+              </div>
+            </div>
+
+            <!-- Friend Requests — filled by loadFriendRequests() -->
+            <div class="rp-box" id="freq-box">
+              <div class="rp-title">
+                👋 Friend Requests
+                <span
+                  id="freq-count"
+                  style="
+                    font-size: 0.72rem;
+                    color: #999;
+                    font-weight: 400;
+                    margin-left: 4px;
+                  "
+                ></span>
+              </div>
+              <div id="freq-list">
+                <div
+                  class="shimmer"
+                  style="height: 56px; margin-bottom: 8px; border-radius: 10px"
+                ></div>
+                <div
+                  class="shimmer"
+                  style="height: 56px; border-radius: 10px"
+                ></div>
+              </div>
+            </div>
+
+            <!-- Top Helpers — filled by loadTopHelpers() -->
+            <div class="rp-box">
+              <div class="rp-title">🏆 Top Helpers This Week</div>
+              <div id="helpers-list">
+                <div
+                  class="shimmer"
+                  style="height: 46px; margin-bottom: 8px; border-radius: 10px"
+                ></div>
+                <div
+                  class="shimmer"
+                  style="height: 46px; margin-bottom: 8px; border-radius: 10px"
+                ></div>
+                <div
+                  class="shimmer"
+                  style="height: 46px; border-radius: 10px"
+                ></div>
+              </div>
+            </div>
+
+            <!-- Upcoming Events (static — can be made dynamic later) -->
+            <div class="rp-box">
+              <div class="rp-title">📅 Upcoming Events</div>
+              <div class="event-item">
+                <div class="event-date" style="background: #d35b3a">
+                  <div class="event-d">26</div>
+                  <div class="event-m">Feb</div>
+                </div>
+                <div>
+                  <div class="event-name">Live Craft Workshop</div>
+                  <div class="event-live">LIVE TODAY · 5 PM IST</div>
+                </div>
+              </div>
+              <div class="event-item">
+                <div class="event-date">
+                  <div class="event-d">2</div>
+                  <div class="event-m">Mar</div>
+                </div>
+                <div>
+                  <div class="event-name">Pricing Strategy Webinar</div>
+                  <div class="event-type">Online · Free · 7 PM IST</div>
+                </div>
+              </div>
+              <div class="event-item">
+                <div class="event-date">
+                  <div class="event-d">10</div>
+                  <div class="event-m">Mar</div>
+                </div>
+                <div>
+                  <div class="event-name">Craft Market Mumbai</div>
+                  <div class="event-type">In-person · Bandra</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Suggested Crafters — filled by loadSuggestions() -->
+            <div class="rp-box">
+              <div class="rp-title">✨ Suggested Crafters</div>
+              <div id="sugg-list">
+                <div
+                  class="shimmer"
+                  style="height: 46px; margin-bottom: 8px; border-radius: 10px"
+                ></div>
+                <div
+                  class="shimmer"
+                  style="height: 46px; border-radius: 10px"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <!-- /rp-scroll -->
+        </aside>
+      </main>
+    </div>
+    <!-- /shell -->
+
+    <!-- Toast container — shared via window.craftToast (socket-client.js) -->
+    <div
+      id="toast"
+      style="
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(40px);
+        background: #2d3520;
+        color: #fff;
+        padding: 10px 24px;
+        border-radius: 20px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        z-index: 9999;
+        opacity: 0;
+        transition: all 0.3s ease;
+        pointer-events: none;
+      "
+    ></div>
+
+    <!-- ═══ SCRIPTS ═══ -->
+    <!-- Socket.io must load before socket-client.js -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <!-- Shared socket singleton — sets window.craftSocket + handles badges -->
+    <script src="js/socket-client.js"></script>
+    <!-- Page script — all data fetching + interactions -->
+    <script src="js/index.js"></script>
+    <script src="js/common.js"></script>
   </body>
 </html>

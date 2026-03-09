@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Post — Craft-SOS</title>
+    <link rel="stylesheet" href="../css/post-detail.css" />
+  </head>
+  <body>
+    <!-- Reading progress bar -->
+    <div id="read-progress"></div>
+
+    <div id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- ══ TOPBAR ══ -->
+    <header id="topbar">
+      <button id="hamburger" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+      <div id="topbar-logo-zone">
+        <div class="logo-pill">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"
+            />
+          </svg>
+        </div>
+      </div>
+      <span id="mobile-title">Craft-SOS</span>
+      <nav id="desk-nav">
+        <span class="tnav active" onclick="syncNav(this)">Friends</span>
+        <span class="tnav" onclick="syncNav(this)">Explore</span>
+        <span class="tnav" onclick="syncNav(this)">Bookmarked</span>
+      </nav>
+      <div id="topbar-right">
+        <!--
+      ✅ FIX 1: Distress Call button — wired in post-detail.js DOMContentLoaded
+                 onclick removed here to avoid double-binding
+    -->
+        <button class="distress-btn">
+          <svg viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>Distress Call</span>
+        </button>
+        <!--
+      ✅ FIX 2: Avatar populated from localStorage by populateUserAvatar() in post-detail.js
+    -->
+        <div
+          class="profile-av-btn"
+          onclick="window.location.href = 'dashboard.html'"
+        ></div>
+      </div>
+    </header>
+    <nav id="subnav">
+      <span class="snav active" onclick="syncNav(this)">Friends</span>
+      <span class="snav" onclick="syncNav(this)">Explore</span>
+      <span class="snav" onclick="syncNav(this)">Bookmarked</span>
+    </nav>
+
+    <!-- ══ SHELL ══ -->
+    <div id="shell">
+      <!-- ══ SIDEBAR ══ -->
+      <aside id="sidebar">
+        <div class="sb-prof">
+          <div class="sb-prof-av"></div>
+          <!--
+        ✅ FIX 3: Sidebar name/handle are no longer hardcoded.
+                  populateUserAvatar() reads from localStorage and writes here.
+      -->
+          <div class="sb-prof-info">
+            <div class="sb-prof-name">Loading…</div>
+            <div class="sb-prof-sub"></div>
+          </div>
+        </div>
+        <nav>
+          <div
+            class="nav-item active"
+            onclick="
+              pickNav(this);
+              window.location.href = '../index.html';
+            "
+          >
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <span class="nav-label">Home</span>
+          </div>
+          <div
+            class="nav-item"
+            onclick="
+              pickNav(this);
+              window.location.href = 'explore.html';
+            "
+          >
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <span class="nav-label">Explore</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span class="nav-label">Search</span>
+          </div>
+          <div
+            class="nav-item"
+            onclick="
+              pickNav(this);
+              window.location.href = 'dashboard.html';
+            "
+          >
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <span class="nav-label">Notifications</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path
+                d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+              />
+            </svg>
+            <span class="nav-label">Messages</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span class="nav-label">Profile</span>
+          </div>
+          <div class="nav-item" onclick="pickNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+              />
+            </svg>
+            <span class="nav-label">Settings</span>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- ══ MAIN ══ -->
+      <main id="main">
+        <div id="post-col">
+          <!-- Breadcrumb -->
+          <nav class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg>
+            <a href="explore.html">Tutorials</a>
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg>
+            <a href="explore.html?filter=financial">Pricing &amp; Business</a>
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg>
+            <span>How I priced my hand-dyed yarn…</span>
+          </nav>
+
+          <!-- ══ HERO ══ -->
+          <div class="post-hero">
+            <div class="hero-cover">
+              <div class="hero-cover-inner">
+                <!--
+              ✅ FIX 4: All hero meta (type, title, counts, read time) are overwritten
+                         by renderHero() in post-detail.js.
+                         The values below are visible placeholder text only —
+                         they are replaced as soon as the API responds.
+            -->
+                <div class="hero-cover-type">
+                  📚 Tutorial · Pricing &amp; Business
+                </div>
+                <div class="hero-cover-title">
+                  How I priced my hand-dyed yarn to actually make a living wage
+                  — the full formula
+                </div>
+                <div class="hero-cover-meta">
+                  <div class="hcm-item">
+                    <svg viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    12 min read
+                  </div>
+                  <div class="hcm-item">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    2,841 views
+                  </div>
+                  <div class="hcm-item">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                      />
+                    </svg>
+                    89 responses
+                  </div>
+                  <div class="hcm-item">🗓 Posted 3 days ago</div>
+                </div>
+                <div class="cover-pills">
+                  <span class="cover-pill">🟢 Beginner Friendly</span>
+                  <span class="cover-pill">🧮 Includes Formula</span>
+                  <span class="cover-pill">📄 Free Download</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ══ Author bar ══ -->
+            <!--
+          ✅ FIX 5: .author-av, .author-name, .author-sub, #save-btn, #follow-label
+                     are all overwritten by renderAuthorBar() in post-detail.js.
+                     The hardcoded values below are placeholders only.
+        -->
+            <div class="author-bar">
+              <div class="author-av">W</div>
+              <div class="author-info">
+                <div class="author-name">WoolCraft Co</div>
+                <div class="author-sub">
+                  <span>@woolcraft</span>
+                  <span class="dot-sep"></span>
+                  <span>Yorkshire, UK</span>
+                  <span class="dot-sep"></span>
+                  <span class="author-pts">
+                    <svg viewBox="0 0 24 24">
+                      <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                      />
+                    </svg>
+                    2,100 pts · 🏆 Mentor
+                  </span>
+                </div>
+              </div>
+              <div class="author-bar-actions">
+                <!-- save-btn class toggled by toggleSave() in post-detail.js -->
+                <button class="ab-btn" id="save-btn" onclick="toggleSave(this)">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                  </svg>
+                  Save
+                </button>
+                <button class="ab-btn" onclick="toggleFollow(this)">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="8.5" cy="7" r="4" />
+                    <line x1="20" y1="8" x2="20" y2="14" />
+                    <line x1="23" y1="11" x2="17" y2="11" />
+                  </svg>
+                  <span id="follow-label">Follow</span>
+                </button>
+                <button class="ab-btn" onclick="copyLink(this)">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="18" cy="5" r="3" />
+                    <circle cx="6" cy="12" r="3" />
+                    <circle cx="18" cy="19" r="3" />
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                  </svg>
+                  Share
+                </button>
+              </div>
+            </div>
+
+            <!-- ══ POST BODY ══
+          The article content below is the actual published tutorial.
+          It stays static in the HTML — no JS injection needed for this page.
+          post-detail.js reads the ?id= from the URL and uses post.body
+          only for dynamically generated posts loaded into the page shell.
+        -->
+            <div class="post-body" id="post-body">
+              <div class="callout">
+                <strong>Who this is for:</strong> Independent craft sellers who
+                feel their prices are "too high" to compete, but worry they're
+                not covering costs. This is the framework I wish I'd had in year
+                one. It works for yarn, ceramics, textiles, and most handmade
+                goods.
+              </div>
+
+              <div class="prose">
+                <p>
+                  I spent the first two years of my business chronically
+                  undercharging. I'd look at mass-produced alternatives, halve
+                  the difference, and call it a day. The result? I was working
+                  50-hour weeks to earn less than minimum wage, and I couldn't
+                  understand why.
+                </p>
+                <p>
+                  The turning point came when a mentor asked me:
+                  <em
+                    >"Have you ever actually calculated your true hourly
+                    cost?"</em
+                  >
+                  I hadn't. Once I did, everything changed. Here's the full
+                  system I now use to price every skein I dye.
+                </p>
+              </div>
+
+              <h3
+                id="step-materials"
+                style="
+                  font-family: &quot;Lora&quot;, serif;
+                  font-weight: 700;
+                  font-size: 1.08rem;
+                  color: var(--text-dark);
+                  margin: 28px 28px 10px 0;
+                "
+              >
+                The 5-Step Pricing Framework
+              </h3>
+
+              <div class="steps">
+                <div class="step-card">
+                  <div class="step-num">1</div>
+                  <div class="step-content">
+                    <div class="step-title">
+                      Calculate your true material cost
+                    </div>
+                    <div class="step-text">
+                      Don't just count the yarn. Include dyes, mordants, water
+                      treatment, packaging (tissue, bags, tags, stickers),
+                      postage materials, and a proportional share of utilities
+                      for dyeing sessions. I track this per 100g skein using a
+                      simple spreadsheet.
+                    </div>
+                    <div class="step-tip">
+                      <span>💡</span> Include a 10% buffer for waste, mistakes,
+                      and material price fluctuations. What costs £X today may
+                      cost £X+12% in 6 months.
+                    </div>
+                  </div>
+                </div>
+                <div class="step-card">
+                  <div class="step-num">2</div>
+                  <div class="step-content">
+                    <div class="step-title">
+                      Set your target hourly wage — then honour it
+                    </div>
+                    <div class="step-text">
+                      Pick a real living wage for your area, not what you think
+                      "the market will bear." In the UK, the Real Living Wage
+                      (2026) is £13.85/hr outside London. Time everything:
+                      dyeing, rinsing, drying, skeining, photographing, listing,
+                      packing, admin. Every minute counts.
+                    </div>
+                    <div class="step-tip">
+                      <span>⏱</span> When I timed myself properly for the first
+                      time, I was shocked — a single skein took 47 minutes of
+                      active work, not the 20 I'd assumed.
+                    </div>
+                  </div>
+                </div>
+                <div class="step-card">
+                  <div class="step-num">3</div>
+                  <div class="step-content">
+                    <div class="step-title">Add your overhead allocation</div>
+                    <div class="step-text">
+                      Overheads are the costs you pay regardless of how much you
+                      sell: studio rent (or a proportion of home costs),
+                      insurance, website fees, marketplace fees, equipment
+                      depreciation, subscriptions. Divide your monthly overhead
+                      total by your monthly unit output. This is your
+                      overhead-per-unit.
+                    </div>
+                  </div>
+                </div>
+                <div class="step-card">
+                  <div class="step-num">4</div>
+                  <div class="step-content">
+                    <div class="step-title">Apply your profit margin</div>
+                    <div class="step-text">
+                      Profit is not the same as your wage. Profit is what allows
+                      you to invest back into the business — new equipment,
+                      stock, marketing, courses. I add a minimum 20% profit
+                      margin on top of all costs. This isn't greed; it's
+                      sustainability.
+                    </div>
+                    <div class="step-tip">
+                      <span>🌱</span> Without profit margin, you cannot grow.
+                      You can only maintain — and any unexpected cost will put
+                      you under.
+                    </div>
+                  </div>
+                </div>
+                <div class="step-card">
+                  <div class="step-num">5</div>
+                  <div class="step-content">
+                    <div class="step-title">
+                      Apply platform &amp; transaction fees last
+                    </div>
+                    <div class="step-text">
+                      Most sellers forget this step. Etsy takes 6.5% + listing +
+                      payment processing. Adding fees at the end means you're
+                      absorbing them from your profit. Instead, gross up your
+                      price so that after fees, you still hit your target. The
+                      formula: <strong>Price ÷ (1 − fee rate)</strong>.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="formula-box">
+                <div class="formula-label">💰 The Full Pricing Formula</div>
+                <div class="formula">
+                  <div>
+                    <span class="var">Material Cost</span>
+                    <span class="op">+</span>
+                    <span class="var">Labour Cost</span>
+                    <span class="op">+</span>
+                    <span class="var">Overhead/Unit</span>
+                  </div>
+                  <div style="margin-top: 4px">
+                    <span class="op">= </span><span class="var">Base Cost</span>
+                  </div>
+                  <div style="margin-top: 8px">
+                    <span class="var">Base Cost</span>
+                    <span class="op">× 1.20</span> <span class="op">=</span>
+                    <span class="var">Cost + Profit</span>
+                  </div>
+                  <div style="margin-top: 8px">
+                    <span class="var">Cost + Profit</span>
+                    <span class="op">÷ (1 − 0.115)</span>
+                    <span class="op">=</span>
+                    <span class="var">Final Listing Price</span>
+                  </div>
+                </div>
+                <div class="formula-note">
+                  *0.115 represents combined Etsy fees (~11.5%). Adjust for your
+                  platform. For direct sales, use 0.03–0.05 for payment
+                  processing only.
+                </div>
+              </div>
+
+              <h3
+                style="
+                  font-family: &quot;Lora&quot;, serif;
+                  font-weight: 700;
+                  font-size: 1.08rem;
+                  color: var(--text-dark);
+                  margin: 28px 0 10px;
+                "
+              >
+                A Real Example
+              </h3>
+
+              <table class="key-table">
+                <thead>
+                  <tr>
+                    <th>Cost Element</th>
+                    <th>Amount (per 100g skein)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Yarn base (100g merino)</td>
+                    <td><strong>£5.80</strong></td>
+                  </tr>
+                  <tr>
+                    <td>Dyes, mordants, chemicals</td>
+                    <td><strong>£1.20</strong></td>
+                  </tr>
+                  <tr>
+                    <td>Packaging (tissue, bag, label)</td>
+                    <td><strong>£0.65</strong></td>
+                  </tr>
+                  <tr>
+                    <td>Utilities proportion</td>
+                    <td><strong>£0.45</strong></td>
+                  </tr>
+                  <tr>
+                    <td>Labour (47 mins × £13.85/hr)</td>
+                    <td><strong>£10.85</strong></td>
+                  </tr>
+                  <tr>
+                    <td>Overhead allocation</td>
+                    <td><strong>£2.40</strong></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Base Cost</strong></td>
+                    <td><strong>£21.35</strong></td>
+                  </tr>
+                  <tr>
+                    <td>+ 20% Profit Margin</td>
+                    <td><strong>£25.62</strong></td>
+                  </tr>
+                  <tr>
+                    <td>÷ (1 − 0.115) for platform fees</td>
+                    <td><strong>£28.95</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="quote-block">
+                "But that's more than £28 for 100g — nobody will pay that!"
+                <br />They will. The right customers will. And those are the
+                only customers who will sustain your business long term.
+                <cite>— The mindset shift that changed everything for me</cite>
+              </div>
+
+              <div class="prose">
+                <p>
+                  When I raised my prices using this formula, I lost about 15%
+                  of my customers in the first month. But within three months my
+                  revenue had increased by 40%, because I was making the same or
+                  more with less volume, less stress, and customers who
+                  genuinely valued the work.
+                </p>
+                <p>
+                  I've attached my pricing spreadsheet as a free download below.
+                  Make a copy and adapt it to your product. If you have
+                  questions about any of the categories or your specific
+                  situation, drop them in the comments and I'll do my best to
+                  help 🌿
+                </p>
+              </div>
+            </div>
+            <!-- /post-body -->
+
+            <!-- ══ Tags ══
+          ✅ FIX 6: Hardcoded post-tag spans replaced with an empty container.
+                     renderTags() in post-detail.js populates this from post.tags[].
+        -->
+            <div class="post-tags" id="post-tags">
+              <!-- Populated by renderTags() -->
+              <div
+                class="loading-shimmer"
+                style="
+                  height: 28px;
+                  width: 260px;
+                  border-radius: 14px;
+                  display: inline-block;
+                "
+              ></div>
+            </div>
+
+            <!-- ══ Reactions bar ══
+          ✅ FIX 7: renderReactions() fills this with real counts from the DB.
+                     Empty on load — shimmer shown while API request is in flight.
+        -->
+            <div class="reactions-bar" id="reactions-bar">
+              <div
+                class="loading-shimmer"
+                style="height: 44px; border-radius: 12px"
+              ></div>
+            </div>
+
+            <!-- ══ Engagement counts ══
+          ✅ FIX 8: #resp-num and #save-num are overwritten by renderEngageCounts().
+                     Placeholder values shown until API responds.
+        -->
+            <div class="engage-nums">
+              <div class="en">
+                <svg viewBox="0 0 24 24">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <span id="views-num">—</span> views
+              </div>
+              <div class="en">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                  />
+                </svg>
+                <span id="resp-num">—</span> responses
+              </div>
+              <div class="en">
+                <svg viewBox="0 0 24 24">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                </svg>
+                <span id="save-num">—</span> saves
+              </div>
+            </div>
+          </div>
+          <!-- /post-hero -->
+
+          <!-- ══ RESPONSES SECTION ══ -->
+          <div class="responses-section">
+            <div class="resp-header">
+              <div class="resp-header-left">
+                <div class="resp-title">
+                  <div class="resp-title-icon">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                      />
+                    </svg>
+                  </div>
+                  Responses
+                  <!-- ✅ FIX 9: #c-count overwritten by renderEngageCounts() from API -->
+                  <span class="resp-count-badge" id="c-count">—</span>
+                </div>
+                <div class="resp-online">
+                  <div class="resp-online-dot"></div>
+                  12 reading now
+                </div>
+              </div>
+              <div class="resp-header-right">
+                <!-- sortComments() in post-detail.js calls GET /api/post-detail/:id/replies?sort= -->
+                <select class="resp-sort" onchange="sortComments(this.value)">
+                  <option value="top">Top Responses</option>
+                  <option value="recent">Most Recent</option>
+                  <option value="oldest">Oldest</option>
+                </select>
+              </div>
+            </div>
+
+            <!--
+          ✅ FIX 10: Pinned card was hardcoded with fake KnitQueen response.
+                      Removed. The top-voted reply from the DB will naturally
+                      appear first when sort=top (the default).
+                      A "pinned" feature can be added later as post.pinnedReplyId.
+        -->
+
+            <!-- Load more button — shown/hidden by loadReplies() -->
+            <div class="resp-load-row">
+              <div class="resp-load-line"></div>
+              <button
+                class="resp-load-btn"
+                onclick="loadMore()"
+                style="display: none"
+              >
+                ↑ Load earlier responses
+              </button>
+              <div class="resp-load-line"></div>
+            </div>
+
+            <!-- ✅ FIX 11: resp-feed populated by loadReplies() via GET /api/post-detail/:id/replies -->
+            <div class="resp-feed" id="resp-feed">
+              <!-- Shimmer placeholders while replies load -->
+              <div
+                class="loading-shimmer"
+                style="height: 88px; border-radius: 14px; margin-bottom: 12px"
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="height: 88px; border-radius: 14px; margin-bottom: 12px"
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="height: 88px; border-radius: 14px; margin-bottom: 12px"
+              ></div>
+            </div>
+
+            <!-- ══ Reply Composer ══ -->
+            <div class="resp-composer">
+              <div class="resp-composer-inner">
+                <div class="resp-composer-top">
+                  <!--
+                ✅ FIX 12: Avatar initial was hardcoded as 'P' (Pebble yarn Studio).
+                            Now empty — populateUserAvatar() writes the correct
+                            initial from localStorage._me.name on DOMContentLoaded.
+              -->
+                  <div class="resp-composer-av"></div>
+                  <textarea
+                    class="resp-composer-ta"
+                    id="reply-ta"
+                    rows="1"
+                    placeholder="Share your experience or ask a question…"
+                    oninput="autoResize(this)"
+                    onkeydown="handleKey(event)"
+                    maxlength="600"
+                  ></textarea>
+                </div>
+                <div class="resp-composer-bottom">
+                  <button class="resp-emoji-btn" onclick="addEmoji('🙌')">
+                    🙌
+                  </button>
+                  <button class="resp-emoji-btn" onclick="addEmoji('🧶')">
+                    🧶
+                  </button>
+                  <button class="resp-emoji-btn" onclick="addEmoji('💚')">
+                    💚
+                  </button>
+                  <button class="resp-emoji-btn" onclick="addEmoji('💰')">
+                    💰
+                  </button>
+                  <span class="resp-char-count" id="char-count">0 / 600</span>
+                  <!-- ✅ FIX 13: postComment() in post-detail.js calls POST /api/posts/:id/replies -->
+                  <button
+                    class="resp-send"
+                    id="send-btn"
+                    onclick="postComment()"
+                    disabled
+                  >
+                    <svg viewBox="0 0 24 24">
+                      <line x1="22" y1="2" x2="11" y2="13" />
+                      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                    </svg>
+                    Post
+                  </button>
+                </div>
+              </div>
+              <div class="resp-hint">
+                Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to post · Responding
+                earns +10 pts
+              </div>
+            </div>
+          </div>
+          <!-- /responses-section -->
+        </div>
+        <!-- /post-col -->
+
+        <!-- ══ RIGHT COL ══ -->
+        <aside id="right-col">
+          <!-- Table of Contents
+           ✅ renderTOC() builds entries from <h3> elements inside #post-body -->
+          <div class="widget">
+            <div class="widget-title">
+              <svg viewBox="0 0 24 24">
+                <line x1="8" y1="6" x2="21" y2="6" />
+                <line x1="8" y1="12" x2="21" y2="12" />
+                <line x1="8" y1="18" x2="21" y2="18" />
+                <line x1="3" y1="6" x2="3.01" y2="6" />
+                <line x1="3" y1="12" x2="3.01" y2="12" />
+                <line x1="3" y1="18" x2="3.01" y2="18" />
+              </svg>
+              Contents
+            </div>
+            <div class="toc-list" id="toc-list">
+              <div
+                class="loading-shimmer"
+                style="height: 20px; border-radius: 6px; margin-bottom: 8px"
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="
+                  height: 20px;
+                  border-radius: 6px;
+                  margin-bottom: 8px;
+                  width: 80%;
+                "
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="
+                  height: 20px;
+                  border-radius: 6px;
+                  margin-bottom: 8px;
+                  width: 90%;
+                "
+              ></div>
+            </div>
+          </div>
+
+          <!-- Author widget
+           ✅ FIX 14: All values were hardcoded (WoolCraft Co, 142 friends etc).
+                       renderSidebarAuthor() overwrites .mini-av, .mini-name,
+                       .mini-handle, .mini-bio, .ms strong, and #follow-btn.
+                       Placeholder text shown until API responds. -->
+          <div class="widget">
+            <div class="widget-title">
+              <svg viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              About the author
+            </div>
+            <div class="mini-author">
+              <div class="mini-av">…</div>
+              <div class="mini-info">
+                <div class="mini-name">Loading…</div>
+                <div class="mini-handle"></div>
+              </div>
+            </div>
+            <div class="mini-bio"></div>
+            <div class="mini-stats">
+              <div class="ms"><strong>—</strong><span>Friends</span></div>
+              <div class="ms"><strong>—</strong><span>Points</span></div>
+              <div class="ms"><strong>—</strong><span>Posts</span></div>
+            </div>
+            <!--
+          ✅ FIX 15: follow-btn data-id is written by renderSidebarAuthor().
+                      toggleFollow() reads it to call PATCH /api/dashboard/follow/:id
+        -->
+            <button
+              class="follow-btn"
+              id="follow-btn"
+              onclick="toggleFollow(this)"
+            >
+              + Follow
+            </button>
+          </div>
+
+          <!-- Free Resources
+           ✅ FIX 16: Was hardcoded with 3 fake resources.
+                       renderResources() fills from post.resources[] (Post model).
+                       Empty container + shimmer shown until load. -->
+          <div class="widget">
+            <div class="widget-title">
+              <svg viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Free Resources
+            </div>
+            <div id="resources-list">
+              <div
+                class="loading-shimmer"
+                style="height: 48px; border-radius: 10px; margin-bottom: 8px"
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="height: 48px; border-radius: 10px; margin-bottom: 8px"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Related Posts
+           ✅ FIX 17: Was hardcoded with 3 fake posts.
+                       loadRelated() fills from GET /api/post-detail/:id/related -->
+          <div class="widget">
+            <div class="widget-title">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              Related Posts
+            </div>
+            <div id="related-list">
+              <div
+                class="loading-shimmer"
+                style="height: 44px; border-radius: 10px; margin-bottom: 8px"
+              ></div>
+              <div
+                class="loading-shimmer"
+                style="height: 44px; border-radius: 10px; margin-bottom: 8px"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Tags
+           ✅ FIX 18: Was hardcoded. renderTags() fills from post.tags[] -->
+          <div class="widget">
+            <div class="widget-title">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"
+                />
+                <line x1="7" y1="7" x2="7.01" y2="7" />
+              </svg>
+              Tags
+            </div>
+            <div class="tags-wrap" id="tags-wrap">
+              <div
+                class="loading-shimmer"
+                style="
+                  height: 28px;
+                  width: 200px;
+                  border-radius: 14px;
+                  display: inline-block;
+                "
+              ></div>
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <!--
+  ✅ FIX 19: Removed 400-line inline <script> block entirely.
+              All logic now lives in post-detail.js (external file).
+              This includes:
+                renderReactions(), renderTOC(), renderResources(),
+                renderRelated(), renderTags(), renderComments(),
+                toggleSave(), toggleFollow(), copyLink(), loadMore(),
+                sortComments(), postComment(), likeResp(), replyTo(),
+                showTyping(), hideTyping(), autoResize(), handleKey(),
+                addEmoji(), updateCharCount(), updateSendBtn(),
+                syncNav(), pickNav(), toggleSidebar(), closeSidebar()
+-->
+    <script src="../js/post-detail.js"></script>
+  </body>
+</html>

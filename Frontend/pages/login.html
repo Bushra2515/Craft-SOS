@@ -9,6 +9,7 @@
     Fonts used by the design (add these if not already in CSS):
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet" />
   --></head>
+  <!-- login.html -->
   <body>
     <!-- ═══ MAIN CARD ═══ -->
     <div class="scene">
@@ -252,7 +253,7 @@
             <label>
               <span>Password</span>
               <!-- onclick calls showForgot() in auth.js -->
-              <a onclick="showForgot()">Forgot password?</a>
+              <a href="#" onclick="showForgot()">Forgot password?</a>
             </label>
             <div class="input-wrap">
               <svg class="fi" viewBox="0 0 24 24">
@@ -268,7 +269,14 @@
                 oninput="clearErr()"
               />
               <!-- onclick calls togglePw() in auth.js -->
-              <button type="button" class="pw-toggle" onclick="togglePw(this)">
+              <!-- <button type="button" class="pw-toggle" onclick="togglePw(this)"> -->
+              <!-- register.html — for comparison -->
+              <button
+                class="pw-toggle"
+                type="button"
+                onclick="togglePw('f-pw', this)"
+                tabindex="-1"
+              >
                 <svg viewBox="0 0 24 24">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                   <circle cx="12" cy="12" r="3" />

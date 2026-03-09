@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Messages — Craft-SOS</title>
+    <!-- Your existing chat CSS goes here -->
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/chat.css" />
+    <style>
+      /* Shimmer animation for loading states */
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+      /* Slide-up for new bubbles */
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <!-- chat.html -->
+  <body>
+    <div id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- ══ TOPBAR ══ -->
+    <header id="topbar">
+      <button id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+        <svg viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+      <div id="topbar-logo-zone">
+        <div class="logo-pill">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"
+            />
+          </svg>
+        </div>
+      </div>
+      <span id="mobile-title">Messages</span>
+      <nav id="desk-nav">
+        <span class="tnav" onclick="syncNav(this)">Friends</span>
+        <span class="tnav" onclick="syncNav(this)">Explore</span>
+        <span class="tnav" onclick="syncNav(this)">Bookmarked</span>
+      </nav>
+      <div id="topbar-right">
+        <button class="distress-btn">
+          <svg viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>Distress Call</span>
+        </button>
+        <!-- Profile avatar — filled by chat.js from localStorage -->
+        <div
+          class="profile-avatar"
+          onclick="window.location.href = 'profile.html'"
+        ></div>
+      </div>
+    </header>
+
+    <!-- Sub-nav -->
+    <nav id="subnav">
+      <span class="snav" onclick="syncNav(this)">Friends</span>
+      <span class="snav" onclick="syncNav(this)">Explore</span>
+      <span class="snav" onclick="syncNav(this)">Bookmarked</span>
+    </nav>
+
+    <!-- ══ SHELL ══ -->
+    <div id="shell">
+      <!-- ══ SIDEBAR ══ -->
+
+      <aside id="sidebar">
+        <div class="sb-prof">
+          <div class="sb-prof-av" style="cursor: pointer"></div>
+          <div class="sb-prof-info">
+            <div class="sb-prof-name">Loading…</div>
+            <div class="sb-prof-sub"></div>
+          </div>
+        </div>
+
+        <nav>
+          <!-- Home -->
+          <div class="nav-item" data-route="index.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <span class="nav-label">Home</span>
+          </div>
+
+          <!-- Explore -->
+          <div class="nav-item" data-route="explore.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <span class="nav-label">Explore</span>
+          </div>
+
+          <!-- Search -->
+          <div class="nav-item" id="sidebar-search-btn">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span class="nav-label">Search</span>
+          </div>
+
+          <!-- Notifications — badge managed by socket-client.js -->
+          <div
+            class="nav-item"
+            id="sidebar-notif-btn"
+            data-route="notifications"
+          >
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <span class="nav-label">Notifications</span>
+            <span
+              id="notif-badge"
+              class="nav-badge-live"
+              style="background: #d35b3a"
+            ></span>
+          </div>
+
+          <!-- Messages — badge managed by socket-client.js -->
+          <div class="nav-item" data-route="chat.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path
+                d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+              />
+            </svg>
+            <span class="nav-label">Messages</span>
+            <span
+              id="chat-badge"
+              class="nav-badge-live"
+              style="background: #3d5a99"
+            ></span>
+          </div>
+
+          <!-- Dashboard -->
+          <div class="nav-item" data-route="dashboard.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            <span class="nav-label">Dashboard</span>
+          </div>
+
+          <!-- Challenges (coming soon) -->
+          <div class="nav-item sb-coming" data-route="challenges.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+              />
+            </svg>
+            <span class="nav-label">Challenges</span>
+            <span class="nav-pill-soon">Soon</span>
+          </div>
+
+          <div class="sb-divider"></div>
+
+          <!-- Profile -->
+          <div class="nav-item" data-route="profile.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span class="nav-label">Profile</span>
+          </div>
+
+          <!-- Saved -->
+          <div class="nav-item" id="sidebar-saved-btn">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+            </svg>
+            <span class="nav-label">Saved</span>
+          </div>
+
+          <div class="sb-divider"></div>
+
+          <!-- Sign Out -->
+          <div class="nav-item" id="sidebar-logout-btn">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            <span class="nav-label">Sign Out</span>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- ══ MESSAGING MAIN ══ -->
+      <div id="msg-main">
+        <!-- Conversation list — populated by chat.js / loadConversations() -->
+        <div id="conv-panel">
+          <div class="conv-panel-head">
+            <div class="conv-panel-title">Messages</div>
+            <div class="search-wrap">
+              <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                class="conv-search"
+                type="text"
+                placeholder="Search conversations…"
+                oninput="filterConvs(this.value)"
+              />
+            </div>
+          </div>
+          <!-- Shimmer placeholders while loading -->
+          <div class="conv-list" id="conv-list">
+            <div
+              style="
+                padding: 12px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+              "
+            >
+              <div
+                style="
+                  height: 60px;
+                  border-radius: 12px;
+                  background: linear-gradient(
+                    90deg,
+                    #f0f0f0 25%,
+                    #e8e8e8 50%,
+                    #f0f0f0 75%
+                  );
+                  background-size: 200% 100%;
+                  animation: shimmer 1.4s infinite;
+                "
+              ></div>
+              <div
+                style="
+                  height: 60px;
+                  border-radius: 12px;
+                  background: linear-gradient(
+                    90deg,
+                    #f0f0f0 25%,
+                    #e8e8e8 50%,
+                    #f0f0f0 75%
+                  );
+                  background-size: 200% 100%;
+                  animation: shimmer 1.4s infinite;
+                "
+              ></div>
+              <div
+                style="
+                  height: 60px;
+                  border-radius: 12px;
+                  background: linear-gradient(
+                    90deg,
+                    #f0f0f0 25%,
+                    #e8e8e8 50%,
+                    #f0f0f0 75%
+                  );
+                  background-size: 200% 100%;
+                  animation: shimmer 1.4s infinite;
+                "
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active chat — populated by openConv() -->
+        <div id="chat-panel">
+          <div id="chat-header">
+            <button id="back-btn" onclick="goBack()">
+              <svg viewBox="0 0 24 24">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            <div class="chat-header-av-wrap">
+              <!-- Avatar filled by openConv() -->
+              <div class="chat-header-av" id="chat-av"></div>
+              <div
+                class="chat-online-dot"
+                id="chat-dot"
+                style="display: none"
+              ></div>
+            </div>
+            <div class="chat-header-info">
+              <div class="chat-header-name" id="chat-name">
+                Select a conversation
+              </div>
+              <div class="chat-header-status" id="chat-status"></div>
+            </div>
+            <!-- Distress tag injected here when applicable -->
+            <div id="chat-distress-wrap"></div>
+            <div class="chat-header-actions">
+              <button class="hdr-btn" title="Call">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.7 9.74 19.79 19.79 0 01.67 1.1 2 2 0 012.66 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"
+                  />
+                </svg>
+              </button>
+              <button class="hdr-btn" title="Info">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Message feed — populated by renderMessages() -->
+          <div id="messages-area">
+            <div
+              style="
+                text-align: center;
+                padding: 60px 24px;
+                color: #bbb;
+                font-size: 0.88rem;
+              "
+            >
+              Select a conversation to start messaging
+            </div>
+          </div>
+
+          <!-- Typing indicator — toggled by socket chat:typing -->
+          <div id="typing-indicator" style="display: none">
+            <div class="typing-av" id="typing-av"></div>
+            <div class="typing-bubble">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+          </div>
+
+          <!-- Composer -->
+          <div id="chat-input-bar">
+            <!-- Attach button — wired by wireAttachButton() in chat.js -->
+            <button class="input-attach" title="Attach image">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"
+                />
+              </svg>
+            </button>
+            <div class="input-wrap">
+              <textarea
+                id="chat-textarea"
+                rows="1"
+                placeholder="Type a message…"
+                onkeydown="handleKey(event)"
+                oninput="autoResize(this)"
+              ></textarea>
+              <button class="emoji-btn" onclick="insertEmoji()">😊</button>
+            </div>
+            <button id="send-btn" onclick="sendMsg()">
+              <svg viewBox="0 0 24 24">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <!-- /chat-panel -->
+      </div>
+      <!-- /msg-main -->
+    </div>
+    <!-- /shell -->
+
+    <!--
+    ── Script order matters ──────────────────────────────────
+    1. socket.io CDN  →  provides the global `io` function
+    2. socket-client.js  →  connects, exposes window.craftSocket,
+                            handles notif:count badge globally
+    3. chat.js  →  page logic, uses window.craftSocket
+  -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="../js/socket-client.js"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/chat.js"></script>
+  </body>
+</html>

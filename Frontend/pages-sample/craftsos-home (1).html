@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Craft-SOS — Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #eef0e8;
+      --panel: #d4dbbf;
+      --sidebar-bg: #c9d3af;
+      --card: #c5cf9e;
+      --card2: #d0d9b0;
+      --accent: #7a8f52;
+      --accent-dark: #5e6e3b;
+      --accent-light: #a8bc72;
+      --text-dark: #2e3520;
+      --text-mid: #4a5730;
+      --text-light: #6b7a50;
+      --badge-high: #d35b3a;
+      --badge-high-bg: #fce8e1;
+      --badge-med: #9a6d1e;
+      --badge-med-bg: #fdf3e0;
+      --badge-low: #6b7a50;
+      --badge-low-bg: #e5ecda;
+      --badge-cat-bg: #d4dbbf;
+      --sb-collapsed: 64px;
+      --sb-expanded: 230px;
+      --topbar-h: 60px;
+      --ease: 0.3s cubic-bezier(.4,0,.2,1);
+      --shadow: 0 2px 14px rgba(46,53,32,0.1);
+      --shadow-lg: 0 6px 28px rgba(46,53,32,0.15);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* subtle paper texture overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Ccircle cx='70' cy='70' r='30' fill='none' stroke='%237a8f52' stroke-width='2'/%3E%3Cpath d='M50 92 Q70 58 90 92' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cellipse cx='420' cy='130' rx='24' ry='34' fill='none' stroke='%237a8f52' stroke-width='2' transform='rotate(-20 420 130)'/%3E%3Crect x='195' y='28' width='70' height='12' rx='6' fill='none' stroke='%237a8f52' stroke-width='1.5' transform='rotate(30 230 34)'/%3E%3Ccircle cx='230' cy='18' r='7' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cpath d='M90 360 L114 334 L138 360 L114 386 Z' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Crect x='338' y='318' width='46' height='62' rx='5' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ══ TOPBAR ══ */
+    #topbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--topbar-h);
+      background: var(--bg);
+      display: flex; align-items: center;
+      padding: 0 20px 0 0;
+      z-index: 200;
+      border-bottom: 1.5px solid rgba(122,143,82,0.15);
+    }
+
+    #topbar-logo-zone {
+      width: var(--sb-collapsed);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .logo-pill {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-pill svg { width: 20px; height: 20px; fill: white; }
+
+    #topbar-wordmark {
+      font-family: 'Lora', serif; font-weight: 700; font-size: 1.15rem;
+      color: var(--text-dark); letter-spacing: -0.01em;
+    }
+    #topbar-wordmark span { color: var(--accent); }
+
+    #topbar-center { flex: 1; }
+
+    .search-wrap {
+      max-width: 360px; margin: 0 auto;
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.55); border: 1.5px solid rgba(122,143,82,0.2);
+      border-radius: 22px; padding: 7px 14px;
+    }
+    .search-wrap svg { width: 15px; height: 15px; stroke: var(--text-light); fill: none; stroke-width: 2; flex-shrink: 0; }
+    .search-wrap input {
+      border: none; background: transparent; outline: none;
+      font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+      color: var(--text-dark); width: 100%;
+    }
+    .search-wrap input::placeholder { color: var(--text-light); }
+
+    #topbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+    .distress-btn {
+      display: flex; align-items: center; gap: 7px;
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 22px; padding: 9px 18px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.87rem; font-weight: 600;
+      cursor: pointer; transition: background 0.2s, transform 0.15s; white-space: nowrap;
+    }
+    .distress-btn:hover { background: var(--accent-dark); transform: scale(1.03); }
+    .distress-btn svg { width: 13px; height: 13px; stroke: white; fill: none; stroke-width: 2.8; stroke-linecap: round; }
+
+    .notif-btn {
+      position: relative; width: 36px; height: 36px; border-radius: 50%;
+      background: var(--panel); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.18s;
+    }
+    .notif-btn:hover { background: var(--card); }
+    .notif-btn svg { width: 17px; height: 17px; stroke: var(--text-mid); fill: none; stroke-width: 1.8; stroke-linecap: round; }
+    .notif-dot {
+      position: absolute; top: 5px; right: 5px;
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--badge-high); border: 2px solid var(--bg);
+    }
+
+    .profile-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-light), var(--accent));
+      border: 2.5px solid var(--accent);
+      cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Lora', serif; font-weight: 700; font-size: 0.85rem; color: white;
+    }
+
+    #hamburger {
+      display: none; background: none; border: none;
+      cursor: pointer; padding: 8px; color: var(--text-dark); flex-shrink: 0;
+    }
+    #hamburger svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+    /* ══ SHELL ══ */
+    #shell {
+      display: flex;
+      margin-top: var(--topbar-h);
+      min-height: calc(100vh - var(--topbar-h));
+      position: relative; z-index: 1;
+    }
+
+    /* ══ SIDEBAR ══ */
+    #sidebar {
+      width: var(--sb-collapsed);
+      flex-shrink: 0;
+      position: sticky;
+      top: var(--topbar-h);
+      height: calc(100vh - var(--topbar-h));
+      align-self: flex-start;
+      background: var(--sidebar-bg);
+      border-radius: 0 20px 20px 0;
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      padding: 14px 0 10px;
+      box-shadow: 2px 0 18px rgba(46,53,32,0.08);
+      z-index: 10;
+      transition: width var(--ease);
+    }
+    #sidebar:hover { width: var(--sb-expanded); }
+    #sidebar.open { width: var(--sb-expanded); }
+
+    .sb-prof {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 12px 14px 14px;
+      border-bottom: 1.5px solid rgba(122,143,82,0.2);
+      margin-bottom: 8px; overflow: hidden;
+    }
+    .sb-prof-av {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-light), var(--accent));
+      border: 2px solid var(--accent); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Lora', serif; font-weight: 700; font-size: 0.85rem; color: white;
+    }
+    .sb-prof-info { opacity: 0; transition: opacity var(--ease); white-space: nowrap; overflow: hidden; }
+    #sidebar:hover .sb-prof-info,
+    #sidebar.open  .sb-prof-info { opacity: 1; }
+    .sb-prof-name { font-family: 'Lora', serif; font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
+    .sb-prof-sub  { font-size: 0.74rem; color: var(--text-light); }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 10px 20px;
+      cursor: pointer; user-select: none;
+      border-radius: 0 14px 14px 0;
+      margin: 1px 8px 1px 0;
+      color: var(--text-mid); font-size: 0.91rem; font-weight: 500;
+      white-space: nowrap; overflow: hidden;
+      transition: background 0.18s, color 0.18s;
+      position: relative;
+    }
+    .nav-item:hover { background: rgba(122,143,82,0.18); color: var(--text-dark); }
+    .nav-item.active {
+      background: rgba(122,143,82,0.28); color: var(--text-dark); font-weight: 600;
+    }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 22%; bottom: 22%;
+      width: 3.5px; background: var(--accent); border-radius: 0 3px 3px 0;
+    }
+    .nav-icon { width: 21px; height: 21px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-label { opacity: 0; transition: opacity var(--ease); }
+    #sidebar:hover .nav-label,
+    #sidebar.open  .nav-label { opacity: 1; }
+
+    .nav-badge {
+      margin-left: auto; background: var(--badge-high); color: white;
+      font-size: 0.68rem; font-weight: 700; border-radius: 10px;
+      padding: 2px 7px; opacity: 0; transition: opacity var(--ease); flex-shrink: 0;
+    }
+    #sidebar:hover .nav-badge,
+    #sidebar.open  .nav-badge { opacity: 1; }
+
+    .sb-divider {
+      height: 1px; background: rgba(122,143,82,0.18);
+      margin: 8px 12px;
+    }
+
+    /* ══ MAIN ══ */
+    #main {
+      flex: 1; min-width: 0;
+      display: flex; gap: 18px;
+      padding: 22px 18px 40px 18px;
+    }
+
+    /* ══ FEED ══ */
+    #feed { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+
+    /* Welcome banner */
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+      border-radius: 20px; padding: 20px 22px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden; position: relative;
+      animation: cardIn 0.4s ease both;
+    }
+    .welcome-banner::before {
+      content: '';
+      position: absolute; right: -30px; top: -30px;
+      width: 130px; height: 130px; border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+    }
+    .welcome-banner::after {
+      content: '';
+      position: absolute; right: 50px; bottom: -40px;
+      width: 90px; height: 90px; border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+    .wb-left { position: relative; z-index: 1; }
+    .wb-greeting { font-family: 'Lora', serif; font-size: 1.3rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+    .wb-sub { font-size: 0.84rem; color: rgba(255,255,255,0.82); }
+    .wb-fire {
+      position: relative; z-index: 1;
+      background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.25);
+      border-radius: 14px; padding: 10px 16px; text-align: center; backdrop-filter: blur(4px);
+    }
+    .wb-fire-num { font-family: 'Lora', serif; font-size: 1.4rem; font-weight: 700; color: #fff; }
+    .wb-fire-label { font-size: 0.75rem; color: rgba(255,255,255,0.8); margin-top: 2px; }
+
+    /* Quick stats row */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+      animation: cardIn 0.4s ease 0.06s both;
+    }
+    .stat-tile {
+      background: var(--card); border-radius: 16px; padding: 14px;
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer; transition: transform 0.16s, box-shadow 0.16s;
+      box-shadow: var(--shadow);
+    }
+    .stat-tile:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .stat-ico {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.45);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .stat-ico svg { width: 17px; height: 17px; stroke: var(--accent-dark); fill: none; stroke-width: 2; stroke-linecap: round; }
+    .stat-num { font-family: 'Lora', serif; font-size: 1.1rem; font-weight: 700; color: var(--text-dark); }
+    .stat-lbl { font-size: 0.74rem; color: var(--text-light); }
+    .stat-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--badge-high); margin-left: auto; flex-shrink: 0; }
+
+    /* Section headers */
+    .sec-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .sec-title {
+      font-family: 'Lora', serif; font-weight: 700; font-size: 1.05rem;
+      color: var(--text-dark); display: flex; align-items: center; gap: 7px;
+    }
+    .sec-title-icon { font-size: 1rem; }
+    .sec-link { font-size: 0.82rem; color: var(--accent); font-weight: 600; cursor: pointer; }
+    .sec-link:hover { text-decoration: underline; }
+
+    /* Filter pills */
+    .filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .fpill {
+      font-size: 0.8rem; font-weight: 500; padding: 5px 14px;
+      border-radius: 20px; cursor: pointer; border: 1.5px solid rgba(122,143,82,0.25);
+      color: var(--text-mid); background: transparent; transition: all 0.16s;
+    }
+    .fpill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .fpill:hover:not(.active) { background: rgba(122,143,82,0.14); }
+
+    /* SOS Card */
+    .sos-card {
+      background: var(--card); border-radius: 18px;
+      padding: 16px 18px 14px;
+      box-shadow: var(--shadow);
+      transition: transform 0.18s, box-shadow 0.18s;
+      animation: cardIn 0.4s ease both;
+      position: relative; overflow: hidden;
+    }
+    .sos-card:nth-child(2) { animation-delay: 0.08s; }
+    .sos-card:nth-child(3) { animation-delay: 0.16s; }
+    .sos-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+    .sos-card.urgent::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 4px; background: var(--badge-high); border-radius: 18px 0 0 18px;
+    }
+    .sos-card.medium::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 4px; background: #e8a838; border-radius: 18px 0 0 18px;
+    }
+
+    .card-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+    .card-av {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--panel); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Lora', serif; font-weight: 700; font-size: 0.82rem; color: var(--text-mid);
+    }
+    .card-meta { flex: 1; min-width: 0; }
+    .card-username { font-weight: 600; font-size: 0.91rem; color: var(--text-dark); }
+    .card-time { font-size: 0.73rem; color: var(--text-light); margin-top: 1px; }
+    .card-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 4px; }
+
+    .badge { font-size: 0.71rem; font-weight: 600; border-radius: 20px; padding: 3px 9px; }
+    .b-high { background: var(--badge-high-bg); color: var(--badge-high); }
+    .b-med  { background: var(--badge-med-bg);  color: var(--badge-med); }
+    .b-low  { background: var(--badge-low-bg);  color: var(--badge-low); }
+    .b-cat  { background: var(--badge-cat-bg); color: var(--text-dark); border: 1px solid rgba(122,143,82,0.2); }
+
+    .sos-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .sos-replies { font-size: 0.78rem; color: var(--text-light); display: flex; align-items: center; gap: 4px; }
+    .sos-replies svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+    .zero-replies { color: var(--badge-high); font-weight: 600; }
+
+    .card-heading {
+      font-family: 'Lora', serif; font-weight: 700; font-size: 1rem;
+      color: var(--text-dark); margin-bottom: 5px;
+    }
+    .card-para { font-size: 0.86rem; color: var(--text-mid); line-height: 1.6; }
+
+    .card-footer {
+      display: flex; align-items: center; gap: 8px;
+      border-top: 1.5px solid rgba(122,143,82,0.17); padding-top: 11px; margin-top: 12px;
+    }
+    .foot-av { width: 28px; height: 28px; border-radius: 50%; background: var(--panel); flex-shrink: 0; }
+    .msg-input {
+      flex: 1; background: rgba(255,255,255,0.5); border: 1.5px solid rgba(122,143,82,0.18);
+      border-radius: 20px; padding: 7px 14px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--text-dark); outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .msg-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(122,143,82,0.1); }
+    .msg-input::placeholder { color: var(--text-light); }
+
+    .card-acts { display: flex; gap: 4px; }
+    .icon-btn {
+      width: 32px; height: 32px; border-radius: 50%; border: none;
+      background: rgba(255,255,255,0.42); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-mid); transition: background 0.16s, transform 0.14s;
+    }
+    .icon-btn:hover { background: rgba(122,143,82,0.25); transform: scale(1.1); }
+    .icon-btn.liked { color: var(--badge-high); background: var(--badge-high-bg); }
+    .icon-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    .help-btn {
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 16px; padding: 7px 14px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.81rem; font-weight: 600;
+      cursor: pointer; transition: background 0.18s, transform 0.14s; white-space: nowrap;
+    }
+    .help-btn:hover { background: var(--accent-dark); transform: scale(1.04); }
+
+    /* Community activity card */
+    .activity-card {
+      background: var(--card2); border-radius: 18px;
+      padding: 16px 18px 14px;
+      box-shadow: var(--shadow);
+      transition: transform 0.18s, box-shadow 0.18s;
+      animation: cardIn 0.4s ease both;
+    }
+    .activity-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+    .act-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid rgba(122,143,82,0.14);
+    }
+    .act-item:last-child { border-bottom: none; }
+    .act-ico {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,0.5); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .act-ico svg { width: 16px; height: 16px; stroke: var(--accent-dark); fill: none; stroke-width: 2; stroke-linecap: round; }
+    .act-info { flex: 1; min-width: 0; }
+    .act-title { font-size: 0.88rem; font-weight: 600; color: var(--text-dark); margin-bottom: 2px; }
+    .act-sub { font-size: 0.77rem; color: var(--text-light); }
+    .act-actions { display: flex; gap: 5px; margin-top: 5px; }
+    .act-tag {
+      font-size: 0.73rem; font-weight: 600; padding: 3px 9px;
+      border-radius: 12px; cursor: pointer;
+      background: rgba(255,255,255,0.5); color: var(--text-mid);
+      border: 1px solid rgba(122,143,82,0.2);
+      transition: background 0.15s;
+    }
+    .act-tag:hover { background: rgba(122,143,82,0.2); }
+    .act-tag.solved { color: var(--badge-low); }
+
+    /* Contributions card */
+    .contrib-card {
+      background: var(--card); border-radius: 18px; padding: 18px;
+      box-shadow: var(--shadow); animation: cardIn 0.4s ease 0.1s both;
+    }
+    .contrib-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+    .contrib-tile {
+      background: rgba(255,255,255,0.45); border-radius: 14px; padding: 12px 10px;
+      text-align: center; cursor: pointer; transition: background 0.16s;
+    }
+    .contrib-tile:hover { background: rgba(255,255,255,0.65); }
+    .contrib-num { font-family: 'Lora', serif; font-size: 1.3rem; font-weight: 700; color: var(--text-dark); }
+    .contrib-lbl { font-size: 0.72rem; color: var(--text-light); margin-top: 2px; }
+
+    .rank-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: linear-gradient(135deg, #f6e7a0, #e8c84a);
+      border-radius: 20px; padding: 8px 16px; margin-top: 14px;
+      font-size: 0.83rem; font-weight: 600; color: #7a5c10;
+    }
+
+    /* Needs your help card */
+    .needs-card {
+      background: linear-gradient(135deg, #fce8e1 0%, #fdf3e0 100%);
+      border-radius: 18px; padding: 18px; box-shadow: var(--shadow);
+      animation: cardIn 0.4s ease 0.12s both;
+    }
+    .needs-title { font-family: 'Lora', serif; font-weight: 700; font-size: 1rem; color: #7a3820; }
+
+    .need-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 0; border-bottom: 1px solid rgba(211,91,58,0.12);
+    }
+    .need-item:last-child { border-bottom: none; }
+    .need-av { width: 32px; height: 32px; border-radius: 50%; background: rgba(211,91,58,0.15); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-size: 0.78rem; font-weight: 700; color: var(--badge-high); }
+    .need-info { flex: 1; min-width: 0; }
+    .need-title { font-size: 0.86rem; font-weight: 600; color: #4a2010; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .need-sub { font-size: 0.74rem; color: #9a6050; margin-top: 1px; }
+    .zero-tag { font-size: 0.69rem; background: var(--badge-high-bg); color: var(--badge-high); border-radius: 10px; padding: 2px 7px; font-weight: 600; }
+
+    /* Announcements */
+    .announce-card {
+      background: var(--card2); border-radius: 18px; padding: 18px;
+      box-shadow: var(--shadow); animation: cardIn 0.4s ease 0.14s both;
+    }
+    .announce-item {
+      display: flex; align-items: flex-start; gap: 10px; padding: 9px 0;
+      border-bottom: 1px solid rgba(122,143,82,0.14);
+    }
+    .announce-item:last-child { border-bottom: none; }
+    .announce-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 6px; }
+    .announce-text { font-size: 0.87rem; color: var(--text-dark); font-weight: 500; line-height: 1.45; }
+    .announce-sub { font-size: 0.75rem; color: var(--text-light); margin-top: 2px; }
+
+    /* ══ RIGHT PANEL ══ */
+    #right-panel { width: 226px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; }
+
+    .rp-box {
+      background: var(--sidebar-bg); border-radius: 18px; padding: 16px 14px;
+      box-shadow: var(--shadow);
+      position: sticky; top: calc(var(--topbar-h) + 22px);
+    }
+
+    .rp-title {
+      font-family: 'Lora', serif; font-size: 0.95rem; font-weight: 700;
+      color: var(--text-dark); margin-bottom: 12px; padding-bottom: 8px;
+      border-bottom: 2px solid var(--accent); display: inline-block;
+    }
+
+    /* Tags */
+    .tags-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag-pill {
+      font-size: 0.78rem; font-weight: 600; padding: 4px 11px;
+      border-radius: 20px; background: var(--card); color: var(--accent-dark);
+      cursor: pointer; transition: background 0.15s, transform 0.12s;
+    }
+    .tag-pill:hover { background: var(--accent); color: white; transform: scale(1.05); }
+
+    /* Helpers */
+    .helper-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 0; border-bottom: 1px solid rgba(122,143,82,0.13);
+    }
+    .helper-item:last-child { border-bottom: none; }
+    .helper-av {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--panel); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Lora', serif; font-size: 0.72rem; font-weight: 700; color: var(--text-mid);
+    }
+    .helper-info { flex: 1; min-width: 0; }
+    .helper-name { font-size: 0.83rem; font-weight: 600; color: var(--text-dark); }
+    .helper-count { font-size: 0.72rem; color: var(--text-light); }
+    .helper-rank { font-size: 0.72rem; }
+
+    /* Events */
+    .event-item {
+      display: flex; gap: 10px; padding: 8px 0;
+      border-bottom: 1px solid rgba(122,143,82,0.13);
+    }
+    .event-item:last-child { border-bottom: none; }
+    .event-date {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--accent); color: white; flex-shrink: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .event-d { font-family: 'Lora', serif; font-size: 0.9rem; font-weight: 700; line-height: 1; }
+    .event-m { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; opacity: 0.85; }
+    .event-name { font-size: 0.83rem; font-weight: 600; color: var(--text-dark); }
+    .event-type { font-size: 0.72rem; color: var(--text-light); }
+    .event-live { font-size: 0.68rem; color: var(--badge-high); font-weight: 700; display: flex; align-items: center; gap: 3px; }
+    .event-live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--badge-high); display: inline-block; animation: blink 1.2s infinite; }
+
+    /* Friend requests */
+    .freq-item {
+      display: flex; align-items: center; gap: 8px; padding: 8px 0;
+      border-bottom: 1px solid rgba(122,143,82,0.13);
+    }
+    .freq-item:last-child { border-bottom: none; }
+    .freq-av { width: 30px; height: 30px; border-radius: 50%; background: var(--panel); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-size: 0.72rem; font-weight: 700; color: var(--text-mid); }
+    .freq-info { flex: 1; min-width: 0; }
+    .freq-name { font-size: 0.82rem; font-weight: 600; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .freq-sub { font-size: 0.71rem; color: var(--text-light); }
+    .freq-btns { display: flex; gap: 4px; }
+    .freq-ok, .freq-no {
+      width: 26px; height: 26px; border-radius: 50%; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; transition: transform 0.13s;
+    }
+    .freq-ok { background: var(--accent); color: white; }
+    .freq-no { background: var(--panel); color: var(--text-mid); }
+    .freq-ok:hover, .freq-no:hover { transform: scale(1.13); }
+
+    /* Suggestions */
+    .sugg-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 0; border-bottom: 1px solid rgba(122,143,82,0.12);
+    }
+    .sugg-item:last-child { border-bottom: none; }
+    .sugg-av { width: 30px; height: 30px; border-radius: 50%; background: var(--panel); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: var(--text-mid); font-family: 'Lora', serif; }
+    .sugg-info { flex: 1; min-width: 0; }
+    .sugg-name { font-size: 0.83rem; font-weight: 500; color: var(--text-dark); }
+    .sugg-niche { font-size: 0.71rem; color: var(--text-light); }
+    .sugg-add {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 1.5px solid var(--accent); background: transparent;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--accent); transition: background 0.16s, transform 0.12s; flex-shrink: 0;
+    }
+    .sugg-add:hover { background: var(--accent); color: #fff; transform: scale(1.12); }
+    .sugg-add svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+    /* Overlay */
+    #overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(46,53,32,0.2); z-index: 150; backdrop-filter: blur(2px);
+    }
+    #overlay.on { display: block; }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+    }
+
+    /* ══ RIGHT PANEL STICKY SECTIONS ══ */
+    .rp-scroll {
+      display: flex; flex-direction: column; gap: 14px;
+    }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 1080px) { #right-panel { width: 200px; } }
+    @media (max-width: 960px)  { #right-panel { display: none; } }
+    @media (max-width: 768px)  { #main { padding: 14px 12px 28px 12px; gap: 12px; } .stats-row { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 600px) {
+      #hamburger { display: flex; }
+      #topbar-wordmark { font-size: 1rem; }
+      .search-wrap { display: none; }
+      #sidebar { position: fixed; top: var(--topbar-h); left: 0; bottom: 0; width: 0; z-index: 160; box-shadow: none; border-radius: 0 18px 18px 0; }
+      #sidebar.open { width: var(--sb-expanded); box-shadow: 6px 0 28px rgba(46,53,32,0.18); }
+      .distress-btn span { display: none; }
+      .distress-btn { padding: 9px 11px; }
+      .stats-row { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="overlay" onclick="closeSidebar()"></div>
+
+<!-- ══ TOPBAR ══ -->
+<header id="topbar">
+  <button id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+
+  <div id="topbar-logo-zone">
+    <div class="logo-pill">
+      <svg viewBox="0 0 24 24"><path d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"/></svg>
+    </div>
+  </div>
+
+  <div id="topbar-center">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search crafters, topics, SOS..." />
+    </div>
+  </div>
+
+  <div id="topbar-right">
+    <button class="distress-btn" onclick="distressCall()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>Post SOS</span>
+    </button>
+    <button class="notif-btn" title="Notifications">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <div class="notif-dot"></div>
+    </button>
+    <div class="profile-avatar">B</div>
+  </div>
+</header>
+
+<!-- ══ SHELL ══ -->
+<div id="shell">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside id="sidebar">
+    <div class="sb-prof">
+      <div class="sb-prof-av">B</div>
+      <div class="sb-prof-info">
+        <div class="sb-prof-name">Bushra Craft Co.</div>
+        <div class="sb-prof-sub">@bushracraft · 🧵 Crochet</div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-item active" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-label">Home</span>
+      </div>
+      <div class="nav-item" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span class="nav-label">SOS Feed</span>
+        <span class="nav-badge">7</span>
+      </div>
+      <div class="nav-item" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span class="nav-label">Explore</span>
+      </div>
+      <div class="nav-item" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span class="nav-label">Messages</span>
+        <span class="nav-badge">3</span>
+      </div>
+      <div class="nav-item" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="nav-label">Notifications</span>
+        <span class="nav-badge">5</span>
+      </div>
+      <div class="nav-item" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="nav-label">My SOS History</span>
+      </div>
+      <div class="sb-divider"></div>
+      <div class="nav-item" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-label">Profile</span>
+      </div>
+      <div class="nav-item" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+        <span class="nav-label">Saved</span>
+      </div>
+      <div class="nav-item" onclick="pickNav(this)">
+        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span class="nav-label">Settings</span>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main id="main">
+    <div id="feed">
+
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <div class="wb-left">
+          <div class="wb-greeting">Welcome back, Bushra 👋</div>
+          <div class="wb-sub">🔥 You helped 3 crafters this week — keep it up!</div>
+          <div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.14);border-radius:12px;padding:6px 12px;font-size:0.8rem;color:rgba(255,255,255,0.9);cursor:pointer;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
+              <span>🔔 5 Notifications</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.14);border-radius:12px;padding:6px 12px;font-size:0.8rem;color:rgba(255,255,255,0.9);cursor:pointer;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              <span>💬 2 Replies to your SOS</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.14);border-radius:12px;padding:6px 12px;font-size:0.8rem;color:rgba(255,255,255,0.9);cursor:pointer;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              <span>📨 3 Messages</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.14);border-radius:12px;padding:6px 12px;font-size:0.8rem;color:rgba(255,255,255,0.9);cursor:pointer;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>🏷 2 Active Posts</span>
+            </div>
+          </div>
+        </div>
+        <div class="wb-fire">
+          <div class="wb-fire-num">🏅</div>
+          <div style="font-size:0.78rem;color:rgba(255,255,255,0.9);font-weight:600;margin-top:4px;">Problem Solver</div>
+          <div class="wb-fire-label">Community Rank</div>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-tile">
+          <div class="stat-ico"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+          <div><div class="stat-num">4</div><div class="stat-lbl">SOS Posted</div></div>
+          <div class="stat-dot"></div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-ico"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div><div class="stat-num">12</div><div class="stat-lbl">SOS Solved</div></div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-ico"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+          <div><div class="stat-num">3</div><div class="stat-lbl">Tutorials Shared</div></div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-ico"><svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg></div>
+          <div><div class="stat-num">47</div><div class="stat-lbl">Helpful Votes</div></div>
+        </div>
+      </div>
+
+      <!-- 🚨 Active SOS Feed -->
+      <div style="animation: cardIn 0.4s ease 0.1s both;">
+        <div class="sec-header">
+          <div class="sec-title"><span class="sec-title-icon">🚨</span> Active SOS Feed</div>
+          <span class="sec-link">View all →</span>
+        </div>
+        <div class="filter-row">
+          <span class="fpill active" onclick="filterPill(this)">All</span>
+          <span class="fpill" onclick="filterPill(this)">🔴 Urgent</span>
+          <span class="fpill" onclick="filterPill(this)">🧶 Crochet</span>
+          <span class="fpill" onclick="filterPill(this)">🍰 Baking</span>
+          <span class="fpill" onclick="filterPill(this)">🏮 Resin</span>
+          <span class="fpill" onclick="filterPill(this)">📦 Packaging</span>
+          <span class="fpill" onclick="filterPill(this)">📍 Near Me</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;">
+
+          <!-- SOS Card 1 - High -->
+          <article class="sos-card urgent">
+            <div class="card-header">
+              <div class="card-av">MK</div>
+              <div class="card-meta">
+                <div class="card-username">MarnaKnits</div>
+                <div class="card-time">2 hours ago</div>
+                <div class="card-badges">
+                  <span class="badge b-high">🔴 High</span>
+                  <span class="badge b-cat">Financial Distress</span>
+                  <span class="badge b-cat">Crochet</span>
+                </div>
+              </div>
+            </div>
+            <div class="sos-meta">
+              <div class="sos-replies"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> 4 responses</div>
+            </div>
+            <h2 class="card-heading">Supplier disappeared after taking bulk payment — need urgent advice</h2>
+            <p class="card-para">Paid ₹18,000 for a yarn bulk order. Supplier has gone silent for 3 days. No receipt, only WhatsApp chat. What are my options?</p>
+            <div class="card-footer">
+              <div class="foot-av"></div>
+              <input class="msg-input" type="text" placeholder="Share your advice..." />
+              <div class="card-acts">
+                <button class="icon-btn" onclick="toggleLike(this)" title="Helpful"><svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg></button>
+                <button class="icon-btn" title="Save"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></button>
+                <button class="icon-btn" title="Share"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+              </div>
+              <button class="help-btn">Help →</button>
+            </div>
+          </article>
+
+          <!-- SOS Card 2 - Medium -->
+          <article class="sos-card medium">
+            <div class="card-header">
+              <div class="card-av">ZR</div>
+              <div class="card-meta">
+                <div class="card-username">ZaraResinArt</div>
+                <div class="card-time">5 hours ago</div>
+                <div class="card-badges">
+                  <span class="badge b-med">🟡 Medium</span>
+                  <span class="badge b-cat">Order Fulfilment</span>
+                  <span class="badge b-cat">Resin</span>
+                </div>
+              </div>
+            </div>
+            <div class="sos-meta">
+              <div class="sos-replies"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> 2 responses</div>
+            </div>
+            <h2 class="card-heading">Customer demanding refund 3 weeks after delivery — product undamaged</h2>
+            <p class="card-para">Delivered a custom resin tray on time. Now 3 weeks later, they claim it's "not what they imagined" and want a full refund. My policy says 7 days.</p>
+            <div class="card-footer">
+              <div class="foot-av"></div>
+              <input class="msg-input" type="text" placeholder="Share your advice..." />
+              <div class="card-acts">
+                <button class="icon-btn" onclick="toggleLike(this)" title="Helpful"><svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg></button>
+                <button class="icon-btn" title="Save"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></button>
+                <button class="icon-btn" title="Share"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+              </div>
+              <button class="help-btn">Help →</button>
+            </div>
+          </article>
+
+          <!-- SOS Card 3 - Low -->
+          <article class="sos-card">
+            <div class="card-header">
+              <div class="card-av">FH</div>
+              <div class="card-meta">
+                <div class="card-username">FlourHouseBakes</div>
+                <div class="card-time">1 day ago</div>
+                <div class="card-badges">
+                  <span class="badge b-low">🟢 Low</span>
+                  <span class="badge b-cat">Pricing Help</span>
+                  <span class="badge b-cat">Homebakery</span>
+                </div>
+              </div>
+            </div>
+            <div class="sos-meta">
+              <div class="sos-replies"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> 8 responses</div>
+            </div>
+            <h2 class="card-heading">How do I price custom birthday cakes fairly without undervaluing my work?</h2>
+            <p class="card-para">I've been getting requests for elaborate designs but I always feel guilty charging what I should. Looking for a pricing formula that works for home bakers.</p>
+            <div class="card-footer">
+              <div class="foot-av"></div>
+              <input class="msg-input" type="text" placeholder="Share your advice..." />
+              <div class="card-acts">
+                <button class="icon-btn liked" onclick="toggleLike(this)" title="Helpful"><svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg></button>
+                <button class="icon-btn" title="Save"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></button>
+                <button class="icon-btn" title="Share"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+              </div>
+              <button class="help-btn">Help →</button>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <!-- Needs Your Help (Personalized) -->
+      <div class="needs-card">
+        <div class="sec-header">
+          <div class="sec-title" style="color:#7a3820;">👉 Needs Your Help</div>
+          <span class="sec-link" style="color:#d35b3a;">See more →</span>
+        </div>
+        <p style="font-size:0.81rem;color:#9a6050;margin-bottom:10px;">Crochet SOS posts from your region with 0 replies</p>
+        <div id="needs-list">
+          <div class="need-item">
+            <div class="need-av">PW</div>
+            <div class="need-info">
+              <div class="need-title">Pattern copyright issue — can I sell inspired designs?</div>
+              <div class="need-sub">🧶 Crochet · Mumbai · <span class="zero-tag">0 replies</span></div>
+            </div>
+          </div>
+          <div class="need-item">
+            <div class="need-av">SL</div>
+            <div class="need-info">
+              <div class="need-title">My Etsy shop got suspended — what now?</div>
+              <div class="need-sub">🧶 Crochet · Pune · <span class="zero-tag">0 replies</span></div>
+            </div>
+          </div>
+          <div class="need-item">
+            <div class="need-av">AK</div>
+            <div class="need-info">
+              <div class="need-title">Struggling to find affordable blocking mats in India</div>
+              <div class="need-sub">🧶 Crochet · Bengaluru · <span class="zero-tag">0 replies</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Community Activity -->
+      <div style="animation: cardIn 0.4s ease 0.16s both;">
+        <div class="sec-header">
+          <div class="sec-title"><span class="sec-title-icon">🌱</span> Recent Community Activity</div>
+          <span class="sec-link">View all →</span>
+        </div>
+
+        <div class="activity-card">
+          <div class="act-item">
+            <div class="act-ico"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></div>
+            <div class="act-info">
+              <div class="act-title">📹 New Tutorial: Crochet Market Bag in 30 mins</div>
+              <div class="act-sub">by PebbleYarnStudio · 2 hours ago · 156 views</div>
+              <div class="act-actions">
+                <span class="act-tag">✔ Helpful</span>
+                <span class="act-tag">💾 Save</span>
+                <span class="act-tag">💬 Comment</span>
+              </div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="act-info">
+              <div class="act-title">✅ SOS Solved: Packaging for fragile resin pieces</div>
+              <div class="act-sub">ResinQueenDelhi helped ZaraResin · 5 hours ago</div>
+              <div class="act-actions">
+                <span class="act-tag solved">🎉 Resolved</span>
+                <span class="act-tag">Read solution</span>
+              </div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div class="act-info">
+              <div class="act-title">📄 Resource: Free Invoice Template for Craft Sellers</div>
+              <div class="act-sub">Shared by CraftAccountant · Yesterday · 320 downloads</div>
+              <div class="act-actions">
+                <span class="act-tag">✔ Helpful</span>
+                <span class="act-tag">💾 Save</span>
+              </div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+            <div class="act-info">
+              <div class="act-title">👥 Community Update: 500 members milestone!</div>
+              <div class="act-sub">Admin · 2 days ago</div>
+              <div class="act-actions">
+                <span class="act-tag">🎊 Celebrate</span>
+                <span class="act-tag">💬 Comment</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Your Contributions -->
+      <div class="contrib-card">
+        <div class="sec-header">
+          <div class="sec-title"><span class="sec-title-icon">⭐</span> Your Contributions</div>
+          <span class="sec-link">Full stats →</span>
+        </div>
+        <div class="contrib-grid">
+          <div class="contrib-tile"><div class="contrib-num">4</div><div class="contrib-lbl">SOS Posted</div></div>
+          <div class="contrib-tile"><div class="contrib-num">12</div><div class="contrib-lbl">SOS Solved</div></div>
+          <div class="contrib-tile"><div class="contrib-num">3</div><div class="contrib-lbl">Tutorials</div></div>
+          <div class="contrib-tile"><div class="contrib-num">47</div><div class="contrib-lbl">Helpful Votes</div></div>
+          <div class="contrib-tile"><div class="contrib-num">#8</div><div class="contrib-lbl">Leaderboard</div></div>
+          <div class="contrib-tile"><div class="contrib-num">🔥 14</div><div class="contrib-lbl">Day Streak</div></div>
+        </div>
+        <div class="rank-badge">🏅 Problem Solver &nbsp;·&nbsp; 🧵 Resource Queen</div>
+      </div>
+
+      <!-- Community Announcements -->
+      <div class="announce-card">
+        <div class="sec-header">
+          <div class="sec-title"><span class="sec-title-icon">📢</span> Community Announcements</div>
+        </div>
+        <div class="announce-item">
+          <div class="announce-dot"></div>
+          <div>
+            <div class="announce-text">🎨 April Craft Challenge: "Upcycle it!" — submit your entry by April 30th</div>
+            <div class="announce-sub">Admin · 1 day ago</div>
+          </div>
+        </div>
+        <div class="announce-item">
+          <div class="announce-dot"></div>
+          <div>
+            <div class="announce-text">✨ New feature: Private chat now live! Start connecting with your craft friends</div>
+            <div class="announce-sub">Admin · 3 days ago</div>
+          </div>
+        </div>
+        <div class="announce-item">
+          <div class="announce-dot"></div>
+          <div>
+            <div class="announce-text">🌟 Monthly Spotlight: NomadClay — Ceramic artist of the month</div>
+            <div class="announce-sub">Admin · 5 days ago</div>
+          </div>
+        </div>
+        <div class="announce-item">
+          <div class="announce-dot"></div>
+          <div>
+            <div class="announce-text">📋 Community guidelines updated — please review before posting SOS</div>
+            <div class="announce-sub">Admin · 1 week ago</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /feed -->
+
+    <!-- ══ RIGHT PANEL ══ -->
+    <aside id="right-panel">
+      <div class="rp-scroll">
+
+        <!-- Trending Tags -->
+        <div class="rp-box">
+          <div class="rp-title">🔖 Trending Tags</div>
+          <div class="tags-wrap">
+            <span class="tag-pill">#crochet</span>
+            <span class="tag-pill">#resin</span>
+            <span class="tag-pill">#homebakery</span>
+            <span class="tag-pill">#packaginghelp</span>
+            <span class="tag-pill">#pricing</span>
+            <span class="tag-pill">#etsy</span>
+            <span class="tag-pill">#macrame</span>
+            <span class="tag-pill">#candles</span>
+          </div>
+        </div>
+
+        <!-- Friend Requests -->
+        <div class="rp-box">
+          <div class="rp-title">👋 Friend Requests</div>
+          <div id="freq-list">
+            <div class="freq-item">
+              <div class="freq-av">NK</div>
+              <div class="freq-info">
+                <div class="freq-name">NomadKnits</div>
+                <div class="freq-sub">🧶 Crochet · Mumbai</div>
+              </div>
+              <div class="freq-btns">
+                <button class="freq-ok" onclick="acceptFreq(this)" title="Accept">✓</button>
+                <button class="freq-no" onclick="declineFreq(this)" title="Decline">✕</button>
+              </div>
+            </div>
+            <div class="freq-item">
+              <div class="freq-av">BB</div>
+              <div class="freq-info">
+                <div class="freq-name">BakesByBee</div>
+                <div class="freq-sub">🍰 Homebakery · Delhi</div>
+              </div>
+              <div class="freq-btns">
+                <button class="freq-ok" onclick="acceptFreq(this)" title="Accept">✓</button>
+                <button class="freq-no" onclick="declineFreq(this)" title="Decline">✕</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Helpers -->
+        <div class="rp-box">
+          <div class="rp-title">🏆 Top Helpers This Week</div>
+          <div id="helpers-list">
+            <div class="helper-item">
+              <div class="helper-av">RQ</div>
+              <div class="helper-info">
+                <div class="helper-name">ResinQueenDelhi</div>
+                <div class="helper-count">14 people helped</div>
+              </div>
+              <div class="helper-rank">🥇</div>
+            </div>
+            <div class="helper-item">
+              <div class="helper-av">WC</div>
+              <div class="helper-info">
+                <div class="helper-name">WoolCraft_Co</div>
+                <div class="helper-count">11 people helped</div>
+              </div>
+              <div class="helper-rank">🥈</div>
+            </div>
+            <div class="helper-item">
+              <div class="helper-av">YW</div>
+              <div class="helper-info">
+                <div class="helper-name">YarnWitch</div>
+                <div class="helper-count">9 people helped</div>
+              </div>
+              <div class="helper-rank">🥉</div>
+            </div>
+            <div class="helper-item">
+              <div class="helper-av">FJ</div>
+              <div class="helper-info">
+                <div class="helper-name">FiberArts_Jo</div>
+                <div class="helper-count">7 people helped</div>
+              </div>
+              <div class="helper-rank">4️⃣</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div class="rp-box">
+          <div class="rp-title">📅 Upcoming Events</div>
+          <div class="event-item">
+            <div class="event-date" style="background:#d35b3a;">
+              <div class="event-d">26</div>
+              <div class="event-m">Feb</div>
+            </div>
+            <div>
+              <div class="event-name">Live Craft Workshop</div>
+              <div class="event-live">LIVE TODAY · 5 PM IST</div>
+            </div>
+          </div>
+          <div class="event-item">
+            <div class="event-date">
+              <div class="event-d">2</div>
+              <div class="event-m">Mar</div>
+            </div>
+            <div>
+              <div class="event-name">Pricing Strategy Webinar</div>
+              <div class="event-type">Online · Free · 7 PM IST</div>
+            </div>
+          </div>
+          <div class="event-item">
+            <div class="event-date">
+              <div class="event-d">10</div>
+              <div class="event-m">Mar</div>
+            </div>
+            <div>
+              <div class="event-name">Craft Market Mumbai</div>
+              <div class="event-type">In-person · Bandra</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Suggested Crafters -->
+        <div class="rp-box">
+          <div class="rp-title">✨ Suggested Crafters</div>
+          <div id="sugg-list"></div>
+        </div>
+
+      </div>
+    </aside>
+
+  </main>
+</div>
+
+<script>
+  /* Suggestions */
+  const suggestedCrafters = [
+    {name:'KnitQueen', niche:'🧶 Crochet · Mumbai', init:'KQ'},
+    {name:'ClayNomad', niche:'🏺 Ceramics · Pune', init:'CN'},
+    {name:'StitchWorks', niche:'🪡 Embroidery · Bengaluru', init:'SW'},
+    {name:'CrochetPro', niche:'🧶 Crochet · Delhi', init:'CP'},
+    {name:'WaxAndWick', niche:'🕯 Candles · Chennai', init:'WW'},
+  ];
+
+  suggestedCrafters.forEach(c => {
+    document.getElementById('sugg-list').innerHTML += `
+      <div class="sugg-item">
+        <div class="sugg-av">${c.init}</div>
+        <div class="sugg-info">
+          <div class="sugg-name">${c.name}</div>
+          <div class="sugg-niche">${c.niche}</div>
+        </div>
+        <button class="sugg-add" onclick="follow(this)" title="Follow">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>`;
+  });
+
+  function follow(btn) {
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    btn.style.cssText = 'background:var(--accent);color:#fff;cursor:default;border-color:var(--accent);';
+    btn.disabled = true;
+  }
+
+  function toggleLike(btn) {
+    btn.classList.toggle('liked');
+  }
+
+  function filterPill(el) {
+    document.querySelectorAll('.fpill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function acceptFreq(btn) {
+    const item = btn.closest('.freq-item');
+    item.style.opacity = '0';
+    item.style.transition = 'opacity 0.3s';
+    setTimeout(() => item.remove(), 300);
+  }
+
+  function declineFreq(btn) {
+    const item = btn.closest('.freq-item');
+    item.style.opacity = '0';
+    item.style.transition = 'opacity 0.3s';
+    setTimeout(() => item.remove(), 300);
+  }
+
+  function pickNav(el) {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    if (window.innerWidth <= 600) closeSidebar();
+  }
+
+  function toggleSidebar() {
+    const open = document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('on', open);
+  }
+
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('on');
+  }
+
+  function distressCall() {
+    const b = document.querySelector('.distress-btn');
+    const orig = b.style.background;
+    b.style.background = '#d35b3a';
+    b.querySelector('span').textContent = 'Posting...';
+    setTimeout(() => {
+      b.style.background = '';
+      b.querySelector('span').textContent = 'Post SOS';
+    }, 1200);
+  }
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 600) closeSidebar();
+  });
+</script>
+</body>
+</html>

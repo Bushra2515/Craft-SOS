@@ -5,7 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard — Craft-SOS</title>
     <link rel="stylesheet" href="../css/dashboard.css" />
+    <style>
+      /* ─── My Posts filter buttons active state ─── */
+      .my-posts-filter-btn.on {
+        background: var(--accent, #7a8f52) !important;
+        color: #fff !important;
+        border-color: var(--accent, #7a8f52) !important;
+      }
+
+      /* ─── Post card action buttons (Edit / Delete) ─── */
+      .op-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .op-actions {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .op-actions button:hover {
+        opacity: 0.8;
+      }
+    </style>
   </head>
+  <!-- dashboard.html -->
+  <!-- this the user dashboard -->
   <body>
     <div id="overlay" onclick="closeSidebar()"></div>
     <div id="toast">
@@ -130,7 +157,7 @@
               <path d="M13.73 21a2 2 0 01-3.46 0" />
             </svg>
             <span class="ni-label">Notifications</span>
-            <span class="ni-badge">5</span>
+            <span class="ni-badge" id="notif-badge"></span>
           </div>
           <div class="nav-item" onclick="navPick(this, 'saved')">
             <svg class="ni-icon" viewBox="0 0 24 24">
@@ -158,7 +185,7 @@
               />
             </svg>
             <span class="ni-label">Messages</span>
-            <span class="ni-badge">2</span>
+            <span class="ni-badge" id="chat-badge"></span>
           </div>
           <div class="nav-item" onclick="toast('Opening settings…')">
             <svg class="ni-icon" viewBox="0 0 24 24">
@@ -176,6 +203,10 @@
       <div id="page">
         <!-- ════════ HOME DASHBOARD ════════ -->
         <section class="dash-section on" id="sec-home">
+          <!-- ── COMMUNITY ANNOUNCEMENTS WIDGET ── -->
+          <!-- Live announcements from admin dashboard — appears above the greeting -->
+          <div id="widget-announcements"></div>
+
           <!-- Greeting hero -->
           <div class="greeting-hero">
             <svg
@@ -506,6 +537,8 @@
                   <div class="loading-placeholder">Loading…</div>
                 </div>
               </div>
+              <!-- Badge showcase — admin-created badges -->
+              <div id="widget-badges"></div>
             </div>
             <!-- /left col -->
 
@@ -614,10 +647,30 @@
               </svg>
               New Post
             </button>
-            <button class="btn ghost">All</button>
-            <button class="btn ghost">Distress Calls</button>
-            <button class="btn ghost">Tutorials</button>
-            <button class="btn ghost">Resolved</button>
+            <button
+              class="btn ghost my-posts-filter-btn on"
+              onclick="filterMyPosts('all', this)"
+            >
+              All
+            </button>
+            <button
+              class="btn ghost my-posts-filter-btn"
+              onclick="filterMyPosts('sos', this)"
+            >
+              Distress Calls
+            </button>
+            <button
+              class="btn ghost my-posts-filter-btn"
+              onclick="filterMyPosts('tut', this)"
+            >
+              Tutorials
+            </button>
+            <button
+              class="btn ghost my-posts-filter-btn"
+              onclick="filterMyPosts('resolved', this)"
+            >
+              Resolved
+            </button>
           </div>
           <!-- populated by dashboard.js renderMyPostsFull() -->
           <div id="my-posts-full"></div>
@@ -844,6 +897,8 @@
                 <!-- populated by dashboard.js renderTopTopics() -->
                 <div class="w-body" id="top-topics-pg"></div>
               </div>
+              <!-- Community badge showcase — admin-created badges -->
+              <div id="widget-badges"></div>
 
               <div class="widget">
                 <div class="w-head">
@@ -895,6 +950,11 @@
          • Lazy-loads notifications, saved, progress on tab switch
          • Handles follow, challenge join, mark-all-read, unsave via API calls
   -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="../js/socket-client.js"></script>
+    <script src="../js/common.js"></script>
     <script src="../js/dashboard.js"></script>
+    <!-- Community widgets: announcements and badge showcase from admin dashboard -->
+    <script src="../js/community-widgets.js"></script>
   </body>
 </html>
