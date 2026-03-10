@@ -201,6 +201,14 @@ exports.updateSettings = async (req, res) => {
         Math.max(0, Number(updates.experience) || 0),
       );
     }
+    // ── Avatar removal ────────────────────────────────────
+    // Frontend sends removeAvatar:true when the user clicks Remove.
+    // avatar is intentionally excluded from EDITABLE_FIELDS to prevent
+    // accidental overwrites on normal saves, so we handle the explicit
+    // removal flag separately here.
+    if (req.body.removeAvatar === true) {
+      updates.avatar = "";
+    }
 
     const updated = await User.findByIdAndUpdate(
       userId,

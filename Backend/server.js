@@ -220,6 +220,8 @@ const challengeRoutes = require("./routes/challengeRoutes");
 // ── Admin API (add after your existing routes) ─────────
 const adminRoutes = require("./routes/adminRoutes");
 const communityRoutes = require("./routes/communityRoutes");
+const reportRoutes = require("./routes/reportRoutes");
+app.use("/api/reports", reportRoutes);
 app.use("/api/community", communityRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
