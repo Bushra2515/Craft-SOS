@@ -225,6 +225,163 @@ function globalSearch(q) {
   else if (ql.includes("log")) goSection("logs", null);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   REPORT CONTENT
+   openReportModal(targetId, targetType)
+   targetType: "post" | "comment" | "user"
+═══════════════════════════════════════════════════════════ */
+function openReportModal(targetId, targetType) {
+  document.getElementById("_report-overlay")?.remove();
+
+  const overlay = document.createElement("div");
+  overlay.id = "_report-overlay";
+  overlay.style.cssText = `
+    position:fixed;inset:0;background:rgba(46,53,32,.5);z-index:10000;
+    display:flex;align-items:center;justify-content:center;padding:16px;
+  `;
+
+  // Matches schema reason enum exactly
+  const REASONS = [
+    ["spam", "🚫 Spam or self-promotion"],
+    ["harassment", "😡 Harassment or bullying"],
+    ["scam", "💰 Scam or fraud"],
+    ["misleading", "❌ Misleading / false info"],
+    ["other", "💬 Other"],
+  ];
+
+  overlay.innerHTML = `
+    <div style="
+      background:#f5f7ee;border-radius:20px;padding:28px 26px 22px;
+      width:100%;max-width:400px;
+      box-shadow:0 20px 60px rgba(0,0,0,.22);
+      font-family:'DM Sans',sans-serif;
+    ">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <h3 style="margin:0;font-size:1.05rem;color:#2d3520;font-family:'Lora',serif;">
+          Report Content
+        </h3>
+        <button onclick="document.getElementById('_report-overlay').remove()"
+          style="background:none;border:none;cursor:pointer;font-size:1.3rem;
+                 color:#aaa;line-height:1;padding:0 4px;">&times;</button>
+      </div>
+
+      <p style="margin:0 0 16px;font-size:.81rem;color:#8a9a6a;line-height:1.5;">
+        Help keep Craft-SOS safe. Reports are reviewed by our moderation team.
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px;">
+        ${REASONS.map(
+          ([val, label]) => `
+          <label style="
+            display:flex;align-items:center;gap:10px;cursor:pointer;
+            padding:9px 13px;border-radius:10px;
+            border:1.5px solid rgba(122,143,82,.2);
+            font-size:.84rem;color:#3d4a2a;
+            transition:background .12s,border-color .12s;user-select:none;
+          "
+          onmouseover="this.style.background='rgba(122,143,82,.08)';this.style.borderColor='rgba(122,143,82,.4)'"
+          onmouseout="this.style.background='';this.style.borderColor='rgba(122,143,82,.2)'"
+          >
+            <input type="radio" name="_report-reason" value="${val}"
+                   style="accent-color:#7a8f52;width:15px;height:15px;flex-shrink:0;">
+            ${label}
+          </label>`,
+        ).join("")}
+      </div>
+
+      <textarea id="_report-detail"
+        placeholder="Optional: add more context…"
+        maxlength="300"
+        style="
+          width:100%;box-sizing:border-box;padding:10px 13px;
+          border-radius:10px;border:1.5px solid rgba(122,143,82,.2);
+          font-size:.82rem;resize:none;height:72px;
+          font-family:'DM Sans',sans-serif;outline:none;
+          color:#3d4a2a;background:rgba(255,255,255,.7);
+        "
+        onfocus="this.style.borderColor='#7a8f52'"
+        onblur="this.style.borderColor='rgba(122,143,82,.2)'"
+      ></textarea>
+      <div style="font-size:.72rem;color:#bbb;text-align:right;margin-top:3px;">
+        <span id="_report-char">0</span> / 300
+      </div>
+
+      <div style="display:flex;gap:9px;margin-top:14px;justify-content:flex-end;">
+        <button onclick="document.getElementById('_report-overlay').remove()"
+          style="
+            padding:8px 20px;border-radius:10px;
+            border:1.5px solid rgba(122,143,82,.25);
+            background:none;cursor:pointer;
+            font-size:.83rem;color:#666;font-family:'DM Sans',sans-serif;
+          ">Cancel</button>
+        <button id="_report-submit-btn"
+          onclick="_submitReport('${targetId}','${targetType}')"
+          style="
+            padding:8px 22px;border-radius:10px;
+            background:#7a8f52;color:#fff;border:none;cursor:pointer;
+            font-size:.83rem;font-weight:700;font-family:'DM Sans',sans-serif;
+            box-shadow:0 3px 10px rgba(122,143,82,.3);
+          ">Submit Report</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+
+  // Char counter
+  overlay
+    .querySelector("#_report-detail")
+    ?.addEventListener("input", function () {
+      const counter = overlay.querySelector("#_report-char");
+      if (counter) counter.textContent = this.value.length;
+    });
+
+  // Close on backdrop
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+
+  // Close on Escape
+  const escFn = (e) => {
+    if (e.key === "Escape") {
+      overlay.remove();
+      document.removeEventListener("keydown", escFn);
+    }
+  };
+  document.addEventListener("keydown", escFn);
+}
+
+async function _submitReport(targetId, targetType) {
+  const reason = document.querySelector(
+    'input[name="_report-reason"]:checked',
+  )?.value;
+  if (!reason) {
+    showToast("Please select a reason", "error");
+    return;
+  }
+
+  const detail = document.getElementById("_report-detail")?.value?.trim() || "";
+  const btn = document.getElementById("_report-submit-btn");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Submitting…";
+  }
+
+  try {
+    await api("/reports", {
+      method: "POST",
+      body: JSON.stringify({ targetId, targetType, reason, detail }),
+    });
+    document.getElementById("_report-overlay")?.remove();
+    showToast("Report submitted — thank you! 🙏", "success");
+  } catch (e) {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Submit Report";
+    }
+    showToast(e.message || "Could not submit report", "error");
+  }
+}
+
 /* ─── Tag / keyword helpers ──────────────────────────────── */
 function addTagFn() {
   const t = prompt("New tag (without #):");
@@ -1201,14 +1358,37 @@ async function submitCreateBadge() {
 
 /* ═══════════════════════════════════════════════════════════
    7. CHALLENGES
+   ─ loadChallenges(tab)          list with tab filter
+   ─ openViewChallenge(id)        read-only detail modal
+   ─ openChallengeModal(id?)      create or edit modal
+   ─ submitChallengeModal()       POST or PUT
+   ─ endChallenge(id, title, btn)
+   ─ reactivateChallenge(id, btn)
+   ─ ch_addReward / ch_addTask / ch_addRule  dynamic rows
 ═══════════════════════════════════════════════════════════ */
-async function loadChallenges() {
+
+let _chTab = "active"; // current tab
+let _editingChallengeId = null; // null = create mode, id = edit mode
+
+/* ── Tab switcher ────────────────────────────────────────── */
+function chTab(tab, el) {
+  _chTab = tab;
+  document
+    .querySelectorAll(".ch-tab")
+    .forEach((t) => t.classList.remove("active"));
+  if (el) el.classList.add("active");
+  loadChallenges(tab);
+}
+
+async function loadChallenges(tab) {
+  tab = tab || _chTab;
   try {
     const [listData, statsData] = await Promise.allSettled([
-      apiFetch("/challenges?status=active"),
+      apiFetch(`/challenges?status=${tab}`),
       apiFetch("/challenges/stats"),
     ]);
 
+    // Stats bar
     if (statsData.status === "fulfilled" && statsData.value.success) {
       const st = statsData.value.stats;
       const setEl = (id, v) => {
@@ -1216,7 +1396,8 @@ async function loadChallenges() {
         if (el) el.textContent = v;
       };
       setEl("ch-active", st.active);
-      setEl("ch-ended", st.ended);
+      setEl("ch-upcoming", st.upcoming);
+      setEl("ch-completed", st.completed);
       setEl("ch-participants", st.totalParticipants);
     }
 
@@ -1224,27 +1405,61 @@ async function loadChallenges() {
     if (!list) return;
 
     if (listData.status !== "fulfilled" || !listData.value.challenges?.length) {
-      list.innerHTML = `<div style="text-align:center;padding:32px;color:var(--text-dim);">🏆 No active challenges — launch one!</div>`;
+      list.innerHTML = `<div class="empty"><div class="empty-icon">🏆</div>No challenges in this tab. <button class="btn btn-primary btn-sm" onclick="openChallengeModal()" style="margin-top:8px">Launch one</button></div>`;
       return;
     }
+
+    const DIFF_CLS = { easy: "p-green", medium: "p-amber", hard: "p-red" };
+    const STAT_CLS = {
+      active: "p-green",
+      upcoming: "p-blue",
+      completed: "p-amber",
+    };
 
     list.innerHTML = listData.value.challenges
       .map((c) => {
         const endsStr = c.endsAt
-          ? `· Ends ${new Date(c.endsAt).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}`
-          : "";
+          ? new Date(c.endsAt).toLocaleDateString("en-IN", {
+              month: "short",
+              day: "numeric",
+            })
+          : "—";
+        const startsStr = c.startsAt
+          ? new Date(c.startsAt).toLocaleDateString("en-IN", {
+              month: "short",
+              day: "numeric",
+            })
+          : "—";
+        const active = c.isActive && c.status !== "completed";
         return `
-        <div class="ch-item">
-          <div class="ch-ico">${esc(c.icon || "🎯")}</div>
-          <div class="ch-info">
-            <div class="ch-title">${esc(c.title)}</div>
-            <div class="ch-meta">${esc(c.meta || "")} · ${(c.participants || []).length} participants ${endsStr}</div>
-          </div>
-          <div class="act-row">
-            <button class="btn btn-danger btn-xs" onclick="endChallenge('${c._id}','${esc(c.title)}',this)">End</button>
+      <div class="ch-item" id="ch-row-${c.id}">
+        <div class="ch-cover-swatch" style="background:${esc(c.coverBg || "var(--accent-pale)")}">
+          <span style="font-size:1.5rem">${esc(c.emoji || "🎯")}</span>
+        </div>
+        <div class="ch-info">
+          <div class="ch-title">${esc(c.title)}</div>
+          <div class="ch-meta">
+            <span class="pill ${STAT_CLS[c.status] || "p-amber"}" style="font-size:.7rem">${c.status}</span>
+            <span class="pill ${DIFF_CLS[c.difficulty] || "p-amber"}" style="font-size:.7rem">${c.difficulty}</span>
+            ${c.featured ? `<span class="pill p-blue" style="font-size:.7rem">⭐ Featured</span>` : ""}
+            <span style="font-size:.75rem;color:var(--text-dim)">
+              📅 ${startsStr} → ${endsStr}
+            </span>
+            <span style="font-size:.75rem;color:var(--text-dim)">
+              👥 ${c.participantCount} · ✅ ${c.taskCount} tasks · 🎁 ${c.rewardCount} rewards
+            </span>
           </div>
         </div>
-      `;
+        <div class="act-row">
+          <button class="btn btn-ghost btn-xs" onclick="openViewChallenge('${c.id}')">👁 View</button>
+          <button class="btn btn-ghost btn-xs" onclick="openChallengeModal('${c.id}')">✏️ Edit</button>
+          ${
+            active
+              ? `<button class="btn btn-danger btn-xs" onclick="adminEndChallenge('${c.id}','${esc(c.title)}',this)">⏹ End</button>`
+              : `<button class="btn btn-primary btn-xs" onclick="adminReactivateChallenge('${c.id}',this)">▶ Reactivate</button>`
+          }
+        </div>
+      </div>`;
       })
       .join("");
   } catch (err) {
@@ -1253,16 +1468,295 @@ async function loadChallenges() {
   }
 }
 
-async function endChallenge(cid, title, btn) {
-  if (!confirm(`End "${title}"?`)) return;
+/* ── View modal ──────────────────────────────────────────── */
+async function openViewChallenge(id) {
+  openModal("m-challenge-view");
+  const mc = document.getElementById("m-cv-body");
+  if (mc) mc.innerHTML = `<div class="empty">⏳ Loading…</div>`;
+  try {
+    const d = await apiFetch(`/challenges/${id}`);
+    const c = d.challenge;
+    const fmt = (dt) =>
+      dt
+        ? new Date(dt).toLocaleDateString("en-IN", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })
+        : "—";
+
+    const rewardsHtml = (c.rewards || []).length
+      ? c.rewards
+          .map(
+            (r) =>
+              `<span class="pill p-blue" style="font-size:.75rem">${esc(r.icon || "")} ${esc(r.label)}</span>`,
+          )
+          .join(" ")
+      : "<em>None</em>";
+
+    const tasksHtml = (c.tasks || []).length
+      ? `<ol style="margin:0;padding-left:18px;font-size:.83rem;color:var(--text-mid);line-height:1.8">
+          ${c.tasks
+            .sort((a, b) => a.order - b.order)
+            .map(
+              (t) =>
+                `<li><strong>${esc(t.title)}</strong>${t.description ? ` — ${esc(t.description)}` : ""}${t.dueLabel ? ` <em style="color:var(--text-dim)">(${esc(t.dueLabel)})</em>` : ""}</li>`,
+            )
+            .join("")}</ol>`
+      : "<em>No tasks defined</em>";
+
+    const rulesHtml = (c.rules || []).length
+      ? `<ol style="margin:0;padding-left:18px;font-size:.83rem;color:var(--text-mid);line-height:1.9">
+          ${c.rules
+            .sort((a, b) => a.order - b.order)
+            .map((r) => `<li>${esc(r.text)}</li>`)
+            .join("")}</ol>`
+      : "<em>No rules defined</em>";
+
+    mc.innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+        <div style="width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:2rem;background:${esc(c.coverBg)}">
+          ${esc(c.emoji || "🎯")}
+        </div>
+        <div>
+          <div style="font-family:'Lora',serif;font-weight:700;font-size:1.1rem;">${esc(c.title)}</div>
+          <div style="font-size:.75rem;color:var(--text-dim);margin-top:2px;">${esc(c.niche)} · ${c.difficulty} · ${c.status}</div>
+        </div>
+      </div>
+      <p style="font-size:.84rem;color:var(--text-mid);line-height:1.65;margin-bottom:14px;">${esc(c.description || "No description.")}</p>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
+        ${[
+          { l: "Participants", v: c.participants?.length ?? 0 },
+          { l: "Points Reward", v: c.pointsReward ?? 0 },
+          { l: "Tasks", v: (c.tasks || []).length },
+          { l: "Rewards", v: (c.rewards || []).length },
+        ]
+          .map(
+            ({
+              l,
+              v,
+            }) => `<div style="background:rgba(122,143,82,.07);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-weight:700;font-size:1.1rem">${v}</div>
+          <div style="font-size:.68rem;color:var(--text-dim)">${l}</div>
+        </div>`,
+          )
+          .join("")}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.78rem;color:var(--text-dim);margin-bottom:14px;">
+        <div>📅 Starts: <strong style="color:var(--text)">${fmt(c.startsAt)}</strong></div>
+        <div>🏁 Ends:   <strong style="color:var(--text)">${fmt(c.endsAt)}</strong></div>
+        <div>🌟 Featured: <strong>${c.featured ? "Yes" : "No"}</strong></div>
+        <div>🟢 isActive: <strong>${c.isActive ? "Yes" : "No"}</strong></div>
+      </div>
+      <div style="margin-bottom:12px"><div style="font-weight:700;font-size:.8rem;margin-bottom:6px">🎁 Rewards</div>${rewardsHtml}</div>
+      <div style="margin-bottom:12px"><div style="font-weight:700;font-size:.8rem;margin-bottom:6px">✅ Tasks</div>${tasksHtml}</div>
+      <div><div style="font-weight:700;font-size:.8rem;margin-bottom:6px">📋 Rules</div>${rulesHtml}</div>
+    `;
+  } catch (err) {
+    const mc2 = document.getElementById("m-cv-body");
+    if (mc2)
+      mc2.innerHTML = `<div class="empty" style="color:var(--high)">⚠️ ${esc(err.message)}</div>`;
+  }
+}
+
+/* ── Create / Edit modal ─────────────────────────────────── */
+async function openChallengeModal(id) {
+  _editingChallengeId = id || null;
+  const titleEl = document.getElementById("m-ch-modal-title");
+  const submitEl = document.getElementById("m-ch-submit-btn");
+  if (titleEl)
+    titleEl.textContent = id ? "✏️ Edit Challenge" : "🏆 New Challenge";
+  if (submitEl) submitEl.textContent = id ? "Save Changes" : "🚀 Launch";
+
+  // Reset form
+  _chClearForm();
+
+  if (id) {
+    openModal("m-challenge");
+    const formWrap = document.getElementById("m-ch-form");
+    if (formWrap) formWrap.style.opacity = ".4";
+    try {
+      const d = await apiFetch(`/challenges/${id}`);
+      _chPopulateForm(d.challenge);
+      if (formWrap) formWrap.style.opacity = "1";
+    } catch (err) {
+      toast("Could not load challenge: " + err.message, "err");
+      closeModal("m-challenge");
+    }
+  } else {
+    openModal("m-challenge");
+  }
+}
+
+function _chClearForm() {
+  const setVal = (id, v) => {
+    const el = document.getElementById(id);
+    if (el) el.value = v;
+  };
+  const setChk = (id, v) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = v;
+  };
+  setVal("mch-emoji", "🎯");
+  setVal("mch-coverbg", "linear-gradient(135deg,#7a8f52 0%,#3d5a20 100%)");
+  setVal("mch-niche", "");
+  setVal("mch-title", "");
+  setVal("mch-desc", "");
+  setVal("mch-difficulty", "medium");
+  setVal("mch-status", "upcoming");
+  setVal("mch-points", "0");
+  setVal("mch-starts", "");
+  setVal("mch-ends", "");
+  setChk("mch-featured", false);
+
+  // Clear dynamic lists
+  const rw = document.getElementById("mch-rewards-list");
+  const tk = document.getElementById("mch-tasks-list");
+  const rl = document.getElementById("mch-rules-list");
+  if (rw) rw.innerHTML = "";
+  if (tk) tk.innerHTML = "";
+  if (rl) rl.innerHTML = "";
+
+  // Reset to first tab
+  chModalTab("basic", document.querySelector(".mch-tab"));
+}
+
+function _chPopulateForm(c) {
+  const setVal = (id, v) => {
+    const el = document.getElementById(id);
+    if (el) el.value = v ?? "";
+  };
+  const setChk = (id, v) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = !!v;
+  };
+  const fmtDate = (d) => (d ? new Date(d).toISOString().split("T")[0] : "");
+
+  setVal("mch-emoji", c.emoji);
+  setVal("mch-coverbg", c.coverBg);
+  setVal("mch-niche", c.niche);
+  setVal("mch-title", c.title);
+  setVal("mch-desc", c.description);
+  setVal("mch-difficulty", c.difficulty);
+  setVal("mch-status", c.status);
+  setVal("mch-points", c.pointsReward ?? 0);
+  setVal("mch-starts", fmtDate(c.startsAt));
+  setVal("mch-ends", fmtDate(c.endsAt));
+  setChk("mch-featured", c.featured);
+
+  // Rewards
+  const rw = document.getElementById("mch-rewards-list");
+  if (rw) {
+    rw.innerHTML = "";
+    (c.rewards || []).forEach((r) => ch_addReward(r));
+  }
+  // Tasks
+  const tk = document.getElementById("mch-tasks-list");
+  if (tk) {
+    tk.innerHTML = "";
+    [...(c.tasks || [])]
+      .sort((a, b) => a.order - b.order)
+      .forEach((t) => ch_addTask(t));
+  }
+  // Rules
+  const rl = document.getElementById("mch-rules-list");
+  if (rl) {
+    rl.innerHTML = "";
+    [...(c.rules || [])]
+      .sort((a, b) => a.order - b.order)
+      .forEach((r) => ch_addRule(r));
+  }
+}
+
+/* ── Modal tab switcher ──────────────────────────────────── */
+function chModalTab(tab, el) {
+  document
+    .querySelectorAll(".mch-tab-pane")
+    .forEach((p) => (p.style.display = "none"));
+  document
+    .querySelectorAll(".mch-tab")
+    .forEach((t) => t.classList.remove("active"));
+  const pane = document.getElementById("mch-pane-" + tab);
+  if (pane) pane.style.display = "";
+  if (el) el.classList.add("active");
+}
+
+/* ── Submit (create or edit) ─────────────────────────────── */
+async function submitChallengeModal() {
+  const g = (id) => document.getElementById(id)?.value?.trim() ?? "";
+  const title = g("mch-title");
+  if (!title) {
+    toast("Title is required", "err");
+    return;
+  }
+
+  const payload = {
+    emoji: g("mch-emoji") || "🎯",
+    coverBg:
+      g("mch-coverbg") || "linear-gradient(135deg,#7a8f52 0%,#3d5a20 100%)",
+    niche: g("mch-niche"),
+    title,
+    description: g("mch-desc"),
+    difficulty: document.getElementById("mch-difficulty")?.value || "medium",
+    status: document.getElementById("mch-status")?.value || "upcoming",
+    featured: document.getElementById("mch-featured")?.checked ?? false,
+    pointsReward: Number(g("mch-points")) || 0,
+    startsAt: g("mch-starts") || null,
+    endsAt: g("mch-ends") || null,
+    rewards: _chReadRewards(),
+    tasks: _chReadTasks(),
+    rules: _chReadRules(),
+  };
+
+  const btn = document.getElementById("m-ch-submit-btn");
+  const orig = btn?.textContent;
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Saving…";
+  }
+
+  try {
+    let d;
+    if (_editingChallengeId) {
+      d = await apiFetch(`/challenges/${_editingChallengeId}`, {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+    } else {
+      d = await apiFetch("/challenges", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+    }
+    toast(d.message, "ok");
+    closeModal("m-challenge");
+    _loaded["challenges"] = false;
+    loadChallenges(_chTab);
+  } catch (err) {
+    toast(err.message, "err");
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = orig;
+    }
+  }
+}
+
+/* ── End / Reactivate ────────────────────────────────────── */
+async function adminEndChallenge(cid, title, btn) {
+  if (
+    !confirm(
+      `End "${title}"? This marks it completed and hides it from active view.`,
+    )
+  )
+    return;
   const orig = btn.textContent;
   btn.textContent = "…";
   btn.disabled = true;
   try {
-    await apiFetch(`/challenges/${cid}/end`, { method: "PATCH" });
-    toast("Challenge ended", "ok");
+    const d = await apiFetch(`/challenges/${cid}/end`, { method: "PATCH" });
+    toast(d.message, "ok");
     _loaded["challenges"] = false;
-    loadChallenges();
+    loadChallenges(_chTab);
   } catch (err) {
     toast(err.message, "err");
     btn.textContent = orig;
@@ -1270,27 +1764,138 @@ async function endChallenge(cid, title, btn) {
   }
 }
 
-async function submitCreateChallenge() {
-  const title = (document.getElementById("mc-title")?.value || "").trim();
-  const meta = (document.getElementById("mc-meta")?.value || "").trim();
-  const icon = (document.getElementById("mc-icon")?.value || "🎯").trim();
-  const endsAt = document.getElementById("mc-ends")?.value || null;
-  if (!title) {
-    toast("Title is required", "err");
-    return;
-  }
+async function adminReactivateChallenge(cid, btn) {
+  if (!confirm("Reactivate this challenge?")) return;
+  const orig = btn.textContent;
+  btn.textContent = "…";
+  btn.disabled = true;
   try {
-    const d = await apiFetch("/challenges", {
-      method: "POST",
-      body: JSON.stringify({ title, meta, icon, endsAt }),
+    const d = await apiFetch(`/challenges/${cid}/reactivate`, {
+      method: "PATCH",
     });
     toast(d.message, "ok");
-    closeModal("m-challenge");
     _loaded["challenges"] = false;
-    loadChallenges();
+    loadChallenges(_chTab);
   } catch (err) {
     toast(err.message, "err");
+    btn.textContent = orig;
+    btn.disabled = false;
   }
+}
+
+/* ══════════════════════════════════════════════════════════
+   DYNAMIC LIST HELPERS — Rewards, Tasks, Rules
+══════════════════════════════════════════════════════════ */
+
+/* REWARDS */
+function ch_addReward(data) {
+  const list = document.getElementById("mch-rewards-list");
+  if (!list) return;
+  const row = document.createElement("div");
+  row.className = "mch-dyn-row";
+  row.innerHTML = `
+    <select class="sel sel-xs rw-type">
+      ${["pts", "badge", "cert", "top", "sponsor"]
+        .map(
+          (t) =>
+            `<option value="${t}"${data?.type === t ? " selected" : ""}>${t}</option>`,
+        )
+        .join("")}
+    </select>
+    <input class="inp inp-xs rw-label" placeholder="Label e.g. +500 pts" value="${esc(data?.label || "")}">
+    <input class="inp inp-xs rw-icon"  placeholder="Icon emoji" value="${esc(data?.icon || "")}" style="width:60px">
+    <input class="inp inp-xs rw-sub"   placeholder="Subtitle (optional)" value="${esc(data?.sub || "")}">
+    <label style="font-size:.72rem;white-space:nowrap;cursor:pointer">
+      <input type="checkbox" class="rw-toponly" ${data?.topOnly ? "checked" : ""}> Top-3 only
+    </label>
+    <button class="btn btn-ghost btn-xs mch-del-btn" onclick="this.closest('.mch-dyn-row').remove()">✕</button>
+  `;
+  list.appendChild(row);
+}
+
+function _chReadRewards() {
+  return Array.from(document.querySelectorAll("#mch-rewards-list .mch-dyn-row"))
+    .map((row) => ({
+      type: row.querySelector(".rw-type")?.value || "pts",
+      label: row.querySelector(".rw-label")?.value || "",
+      icon: row.querySelector(".rw-icon")?.value || "",
+      sub: row.querySelector(".rw-sub")?.value || "",
+      topOnly: row.querySelector(".rw-toponly")?.checked || false,
+    }))
+    .filter((r) => r.label.trim());
+}
+
+/* TASKS */
+function ch_addTask(data) {
+  const list = document.getElementById("mch-tasks-list");
+  if (!list) return;
+  const order = list.children.length + 1;
+  const row = document.createElement("div");
+  row.className = "mch-dyn-row mch-task-row";
+  row.innerHTML = `
+    <div class="mch-task-num">${data?.order || order}</div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+      <input class="inp inp-xs tk-title" placeholder="Task title *" value="${esc(data?.title || "")}" style="font-weight:600">
+      <input class="inp inp-xs tk-desc"  placeholder="Short description (optional)" value="${esc(data?.description || "")}">
+      <div style="display:flex;gap:6px">
+        <input class="inp inp-xs tk-due" placeholder="Due label e.g. Due Mar 22" value="${esc(data?.dueLabel || "")}" style="flex:1">
+        <select class="sel sel-xs tk-tagcls">
+          <option value="">No tag</option>
+          ${["tag-pts", "tag-badge", "tag-req", "tag-final"]
+            .map(
+              (v) =>
+                `<option value="${v}"${data?.tagCls === v ? " selected" : ""}>${v}</option>`,
+            )
+            .join("")}
+        </select>
+        <input class="inp inp-xs tk-tagtxt" placeholder="Tag text e.g. +100 pts" value="${esc(data?.tagText || "")}" style="width:110px">
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-xs mch-del-btn" onclick="this.closest('.mch-task-row').remove()">✕</button>
+  `;
+  list.appendChild(row);
+}
+
+function _chReadTasks() {
+  return Array.from(document.querySelectorAll("#mch-tasks-list .mch-task-row"))
+    .map((row, i) => ({
+      order: i + 1,
+      title: row.querySelector(".tk-title")?.value || "",
+      description: row.querySelector(".tk-desc")?.value || "",
+      dueLabel: row.querySelector(".tk-due")?.value || "",
+      tagCls: row.querySelector(".tk-tagcls")?.value || "",
+      tagText: row.querySelector(".tk-tagtxt")?.value || "",
+    }))
+    .filter((t) => t.title.trim());
+}
+
+/* RULES */
+function ch_addRule(data) {
+  const list = document.getElementById("mch-rules-list");
+  if (!list) return;
+  const order = list.children.length + 1;
+  const row = document.createElement("div");
+  row.className = "mch-dyn-row mch-rule-row";
+  row.innerHTML = `
+    <div class="mch-task-num">${data?.order || order}</div>
+    <input class="inp inp-xs rl-text" placeholder="Rule text…" value="${esc(data?.text || "")}" style="flex:1">
+    <button class="btn btn-ghost btn-xs mch-del-btn" onclick="this.closest('.mch-rule-row').remove()">✕</button>
+  `;
+  list.appendChild(row);
+}
+
+function _chReadRules() {
+  return Array.from(document.querySelectorAll("#mch-rules-list .mch-rule-row"))
+    .map((row, i) => ({
+      order: i + 1,
+      text: row.querySelector(".rl-text")?.value || "",
+    }))
+    .filter((r) => r.text.trim());
+}
+
+/* ── Keep old submitCreateChallenge as alias for compat ─── */
+function submitCreateChallenge() {
+  submitChallengeModal();
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1515,6 +2120,37 @@ async function loadLogs() {
   }
 }
 
+async function checkPendingReports() {
+  const box = document.getElementById("sidebar-alert");
+  const titleEl = box?.querySelector(".sb-alert-title");
+  const subEl = box?.querySelector(".sb-alert-sub");
+  if (!box) return;
+
+  try {
+    const data = await apiFetch("/reports?status=pending&limit=1");
+    const total = data.total ?? 0;
+
+    if (total > 0) {
+      box.style.display = "";
+      if (titleEl)
+        titleEl.textContent = `⚠ ${total} Report${total !== 1 ? "s" : ""} Pending`;
+      if (subEl)
+        subEl.textContent = `${total} item${total !== 1 ? "s" : ""} require immediate review`;
+
+      // Also update the topbar dot
+      const dot = document.getElementById("tb-reports-count");
+      if (dot) dot.textContent = total > 99 ? "99+" : total;
+    } else {
+      box.style.display = "none";
+      const dot = document.getElementById("tb-reports-count");
+      if (dot) dot.style.display = "none";
+    }
+  } catch {
+    // Silent fail — don't break the page
+    box.style.display = "none";
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════
    REGISTER LOADERS  (must come after function definitions)
 ═══════════════════════════════════════════════════════════ */
@@ -1529,6 +2165,14 @@ LOADERS.announcements = loadAnnouncements;
 LOADERS.analytics = loadAnalytics;
 LOADERS.logs = loadLogs;
 
+function adminLogout() {
+  if (!confirm("Sign out of the admin dashboard?")) return;
+  localStorage.removeItem("adminToken");
+  localStorage.removeItem("adminUser");
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.location.href = "login.html";
+}
 /* ═══════════════════════════════════════════════════════════
    INIT  —  runs after DOM is ready
 ═══════════════════════════════════════════════════════════ */
@@ -1551,4 +2195,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Load dashboard immediately
   loadDashboard();
   _loaded["dashboard"] = true;
+
+  // ← ADD THIS
+  checkPendingReports();
+  setInterval(checkPendingReports, 60_000);
 });

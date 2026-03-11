@@ -90,7 +90,9 @@
           <div class="tb-notif-dot"></div>
         </button>
         <!-- Avatar initial populated by dashboard.js -->
-        <div class="tb-av" onclick="toast('Opening profile…')">W</div>
+        <div class="tb-av" onclick="window.location.href = 'profile.html'">
+          W
+        </div>
       </div>
     </header>
 
@@ -144,7 +146,7 @@
               <polyline points="14 2 14 8 20 8" />
             </svg>
             <span class="ni-label">My Posts</span>
-            <span class="ni-badge">3</span>
+            <!-- <span class="ni-badge">3</span> -->
           </div>
           <!-- data-section used by dashboard.js to update the notification badge -->
           <div
@@ -165,29 +167,29 @@
             </svg>
             <span class="ni-label">Saved Posts</span>
           </div>
-          <div class="nav-item" onclick="navPick(this, 'progress')">
+          <!-- <div class="nav-item" onclick="navPick(this, 'progress')">
             <svg class="ni-icon" viewBox="0 0 24 24">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
             </svg>
             <span class="ni-label">My Progress</span>
-          </div>
-          <div class="nav-item" onclick="toast('Opening your profile…')">
+          </div> -->
+          <div class="nav-item" onclick="window.location.href = 'profile.html'">
             <svg class="ni-icon" viewBox="0 0 24 24">
               <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
             <span class="ni-label">My Profile</span>
           </div>
-          <div class="nav-item" onclick="toast('Opening messages…')">
+          <div class="nav-item" onclick="window.location.href = 'chat.html'">
             <svg class="ni-icon" viewBox="0 0 24 24">
               <path
                 d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
               />
             </svg>
             <span class="ni-label">Messages</span>
-            <span class="ni-badge" id="chat-badge"></span>
+            <!-- <span class="ni-badge" id="chat-badge"></span> -->
           </div>
-          <div class="nav-item" onclick="toast('Opening settings…')">
+          <!-- <div class="nav-item" onclick="toast('Opening settings…')">
             <svg class="ni-icon" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="3" />
               <path
@@ -195,7 +197,7 @@
               />
             </svg>
             <span class="ni-label">Settings</span>
-          </div>
+          </div> -->
         </nav>
       </aside>
 

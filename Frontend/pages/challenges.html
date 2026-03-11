@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Challenges · Craft-SOS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/challenges.css" />
+  </head>
+  <!-- challenges.html -->
+  <body>
+    <div id="toast">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg
+      ><span id="toast-msg"></span>
+    </div>
+    <div id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- ══ TOPBAR ══ -->
+    <header id="topbar">
+      <button id="hamburger" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+
+      <div class="logo-pill">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"
+          />
+        </svg>
+      </div>
+
+      <span id="mobile-title">Challenges</span>
+      <div id="topbar-right">
+        <button
+          class="distress-btn"
+          onclick="window.location.href = 'create-post.html'"
+        >
+          <svg viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>Distress Call</span>
+        </button>
+        <button class="notif-btn" id="notif-bell-btn" title="Notifications">
+          <svg viewBox="0 0 24 24">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 01-3.46 0" />
+          </svg>
+          <div
+            class="notif-dot"
+            id="topbar-notif-dot"
+            style="display: none"
+          ></div>
+        </button>
+        <div
+          class="profile-av-btn"
+          id="topbar-av"
+          onclick="window.location.href = 'profile.html'"
+        ></div>
+      </div>
+    </header>
+
+    <!-- ══ SHELL ══ -->
+    <div id="shell">
+      <!-- ══ SIDEBAR ══ -->
+      <aside id="sidebar">
+        <div class="sb-prof">
+          <div class="sb-prof-av" id="sb-prof-av"></div>
+          <div class="sb-prof-info">
+            <div class="sb-prof-name" id="sb-prof-name">Loading…</div>
+            <div class="sb-prof-sub" id="sb-prof-sub">—</div>
+          </div>
+        </div>
+        <nav>
+          <div class="nav-item" data-route="index.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <span class="nav-label">Home</span>
+          </div>
+          <div class="nav-item" data-route="explore.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <span class="nav-label">Explore</span>
+          </div>
+          <div class="nav-item" id="sidebar-search-btn">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span class="nav-label">Search</span>
+          </div>
+          <div class="nav-item" id="sidebar-notif-btn">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <span class="nav-label">Notifications</span>
+          </div>
+          <div class="nav-item" data-route="chat.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path
+                d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+              />
+            </svg>
+            <span class="nav-label">Messages</span>
+          </div>
+          <div class="nav-item" data-route="dashboard.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            <span class="nav-label">Dashboard</span>
+          </div>
+          <!-- Challenges — active page -->
+          <div class="nav-item active">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M18 2H6v7a6 6 0 0012 0V2z" />
+              <path d="M6 9H4.5a2.5 2.5 0 010-5H6" />
+              <path d="M18 9h1.5a2.5 2.5 0 000-5H18" />
+              <path d="M4 22h16" />
+            </svg>
+            <span class="nav-label">Challenges</span>
+          </div>
+          <div class="nav-item" data-route="profile.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span class="nav-label">Profile</span>
+          </div>
+          <div class="nav-item" id="sidebar-saved-btn">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+            </svg>
+            <span class="nav-label">Saved</span>
+          </div>
+          <div class="nav-item" id="sidebar-logout-btn">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            <span class="nav-label">Sign Out</span>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- ══ MAIN ══ -->
+      <main id="main">
+        <!-- ── HERO ── -->
+        <div class="challenges-hero">
+          <div class="hero-inner">
+            <div class="hero-left">
+              <div class="hero-eyebrow">
+                <div class="hero-eyebrow-dot"></div>
+                Live Now · <span id="hero-month">March 2026</span>
+              </div>
+              <div class="hero-title">Community <span>Challenges</span></div>
+              <div class="hero-sub">
+                Compete, learn, and grow alongside fellow crafters. Complete
+                challenges to earn points, exclusive badges, and recognition on
+                the leaderboard.
+              </div>
+              <div
+                class="active-spotlight"
+                id="active-spotlight"
+                style="display: none"
+              >
+                <div class="as-icon" id="as-icon">📦</div>
+                <div class="as-text">
+                  <div class="as-label">Your Active Challenge</div>
+                  <div class="as-title" id="as-title">Loading…</div>
+                  <div class="as-prog">
+                    <div class="as-bar">
+                      <div class="as-fill" id="as-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="as-pct" id="as-pct">0%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="hero-right">
+              <button
+                class="hero-btn hero-btn-primary"
+                onclick="
+                  document
+                    .getElementById('challenges-grid')
+                    .scrollIntoView({ behavior: 'smooth' })
+                "
+              >
+                <svg viewBox="0 0 24 24">
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  />
+                </svg>
+                Browse Challenges
+              </button>
+              <button
+                class="hero-btn hero-btn-ghost"
+                onclick="
+                  setTab(
+                    'completed',
+                    document.querySelector('[data-tab=completed]'),
+                  )
+                "
+              >
+                <svg viewBox="0 0 24 24">
+                  <line x1="8" y1="6" x2="21" y2="6" />
+                  <line x1="8" y1="12" x2="21" y2="12" />
+                  <line x1="8" y1="18" x2="21" y2="18" />
+                  <line x1="3" y1="6" x2="3.01" y2="6" />
+                  <line x1="3" y1="12" x2="3.01" y2="12" />
+                  <line x1="3" y1="18" x2="3.01" y2="18" />
+                </svg>
+                My History
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── MY PROGRESS STRIP ── -->
+        <div class="my-progress-strip">
+          <div class="mp-tile">
+            <div class="mp-ico" style="background: var(--gold-bg, #fff8e1)">
+              🏆
+            </div>
+            <div class="mp-val" id="mp-wins">—</div>
+            <div class="mp-label">Challenges Won</div>
+          </div>
+          <div class="mp-tile">
+            <div class="mp-ico" style="background: var(--accent-lt, #f0f5e8)">
+              ⚡
+            </div>
+            <div class="mp-val" id="mp-active">—</div>
+            <div class="mp-label">In Progress</div>
+          </div>
+          <div class="mp-tile">
+            <div class="mp-ico" style="background: var(--purple-bg, #f3f0ff)">
+              🎖
+            </div>
+            <div class="mp-val" id="mp-badges">—</div>
+            <div class="mp-label">Badges Earned</div>
+          </div>
+          <div class="mp-tile">
+            <div class="mp-ico" style="background: var(--green-bg, #f0fff4)">
+              ✨
+            </div>
+            <div class="mp-val" id="mp-points">—</div>
+            <div class="mp-label">Points from Challenges</div>
+          </div>
+        </div>
+
+        <!-- ── TABS + FILTER ── -->
+        <div class="tab-filter-row">
+          <div class="tabs">
+            <div
+              class="tab active"
+              data-tab="all"
+              onclick="setTab('all', this)"
+            >
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+              All <span class="tab-badge" id="badge-all">—</span>
+            </div>
+            <div class="tab" data-tab="active" onclick="setTab('active', this)">
+              <svg viewBox="0 0 24 24">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+              In Progress <span class="tab-badge" id="badge-active">—</span>
+            </div>
+            <div
+              class="tab"
+              data-tab="upcoming"
+              onclick="setTab('upcoming', this)"
+            >
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              Upcoming <span class="tab-badge" id="badge-upcoming">—</span>
+            </div>
+            <div
+              class="tab"
+              data-tab="completed"
+              onclick="setTab('completed', this)"
+            >
+              <svg viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Completed <span class="tab-badge" id="badge-completed">—</span>
+            </div>
+          </div>
+          <div class="filter-right">
+            <div class="search-wrap">
+              <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search challenges…"
+                oninput="filterCards(this.value)"
+                id="search-inp"
+              />
+            </div>
+            <select class="sort-sel" onchange="sortCards(this.value)">
+              <option value="default">Default order</option>
+              <option value="points">Most points</option>
+              <option value="deadline">Ending soonest</option>
+              <option value="participants">Most popular</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ── PAGE BODY ── -->
+        <div class="page-body">
+          <div class="page-col-main">
+            <div class="challenges-grid" id="challenges-grid"></div>
+            <div class="empty-state" id="empty-state">
+              <div class="empty-ico">🔍</div>
+              <div class="empty-title">No challenges found</div>
+              <div class="empty-sub">
+                Try a different filter or search term.
+              </div>
+            </div>
+          </div>
+
+          <!-- ASIDE -->
+          <aside class="page-col-aside">
+            <!-- Leaderboard -->
+            <div class="widget">
+              <div class="w-title">
+                <svg viewBox="0 0 24 24">
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  />
+                </svg>
+                This Month's Leaders
+              </div>
+              <div class="my-rank-pill">
+                <div class="mrp-rank" id="my-rank-num">#—</div>
+                <div class="mrp-info">
+                  <div class="mrp-label">Your rank</div>
+                  <div class="mrp-pts" id="my-rank-pts">0 pts</div>
+                </div>
+              </div>
+              <div id="leaderboard-list">
+                <!-- JS renders lb-item rows -->
+                <div
+                  style="
+                    text-align: center;
+                    padding: 16px;
+                    color: #aaa;
+                    font-size: 0.82rem;
+                  "
+                >
+                  Loading…
+                </div>
+              </div>
+            </div>
+
+            <!-- Countdown -->
+            <div class="widget">
+              <div class="w-title">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Next Challenge Starts
+              </div>
+              <div
+                style="
+                  font-size: 0.82rem;
+                  font-weight: 700;
+                  color: var(--tx);
+                  margin-bottom: 10px;
+                "
+                id="countdown-title"
+              >
+                —
+              </div>
+              <div class="countdown-row" id="countdown">
+                <div class="cd-unit">
+                  <div class="cd-val" id="cd-d">00</div>
+                  <div class="cd-label">Days</div>
+                </div>
+                <div class="cd-unit">
+                  <div class="cd-val" id="cd-h">00</div>
+                  <div class="cd-label">Hours</div>
+                </div>
+                <div class="cd-unit">
+                  <div class="cd-val" id="cd-m">00</div>
+                  <div class="cd-label">Mins</div>
+                </div>
+                <div class="cd-unit">
+                  <div class="cd-val" id="cd-s">00</div>
+                  <div class="cd-label">Secs</div>
+                </div>
+              </div>
+              <button
+                class="btn btn-primary"
+                style="width: 100%; justify-content: center"
+                onclick="showToast('You\'re on the waitlist! 🎉', 'success')"
+              >
+                <svg viewBox="0 0 24 24">
+                  <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 01-3.46 0" />
+                </svg>
+                Notify Me
+              </button>
+            </div>
+
+            <!-- Tips -->
+            <div class="widget">
+              <div class="w-title">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                How Challenges Work
+              </div>
+              <div class="tip-row">
+                <div class="tip-ico">🎯</div>
+                <div class="tip-text">
+                  Join before the deadline and complete all required tasks
+                  within the challenge period.
+                </div>
+              </div>
+              <div class="tip-row">
+                <div class="tip-ico">📊</div>
+                <div class="tip-text">
+                  Track your progress in the card — your completion % updates
+                  daily.
+                </div>
+              </div>
+              <div class="tip-row">
+                <div class="tip-ico">🏅</div>
+                <div class="tip-text">
+                  Earn exclusive badges only available through challenges — not
+                  purchasable anywhere.
+                </div>
+              </div>
+              <div class="tip-row">
+                <div class="tip-ico">💡</div>
+                <div class="tip-text">
+                  Top 3 finishers get featured on the community homepage for a
+                  week.
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+
+    <!-- common.js must load before challenges.js so sidebar/notif/logout are wired -->
+    <script src="../js/common.js"></script>
+    <script src="../js/challenges.js"></script>
+  </body>
+</html>

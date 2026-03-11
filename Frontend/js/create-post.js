@@ -187,10 +187,15 @@ function collectCategories() {
 async function publishPost() {
   const btn = document.getElementById("publish-btn");
   const title = document.getElementById("title-input").value.trim();
-  const body = (document.getElementById("editor-area").innerText || "").trim();
+  const bodyHTML = (
+    document.getElementById("editor-area").innerText || ""
+  ).trim();
+  const bodyText = (
+    document.getElementById("editor-area").innerText || ""
+  ).trim();
 
   // Final client-side guard (button should already be disabled)
-  if (!postType || !title || body.length < 30 || !tags.length) {
+  if (!postType || !title || bodyText.length < 30 || !tags.length) {
     showToast("Please complete all required fields first");
     return;
   }
@@ -204,7 +209,7 @@ async function publishPost() {
       // type: postType, // controller maps "tutorial" → "tut" etc.
       type: TYPE_MAP[postType],
       title,
-      body,
+      body: bodyHTML,
       tags: [...tags], // ← was: tags.join(",")
       priority: priority || undefined,
       categories: collectCategories(),

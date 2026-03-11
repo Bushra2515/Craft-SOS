@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../css/common.css" />
     <link rel="stylesheet" href="../css/profile.css" />
   </head>
+  <!-- profile.html -->
   <body>
     <div id="overlay" onclick="closeSidebar()"></div>
 
@@ -30,9 +31,9 @@
       </div>
       <span id="mobile-title">Craft-SOS</span>
       <nav id="desk-nav">
-        <span class="tnav" onclick="syncNav(this)">Friends</span>
+        <!-- <span class="tnav" onclick="syncNav(this)">Friends</span>
         <span class="tnav" onclick="syncNav(this)">Explore</span>
-        <span class="tnav" onclick="syncNav(this)">Bookmarked</span>
+        <span class="tnav" onclick="syncNav(this)">Bookmarked</span> -->
       </nav>
       <div id="topbar-right">
         <button class="distress-btn">
@@ -51,9 +52,9 @@
     </header>
 
     <nav id="subnav">
-      <span class="snav" onclick="syncNav(this)">Friends</span>
+      <!-- <span class="snav" onclick="syncNav(this)">Friends</span>
       <span class="snav" onclick="syncNav(this)">Explore</span>
-      <span class="snav" onclick="syncNav(this)">Bookmarked</span>
+      <span class="snav" onclick="syncNav(this)">Bookmarked</span> -->
     </nav>
 
     <!-- ══ SHELL ══ -->
@@ -142,14 +143,13 @@
           </div>
 
           <!-- Challenges (coming soon) -->
-          <div class="nav-item sb-coming" data-route="challenges.html">
+          <div class="nav-item" data-route="challenges.html">
             <svg class="nav-icon" viewBox="0 0 24 24">
               <polygon
                 points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
               />
             </svg>
             <span class="nav-label">Challenges</span>
-            <span class="nav-pill-soon">Soon</span>
           </div>
 
           <div class="sb-divider"></div>
@@ -399,6 +399,14 @@
                 ></div>
               </div>
             </div>
+            <!-- ══ COMMUNITY WIDGETS ══
+                 Rendered automatically by community-widgets.js.
+                 Active Challenges: POST /api/community/challenges
+                 Community Badges:  GET  /api/community/badges
+                 No extra config needed — just these two divs.
+            -->
+            <div id="widget-challenges"></div>
+            <div id="widget-badges"></div>
           </div>
 
           <!-- ── RIGHT ── -->
@@ -621,6 +629,6 @@
     <script src="../js/common.js"></script>
     <script src="../js/profile.js"></script>
     <!-- Community widgets: announcements, challenges, badges from admin dashboard -->
-    <script src="../js/community-widgets.js"></script>
+    <script src="../js/community-widget.js"></script>
   </body>
 </html>

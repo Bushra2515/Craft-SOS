@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Challenge · Craft-SOS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/challenges.css" />
+    <link rel="stylesheet" href="../css/challenge-detail.css" />
+  </head>
+  <!-- challenge-detail.html -->
+  <body>
+    <!-- ── LEAVE MODAL ── -->
+    <div class="modal-wrap" id="leave-modal">
+      <div class="modal">
+        <div class="modal-hdr">
+          <div class="modal-title">Leave Challenge?</div>
+          <button class="modal-close" onclick="closeLeaveModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <p>
+            If you leave now, your progress will be
+            <strong style="color: var(--red, #d35b3a)">permanently lost</strong>
+            and you will be removed from the leaderboard. You can re-join if the
+            challenge is still open, but your task history will be reset.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost btn-sm" onclick="closeLeaveModal()">
+            Cancel
+          </button>
+          <button class="btn btn-red btn-sm" onclick="confirmLeave()">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Yes, Leave
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg
+      ><span id="toast-msg"></span>
+    </div>
+    <div id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- ══ TOPBAR ══ -->
+    <header id="topbar">
+      <button id="hamburger" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+      <div class="logo-pill">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"
+          />
+        </svg>
+      </div>
+      <span id="mobile-title">Challenge</span>
+      <div id="topbar-right">
+        <button
+          class="distress-btn"
+          onclick="window.location.href = 'create-post.html'"
+        >
+          <svg viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>Distress Call</span>
+        </button>
+        <button class="notif-btn" id="notif-bell-btn" title="Notifications">
+          <svg viewBox="0 0 24 24">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 01-3.46 0" />
+          </svg>
+          <div
+            class="notif-dot"
+            id="topbar-notif-dot"
+            style="display: none"
+          ></div>
+        </button>
+        <div
+          class="profile-av-btn"
+          id="topbar-av"
+          onclick="window.location.href = 'profile.html'"
+        ></div>
+      </div>
+    </header>
+
+    <!-- ══ SHELL ══ -->
+    <div id="shell">
+      <!-- ══ SIDEBAR ══ -->
+      <aside id="sidebar">
+        <div class="sb-prof">
+          <div class="sb-prof-av" style="cursor: pointer"></div>
+          <div class="sb-prof-info">
+            <div class="sb-prof-name">Loading…</div>
+            <div class="sb-prof-sub"></div>
+          </div>
+        </div>
+
+        <nav>
+          <!-- Home -->
+          <div class="nav-item" data-route="index.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <span class="nav-label">Home</span>
+          </div>
+
+          <!-- Explore -->
+          <div class="nav-item" data-route="explore.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <span class="nav-label">Explore</span>
+          </div>
+
+          <!-- Search -->
+          <div class="nav-item" id="sidebar-search-btn">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span class="nav-label">Search</span>
+          </div>
+
+          <!-- Notifications — badge managed by socket-client.js -->
+          <div class="nav-item" id="sidebar-notif-btn">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <span class="nav-label">Notifications</span>
+            <span
+              id="notif-badge"
+              class="nav-badge-live"
+              style="background: #d35b3a"
+            ></span>
+          </div>
+
+          <!-- Messages — badge managed by socket-client.js -->
+          <div class="nav-item" data-route="chat.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path
+                d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+              />
+            </svg>
+            <span class="nav-label">Messages</span>
+            <span
+              id="chat-badge"
+              class="nav-badge-live"
+              style="background: #3d5a99"
+            ></span>
+          </div>
+
+          <!-- Dashboard -->
+          <div class="nav-item" data-route="dashboard.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            <span class="nav-label">Dashboard</span>
+          </div>
+
+          <!-- CORRECT -->
+          <div class="nav-item active" data-route="challenges.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M18 2H6v7a6 6 0 0012 0V2z" />
+              <path d="M6 9H4.5a2.5 2.5 0 010-5H6" />
+              <path d="M18 9h1.5a2.5 2.5 0 000-5H18" />
+              <path d="M4 22h16" />
+            </svg>
+            <span class="nav-label">Challenges</span>
+          </div>
+
+          <div class="sb-divider"></div>
+
+          <!-- Profile -->
+          <div class="nav-item" data-route="profile.html">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span class="nav-label">Profile</span>
+          </div>
+
+          <!-- Saved -->
+          <div class="nav-item" id="sidebar-saved-btn">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+            </svg>
+            <span class="nav-label">Saved</span>
+          </div>
+
+          <div class="sb-divider"></div>
+
+          <!-- Sign Out -->
+          <div class="nav-item" id="sidebar-logout-btn">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            <span class="nav-label">Sign Out</span>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- ══ MAIN ══ -->
+      <main id="main">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a href="../index.html">Home</a>
+          <svg class="bc-sep" viewBox="0 0 24 24">
+            <polyline points="9 6 15 12 9 18" />
+          </svg>
+          <a href="challenges.html">Challenges</a>
+          <svg class="bc-sep" viewBox="0 0 24 24">
+            <polyline points="9 6 15 12 9 18" />
+          </svg>
+          <span id="bc-title">Loading…</span>
+        </nav>
+
+        <!-- ══ HERO ══ -->
+        <div class="hero-wrap">
+          <!-- cover -->
+          <div class="hero-cover" id="hero-cover">
+            <span class="hero-emoji" id="hero-emoji">🎯</span>
+
+            <!-- status badge top-left -->
+            <div class="hero-status-badge sb-active" id="hero-status">
+              <div class="sb-dot"></div>
+              In Progress
+            </div>
+
+            <!-- action buttons top-right -->
+            <div class="hero-tr">
+              <button class="icon-btn" onclick="copyLink()" title="Copy link">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
+              </button>
+              <button
+                class="icon-btn"
+                id="bookmark-btn"
+                onclick="toggleBookmark(this)"
+                title="Bookmark"
+              >
+                <svg viewBox="0 0 24 24">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- time left bottom-right -->
+            <div class="hero-br">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              <span id="hero-timeleft">—</span>
+            </div>
+
+            <!-- difficulty chip bottom-left -->
+            <div class="hero-bl">
+              <span class="diff-chip diff-medium" id="hero-diff"
+                >🟡 Medium</span
+              >
+            </div>
+          </div>
+
+          <!-- hero info -->
+          <div class="hero-info">
+            <div class="hero-niche" id="hero-niche">—</div>
+            <div class="hero-title" id="hero-title">Loading challenge…</div>
+            <div class="hero-desc" id="hero-desc"></div>
+            <div class="hero-pills" id="hero-pills"></div>
+          </div>
+
+          <!-- CTA strip -->
+          <div class="hero-cta" id="hero-cta">
+            <div class="cta-info" id="cta-joined-info">
+              <div class="cta-main">
+                You are participating ·
+                <span style="color: var(--amber); font-weight: 700" id="cta-pct"
+                  >0% complete</span
+                >
+              </div>
+              <div class="cta-sub" id="cta-sub">—</div>
+            </div>
+            <div class="cta-btns">
+              <button
+                class="btn btn-ghost btn-sm"
+                id="cta-leave-btn"
+                onclick="openLeaveModal()"
+                style="display: none"
+              >
+                <svg viewBox="0 0 24 24">
+                  <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                Leave
+              </button>
+              <button
+                class="btn btn-primary btn-sm"
+                id="cta-join-btn"
+                onclick="joinChallenge(this)"
+                style="display: none"
+              >
+                <svg viewBox="0 0 24 24">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Join Challenge
+              </button>
+              <button
+                class="btn btn-amber btn-sm"
+                onclick="scrollTo('composer-section')"
+              >
+                <svg viewBox="0 0 24 24">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                Post Update
+              </button>
+              <button
+                class="btn btn-primary btn-sm"
+                onclick="scrollTo('tasks-section')"
+              >
+                <svg viewBox="0 0 24 24">
+                  <polyline points="9 11 12 14 22 4" />
+                  <path
+                    d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"
+                  />
+                </svg>
+                My Tasks
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- /hero-wrap -->
+
+        <!-- ══ STICKY PROGRESS ══ -->
+        <div class="sticky-prog">
+          <div class="sp-inner">
+            <span class="sp-label">Your progress</span>
+            <div class="sp-bar-wrap">
+              <div class="sp-bar" id="sp-bar" style="width: 0%"></div>
+            </div>
+            <span class="sp-pct" id="sp-pct">0%</span>
+            <span class="sp-rank" id="sp-rank"></span>
+          </div>
+        </div>
+
+        <!-- ══ PAGE BODY ══ -->
+        <div class="page-body">
+          <!-- ── MAIN COLUMN ── -->
+          <div class="col-main">
+            <!-- MY TASKS -->
+            <div class="card" id="tasks-section">
+              <div class="card-hdr">
+                <div class="chdr-left">
+                  <div class="chdr-ico">
+                    <svg viewBox="0 0 24 24">
+                      <polyline points="9 11 12 14 22 4" />
+                      <path
+                        d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="chdr-title">My Tasks</div>
+                    <div class="chdr-sub">
+                      Check off each step as you complete it
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="prog-hero">
+                  <div class="ph-top">
+                    <div class="ph-pct" id="ph-pct">0%</div>
+                    <div class="ph-label" id="ph-label">0 tasks done</div>
+                  </div>
+                  <div class="ph-bar">
+                    <div class="ph-fill" id="ph-fill" style="width: 0%"></div>
+                  </div>
+                  <div class="ph-sub" id="ph-sub">—</div>
+                </div>
+                <div id="task-list">
+                  <div class="skeleton-row"></div>
+                  <div class="skeleton-row"></div>
+                  <div class="skeleton-row"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- REWARDS -->
+            <div class="card">
+              <div class="card-hdr">
+                <div class="chdr-left">
+                  <div class="chdr-ico">
+                    <svg viewBox="0 0 24 24">
+                      <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="chdr-title">Rewards</div>
+                    <div class="chdr-sub">
+                      Complete the challenge to unlock everything
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="rewards-grid" id="rewards-grid">
+                  <div class="skeleton-box"></div>
+                  <div class="skeleton-box"></div>
+                  <div class="skeleton-box"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RULES -->
+            <div class="card">
+              <div class="card-hdr">
+                <div class="chdr-left">
+                  <div class="chdr-ico">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="chdr-title">Rules &amp; Guidelines</div>
+                    <div class="chdr-sub">Read carefully before submitting</div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="rules-list">
+                  <div class="skeleton-row"></div>
+                  <div class="skeleton-row"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- COMMUNITY FEED -->
+            <div class="card" id="composer-section">
+              <div class="card-hdr">
+                <div class="chdr-left">
+                  <div class="chdr-ico">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="chdr-title">Community Updates</div>
+                    <div class="chdr-sub" id="feed-count">Loading…</div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <!-- composer -->
+                <div class="composer">
+                  <div class="composer-top">
+                    <div class="comp-av" id="comp-av"></div>
+                    <textarea
+                      class="comp-ta"
+                      id="comp-ta"
+                      rows="2"
+                      placeholder="Share your progress, a win, or a tip for the community…"
+                    ></textarea>
+                  </div>
+                  <div class="composer-ft">
+                    <div
+                      class="attach-btn"
+                      onclick="showToast('File attach coming soon', 'warn')"
+                    >
+                      <svg viewBox="0 0 24 24">
+                        <path
+                          d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"
+                        />
+                      </svg>
+                      Attach screenshot
+                    </div>
+                    <button
+                      class="btn btn-primary btn-sm"
+                      id="post-btn"
+                      onclick="postUpdate()"
+                      disabled
+                    >
+                      <svg viewBox="0 0 24 24">
+                        <line x1="22" y1="2" x2="11" y2="13" />
+                        <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                      </svg>
+                      Post Update
+                    </button>
+                  </div>
+                </div>
+                <!-- feed -->
+                <div id="feed-list">
+                  <div class="skeleton-row"></div>
+                  <div class="skeleton-row"></div>
+                </div>
+                <!-- load more -->
+                <div style="text-align: center; margin-top: 12px">
+                  <button
+                    class="btn btn-ghost btn-sm"
+                    id="load-more-btn"
+                    style="display: none"
+                    onclick="loadFeed(_feedPage + 1)"
+                  >
+                    Load more
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /col-main -->
+
+          <!-- ── ASIDE ── -->
+          <aside class="col-aside">
+            <!-- Deadline ring -->
+            <div class="widget">
+              <div class="w-hdr">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <div class="w-hdr-title">Deadline</div>
+              </div>
+              <div class="w-body">
+                <div class="deadline-ring-wrap">
+                  <div class="dl-ring">
+                    <svg class="dl-svg" viewBox="0 0 36 36">
+                      <circle class="dl-track" cx="18" cy="18" r="14" />
+                      <circle
+                        class="dl-prog"
+                        cx="18"
+                        cy="18"
+                        r="14"
+                        id="dl-circle"
+                        stroke-dasharray="87.96"
+                        stroke-dashoffset="87.96"
+                      />
+                    </svg>
+                    <div class="dl-center">
+                      <div class="dl-days" id="dl-days">—</div>
+                      <div class="dl-label">days left</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="dl-dates" id="dl-dates">
+                  <span>—</span><span>—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Rewards status -->
+            <div class="widget">
+              <div class="w-hdr">
+                <svg viewBox="0 0 24 24">
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  />
+                </svg>
+                <div class="w-hdr-title">My Rewards Status</div>
+              </div>
+              <div class="w-body" id="reward-status-list">
+                <div class="skeleton-row"></div>
+              </div>
+            </div>
+
+            <!-- Challenge leaderboard -->
+            <div class="widget">
+              <div class="w-hdr">
+                <svg viewBox="0 0 24 24">
+                  <line x1="18" y1="20" x2="18" y2="10" />
+                  <line x1="12" y1="20" x2="12" y2="4" />
+                  <line x1="6" y1="20" x2="6" y2="14" />
+                </svg>
+                <div class="w-hdr-title">Leaderboard</div>
+              </div>
+              <div class="w-body">
+                <div class="my-rank-pill">
+                  <div class="mrp-rank" id="my-rank-num">#—</div>
+                  <div>
+                    <div class="mrp-label">Your rank</div>
+                    <div class="mrp-sub" id="my-rank-sub">—</div>
+                  </div>
+                </div>
+                <div id="board-list">
+                  <div
+                    style="
+                      text-align: center;
+                      padding: 16px;
+                      color: #aaa;
+                      font-size: 0.82rem;
+                    "
+                  >
+                    Loading…
+                  </div>
+                </div>
+                <div style="margin-top: 10px; text-align: center">
+                  <button
+                    class="btn btn-ghost btn-sm"
+                    id="view-all-btn"
+                    style="width: 100%; justify-content: center"
+                    onclick="showToast('Full leaderboard coming soon', 'warn')"
+                  >
+                    View all
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Participants mosaic -->
+            <div class="widget">
+              <div class="w-hdr">
+                <svg viewBox="0 0 24 24">
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                  <path d="M16 3.13a4 4 0 010 7.75" />
+                </svg>
+                <div class="w-hdr-title" id="participants-hdr">
+                  Participants
+                </div>
+              </div>
+              <div class="w-body">
+                <div class="av-mosaic" id="av-mosaic"></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+        <!-- /page-body -->
+      </main>
+    </div>
+    <!-- /shell -->
+
+    <script src="../js/common.js"></script>
+    <script src="../js/challenge-detail.js"></script>
+  </body>
+</html>

@@ -12,6 +12,7 @@
     />
     <link rel="stylesheet" href="../css/admin.css" />
   </head>
+  <!-- admin.html -->
   <body>
     <!-- ══════════════ TOAST CONTAINER ══════════════ -->
     <div id="toast-container"></div>
@@ -86,45 +87,271 @@
       </div>
     </div>
 
-    <!-- Create Challenge -->
+    <!-- Create / Edit Challenge -->
     <div
       class="modal-ov"
       id="m-challenge"
       onclick="if (event.target === this) closeModal('m-challenge');"
     >
-      <div class="modal-box">
-        <div class="modal-title">🏆 New Challenge</div>
-        <div class="modal-sub">
-          Launch a community challenge to boost engagement.
+      <div class="modal-box" style="max-width: 680px; width: 96vw">
+        <!-- Header -->
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+          "
+        >
+          <div class="modal-title" id="m-ch-modal-title">🏆 New Challenge</div>
+          <button
+            class="btn btn-ghost btn-xs"
+            onclick="closeModal('m-challenge')"
+          >
+            ✕
+          </button>
         </div>
-        <div class="modal-form">
-          <div class="field">
-            <label class="field-label">Challenge Title *</label
-            ><input
-              class="inp"
-              id="mc-title"
-              placeholder="e.g. April Upcycle Challenge"
-            />
-          </div>
-          <div class="field">
-            <label class="field-label">Subtitle / Meta</label
-            ><input
-              class="inp"
-              id="mc-meta"
-              placeholder="Short description shown on the card"
-            />
-          </div>
-          <div class="modal-grid">
-            <div class="field">
-              <label class="field-label">Icon (emoji)</label
-              ><input class="inp" id="mc-icon" placeholder="🎯" value="🎯" />
+        <div class="modal-sub">Fill out all sections then hit Launch.</div>
+
+        <!-- Tab nav -->
+        <div
+          style="
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin: 12px 0 4px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+          "
+        >
+          <button
+            class="btn btn-ghost btn-xs mch-tab active"
+            onclick="chModalTab('basic', this)"
+          >
+            Core
+          </button>
+          <button
+            class="btn btn-ghost btn-xs mch-tab"
+            onclick="chModalTab('schedule', this)"
+          >
+            Schedule &amp; Points
+          </button>
+          <button
+            class="btn btn-ghost btn-xs mch-tab"
+            onclick="chModalTab('rewards', this)"
+          >
+            🎁 Rewards
+          </button>
+          <button
+            class="btn btn-ghost btn-xs mch-tab"
+            onclick="chModalTab('tasks', this)"
+          >
+            ✅ Tasks
+          </button>
+          <button
+            class="btn btn-ghost btn-xs mch-tab"
+            onclick="chModalTab('rules', this)"
+          >
+            📋 Rules
+          </button>
+        </div>
+
+        <div id="m-ch-form" style="min-height: 260px; transition: opacity 0.2s">
+          <!-- CORE -->
+          <div class="mch-tab-pane modal-form" id="mch-pane-basic">
+            <div class="modal-grid" style="grid-template-columns: 64px 1fr">
+              <div class="field">
+                <label class="field-label">Emoji</label>
+                <input class="inp" id="mch-emoji" placeholder="🎯" value="🎯" />
+              </div>
+              <div class="field">
+                <label class="field-label">Niche / Category</label>
+                <input
+                  class="inp"
+                  id="mch-niche"
+                  placeholder="e.g. Crochet &amp; Knitting"
+                />
+              </div>
             </div>
             <div class="field">
-              <label class="field-label">End Date (optional)</label
-              ><input class="inp" id="mc-ends" type="date" />
+              <label class="field-label">Title *</label>
+              <input
+                class="inp"
+                id="mch-title"
+                placeholder="e.g. April Upcycle Challenge"
+              />
+            </div>
+            <div class="field">
+              <label class="field-label">Description</label>
+              <textarea
+                class="inp inp-area"
+                id="mch-desc"
+                placeholder="What is this challenge about?"
+                style="min-height: 70px"
+              ></textarea>
+            </div>
+            <div class="modal-grid">
+              <div class="field">
+                <label class="field-label">Difficulty</label>
+                <select class="sel" id="mch-difficulty">
+                  <option value="easy">🟢 Easy</option>
+                  <option value="medium" selected>🟡 Medium</option>
+                  <option value="hard">🔴 Hard</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label">Status</label>
+                <select class="sel" id="mch-status">
+                  <option value="upcoming">⏳ Upcoming</option>
+                  <option value="active">▶ Active</option>
+                  <option value="completed">✅ Completed</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Cover Gradient (CSS)</label>
+              <input
+                class="inp"
+                id="mch-coverbg"
+                placeholder="linear-gradient(135deg,#7a8f52 0%,#3d5a20 100%)"
+              />
+            </div>
+            <div
+              class="field"
+              style="flex-direction: row; align-items: center; gap: 8px"
+            >
+              <input
+                type="checkbox"
+                id="mch-featured"
+                style="accent-color: var(--accent); width: 16px; height: 16px"
+              />
+              <label
+                class="field-label"
+                for="mch-featured"
+                style="margin: 0; cursor: pointer"
+                >⭐ Mark as Featured</label
+              >
             </div>
           </div>
+
+          <!-- SCHEDULE & POINTS -->
+          <div
+            class="mch-tab-pane modal-form"
+            id="mch-pane-schedule"
+            style="display: none"
+          >
+            <div class="modal-grid">
+              <div class="field">
+                <label class="field-label">Starts At</label>
+                <input class="inp" id="mch-starts" type="date" />
+              </div>
+              <div class="field">
+                <label class="field-label">Ends At</label>
+                <input class="inp" id="mch-ends" type="date" />
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label"
+                >Points Reward (awarded on completion)</label
+              >
+              <input
+                class="inp"
+                id="mch-points"
+                type="number"
+                min="0"
+                placeholder="e.g. 500"
+              />
+            </div>
+          </div>
+
+          <!-- REWARDS -->
+          <div
+            class="mch-tab-pane modal-form"
+            id="mch-pane-rewards"
+            style="display: none"
+          >
+            <div
+              style="
+                font-size: 0.78rem;
+                color: var(--text-dim);
+                margin-bottom: 10px;
+              "
+            >
+              Add reward cards shown to participants on the detail page.
+            </div>
+            <div
+              id="mch-rewards-list"
+              style="display: flex; flex-direction: column; gap: 8px"
+            ></div>
+            <button
+              class="btn btn-ghost btn-sm"
+              style="margin-top: 10px"
+              onclick="ch_addReward()"
+            >
+              + Add Reward
+            </button>
+          </div>
+
+          <!-- TASKS -->
+          <div
+            class="mch-tab-pane modal-form"
+            id="mch-pane-tasks"
+            style="display: none"
+          >
+            <div
+              style="
+                font-size: 0.78rem;
+                color: var(--text-dim);
+                margin-bottom: 10px;
+              "
+            >
+              Tasks are shown in order. Users mark them done to advance their
+              progress %.
+            </div>
+            <div
+              id="mch-tasks-list"
+              style="display: flex; flex-direction: column; gap: 10px"
+            ></div>
+            <button
+              class="btn btn-ghost btn-sm"
+              style="margin-top: 10px"
+              onclick="ch_addTask()"
+            >
+              + Add Task
+            </button>
+          </div>
+
+          <!-- RULES -->
+          <div
+            class="mch-tab-pane modal-form"
+            id="mch-pane-rules"
+            style="display: none"
+          >
+            <div
+              style="
+                font-size: 0.78rem;
+                color: var(--text-dim);
+                margin-bottom: 10px;
+              "
+            >
+              Rules are displayed as a numbered list on the challenge detail
+              page.
+            </div>
+            <div
+              id="mch-rules-list"
+              style="display: flex; flex-direction: column; gap: 7px"
+            ></div>
+            <button
+              class="btn btn-ghost btn-sm"
+              style="margin-top: 10px"
+              onclick="ch_addRule()"
+            >
+              + Add Rule
+            </button>
+          </div>
         </div>
+        <!-- /m-ch-form -->
+
         <div class="modal-foot">
           <button
             class="btn btn-ghost btn-sm"
@@ -134,10 +361,49 @@
           </button>
           <button
             class="btn btn-primary btn-sm"
-            onclick="submitCreateChallenge()"
+            id="m-ch-submit-btn"
+            onclick="submitChallengeModal()"
           >
             🚀 Launch
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Challenge (read-only) -->
+    <div
+      class="modal-ov"
+      id="m-challenge-view"
+      onclick="if (event.target === this) closeModal('m-challenge-view');"
+    >
+      <div class="modal-box" style="max-width: 620px; width: 96vw">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+          "
+        >
+          <div class="modal-title">👁 Challenge Detail</div>
+          <div style="display: flex; gap: 8px">
+            <button
+              class="btn btn-ghost btn-xs"
+              id="m-cv-edit-btn"
+              onclick="closeModal('m-challenge-view')"
+            >
+              ✏️ Edit
+            </button>
+            <button
+              class="btn btn-ghost btn-xs"
+              onclick="closeModal('m-challenge-view')"
+            >
+              ✕ Close
+            </button>
+          </div>
+        </div>
+        <div id="m-cv-body" style="max-height: 70vh; overflow-y: auto">
+          <div class="empty">⏳ Loading…</div>
         </div>
       </div>
     </div>
@@ -149,27 +415,24 @@
       onclick="if (event.target === this) closeModal('m-assign-badge');"
     >
       <div class="modal-box">
-        <div class="modal-title" id="m-assign-badge-title">🏅 Assign Badge</div>
-        <div class="modal-sub">
-          Enter the user ID and a reason for this award.
-        </div>
+        <div class="modal-title" id="ab-title">🏅 Assign Badge</div>
+        <div class="modal-sub">Enter the user's MongoDB ID and a reason.</div>
         <div class="modal-form">
           <div class="field">
             <label class="field-label">User ID *</label
             ><input
               class="inp"
-              id="assign-uid"
-              placeholder="MongoDB ObjectId of the user"
+              id="ab-userid"
+              placeholder="MongoDB ObjectId of user"
             />
           </div>
           <div class="field">
-            <label class="field-label">Reason (optional)</label
-            ><textarea
-              class="inp inp-area"
-              id="assign-reason"
+            <label class="field-label">Reason</label
+            ><input
+              class="inp"
+              id="ab-reason"
               placeholder="e.g. 50+ SOS helps this month"
-              style="min-height: 60px"
-            ></textarea>
+            />
           </div>
         </div>
         <div class="modal-foot">
@@ -179,23 +442,13 @@
           >
             Cancel
           </button>
-          <button class="btn btn-primary btn-sm" onclick="submitAssignBadge()">
-            Assign Badge
+          <button
+            class="btn btn-primary btn-sm"
+            id="ab-submit-btn"
+            onclick="submitAssignBadge()"
+          >
+            Assign
           </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- User Detail -->
-    <div
-      class="modal-ov"
-      id="m-user"
-      onclick="if (event.target === this) closeModal('m-user');"
-    >
-      <div class="modal-box" id="m-user-content">
-        <div class="empty">
-          <div class="empty-icon">👤</div>
-          Loading user…
         </div>
       </div>
     </div>
@@ -358,7 +611,11 @@
           System Health
         </div>
 
-        <div class="sb-alert" style="margin-top: auto" id="sidebar-alert">
+        <div
+          class="sb-alert"
+          style="margin-top: auto; display: none"
+          id="sidebar-alert"
+        >
           <div class="sb-alert-title">⚠ Reports Pending</div>
           <div class="sb-alert-sub">Require immediate review</div>
           <button
@@ -369,9 +626,15 @@
             Review Now
           </button>
         </div>
-        <button onclick="adminLogout()" class="btn btn-ghost btn-sm">
+
+        <div class="nav-item" onclick="adminLogout()">
+          <svg class="ni" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
           Logout
-        </button>
+        </div>
       </aside>
 
       <!-- ══════════════ MAIN ══════════════ -->
@@ -1319,34 +1582,78 @@
             <div class="ph-right">
               <button
                 class="btn btn-primary btn-sm"
-                onclick="openModal('m-challenge')"
+                onclick="openChallengeModal()"
               >
                 + New Challenge
               </button>
             </div>
           </div>
-          <div class="sg sg-3" style="margin-bottom: 0">
+
+          <!-- Stats row -->
+          <div
+            class="sg"
+            style="margin-bottom: 0; grid-template-columns: repeat(4, 1fr)"
+          >
             <div class="sc">
-              <div class="sc-val" id="ch-active">—</div>
-              <div class="sc-label">Active Challenges</div>
+              <div class="sc-val" style="color: var(--low)" id="ch-active">
+                —
+              </div>
+              <div class="sc-label">Active</div>
             </div>
             <div class="sc">
-              <div class="sc-val" id="ch-ended">—</div>
-              <div class="sc-label">Past Challenges</div>
+              <div class="sc-val" style="color: var(--blue)" id="ch-upcoming">
+                —
+              </div>
+              <div class="sc-label">Upcoming</div>
+            </div>
+            <div class="sc">
+              <div class="sc-val" id="ch-completed">—</div>
+              <div class="sc-label">Completed</div>
             </div>
             <div class="sc">
               <div class="sc-val" id="ch-participants">—</div>
               <div class="sc-label">Total Participants</div>
             </div>
           </div>
+
+          <!-- Tab bar -->
+          <div
+            style="
+              display: flex;
+              gap: 6px;
+              margin: 14px 0 0;
+              border-bottom: 1px solid var(--border);
+              padding-bottom: 10px;
+            "
+          >
+            <button
+              class="btn btn-ghost btn-xs ch-tab active"
+              onclick="chTab('active', this)"
+            >
+              ▶ Active
+            </button>
+            <button
+              class="btn btn-ghost btn-xs ch-tab"
+              onclick="chTab('upcoming', this)"
+            >
+              ⏳ Upcoming
+            </button>
+            <button
+              class="btn btn-ghost btn-xs ch-tab"
+              onclick="chTab('completed', this)"
+            >
+              ✅ Completed
+            </button>
+          </div>
+
           <div class="card" style="margin-top: 14px">
             <div class="card-hdr">
-              <div class="card-hdr-title"><em>🏆</em> Active Challenges</div>
+              <div class="card-hdr-title"><em>🏆</em> Challenges</div>
             </div>
             <div id="challenges-list">
               <div class="empty">
                 <div class="empty-icon">🏆</div>
-                Loading challenges…
+                Loading…
               </div>
             </div>
           </div>

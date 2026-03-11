@@ -599,16 +599,31 @@
       });
     });
 
+    // /* ── 4. Special: Notifications button ─────────────── */
+    // const notifBtn = document.getElementById("sidebar-notif-btn");
+    // if (notifBtn) {
+    //   notifBtn.addEventListener("click", () => {
+    //     if (window.innerWidth <= 768) closeSidebar();
+    //     // On index.html openNotifPanel is defined; open the panel there.
+    //     // On all other pages navigate to dashboard notifications.
+    //     if (typeof openNotifPanel === "function") {
+    //       const bell = document.getElementById("notif-bell-btn");
+    //       openNotifPanel(bell || notifBtn);
+    //     } else {
+    //       window.location.href =
+    //         resolveRoute("dashboard.html") + "#notifications";
+    //     }
+    //   });
+    // }
     /* ── 4. Special: Notifications button ─────────────── */
     const notifBtn = document.getElementById("sidebar-notif-btn");
     if (notifBtn) {
       notifBtn.addEventListener("click", () => {
         if (window.innerWidth <= 768) closeSidebar();
-        // On index.html openNotifPanel is defined; open the panel there.
-        // On all other pages navigate to dashboard notifications.
-        if (typeof openNotifPanel === "function") {
-          const bell = document.getElementById("notif-bell-btn");
-          openNotifPanel(bell || notifBtn);
+        const bell = document.getElementById("notif-bell-btn");
+        // openNotifPanel is exposed as window._openNotifPanel
+        if (typeof window._openNotifPanel === "function") {
+          window._openNotifPanel(bell || notifBtn);
         } else {
           window.location.href =
             resolveRoute("dashboard.html") + "#notifications";
@@ -639,18 +654,18 @@
         window.location.href = resolveRoute("dashboard.html") + "#saved";
       });
 
-    /* ── 7. Special: Challenges (coming soon) ─────────── */
-    // Challenges page doesn't exist yet — prevent navigation
-    document
-      .querySelectorAll('.nav-item[data-route="challenges.html"]')
-      .forEach((el) => {
-        el.addEventListener("click", (e) => {
-          e.stopImmediatePropagation(); // prevent the data-route listener above
-          if (window.innerWidth <= 768) closeSidebar();
-          if (window.craftToast)
-            window.craftToast("Challenges coming soon! 🏆", "info");
-        });
-      });
+    // /* ── 7. Special: Challenges (coming soon) ─────────── */
+    // // Challenges page doesn't exist yet — prevent navigation
+    // document
+    //   .querySelectorAll('.nav-item[data-route="challenges.html"]')
+    //   .forEach((el) => {
+    //     el.addEventListener("click", (e) => {
+    //       e.stopImmediatePropagation(); // prevent the data-route listener above
+    //       if (window.innerWidth <= 768) closeSidebar();
+    //       if (window.craftToast)
+    //         window.craftToast("Challenges coming soon! 🏆", "info");
+    //     });
+    //   });
 
     /* ── 8. Logout button ─────────────────────────────── */
     document
@@ -672,5 +687,7 @@
     );
     /* ── 11. Notification panel ─────────────────────────── */
     initNotifPanel();
+    // Expose so sidebar button can open the panel on any page
+    window._openNotifPanel = openNotifPanel;
   };
 })();

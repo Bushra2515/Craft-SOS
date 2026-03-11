@@ -1,0 +1,1026 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>30-Day Order Fulfilment Sprint — Craft-SOS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+  :root {
+    --bg:        #edf0e6;
+    --surface:   #ffffff;
+    --surface2:  #f4f6ef;
+    --surface3:  #e8ece0;
+    --border:    rgba(90,108,54,.15);
+    --border-d:  rgba(90,108,54,.28);
+    --accent:    #7a8f52;
+    --accent-dk: #5e6e3b;
+    --accent-lt: rgba(122,143,82,.10);
+    --tx:        #242e14;
+    --tx-mid:    #445228;
+    --tx-dim:    #7a9068;
+    --red:    #c03828; --red-bg:    rgba(192,56,40,.08);
+    --amber:  #a46818; --amber-bg:  rgba(164,104,24,.09);
+    --green:  #347834; --green-bg:  rgba(52,120,52,.09);
+    --blue:   #3468a4; --blue-bg:   rgba(52,104,164,.09);
+    --purple: #7054ae; --purple-bg: rgba(112,84,174,.09);
+    --gold:   #c8951a; --gold-bg:   rgba(200,149,26,.10);
+    --sh:    0 1px 3px rgba(36,46,20,.06), 0 4px 14px rgba(36,46,20,.08);
+    --sh-lg: 0 8px 32px rgba(36,46,20,.14);
+    --r:  14px;
+    --topbar-h: 58px;
+    --sb-w:     244px;
+    --ease: cubic-bezier(.4,0,.2,1);
+  }
+  *,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+  html { scroll-behavior:smooth }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--tx); min-height:100vh }
+  body::before {
+    content:''; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.025;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Ccircle cx='60' cy='60' r='28' fill='none' stroke='%237a8f52' stroke-width='2'/%3E%3Cpath d='M42 80 Q60 50 78 80' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Cellipse cx='380' cy='110' rx='22' ry='32' fill='none' stroke='%237a8f52' stroke-width='2' transform='rotate(-20 380 110)'/%3E%3Crect x='310' y='300' width='44' height='58' rx='5' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3Ccircle cx='440' cy='400' r='20' fill='none' stroke='%237a8f52' stroke-width='1.5'/%3E%3C/svg%3E");
+  }
+
+  /* ── OVERLAY ── */
+  #overlay { display:none; position:fixed; inset:0; z-index:299; background:rgba(36,46,20,.45); backdrop-filter:blur(4px) }
+  #overlay.on { display:block }
+
+  /* ── MODAL BACKDROP ── */
+  .modal-wrap { display:none; position:fixed; inset:0; z-index:400; background:rgba(36,46,20,.5); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:16px }
+  .modal-wrap.open { display:flex }
+  .modal { background:var(--surface); border-radius:18px; box-shadow:var(--sh-lg); width:100%; max-width:480px; overflow:hidden; animation:popIn .22s var(--ease) }
+  .modal-hdr { padding:18px 22px 14px; border-bottom:1.5px solid var(--border); display:flex; align-items:center; justify-content:space-between }
+  .modal-title { font-family:'Lora',serif; font-weight:700; font-size:1.05rem; color:var(--tx) }
+  .modal-close { width:30px; height:30px; border-radius:8px; border:none; background:var(--surface2); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--tx-dim); font-size:1rem }
+  .modal-body { padding:20px 22px }
+  .modal-footer { padding:14px 22px; border-top:1.5px solid var(--border); display:flex; gap:8px; justify-content:flex-end }
+
+  /* ── TOAST ── */
+  #toast { position:fixed; bottom:24px; right:24px; z-index:999; background:var(--tx); color:#fff; border-radius:12px; padding:11px 18px; font-size:.85rem; font-weight:600; display:flex; align-items:center; gap:9px; box-shadow:var(--sh-lg); transform:translateY(80px); opacity:0; transition:all .3s var(--ease); pointer-events:none }
+  #toast.show    { transform:translateY(0); opacity:1 }
+  #toast.success { background:var(--green) }
+  #toast.warn    { background:var(--amber) }
+  #toast svg { width:15px; height:15px; stroke:#fff; fill:none; stroke-width:2.5; stroke-linecap:round; flex-shrink:0 }
+
+  /* ── TOPBAR ── */
+  #topbar { position:sticky; top:0; z-index:300; height:var(--topbar-h); background:var(--surface); border-bottom:1.5px solid var(--border); box-shadow:0 1px 8px rgba(36,46,20,.06); display:flex; align-items:center; padding:0 16px; gap:12px }
+  #hamburger { width:38px; height:38px; border-radius:9px; border:none; background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--tx-mid) }
+  #hamburger svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round }
+  .logo-pill { width:34px; height:34px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; flex-shrink:0 }
+  .logo-pill svg { width:16px; height:16px; fill:#fff }
+  #desk-nav { display:flex; gap:4px; margin-left:auto }
+  .tnav { padding:6px 13px; border-radius:8px; font-size:.85rem; font-weight:500; color:var(--tx-mid); cursor:pointer; transition:background .14s }
+  .tnav:hover { background:var(--surface2) }
+  #topbar-right { display:flex; align-items:center; gap:8px; margin-left:auto }
+  .distress-btn { display:flex; align-items:center; gap:6px; padding:7px 14px; border-radius:9px; border:1.5px solid rgba(192,56,40,.2); background:var(--red-bg); color:var(--red); font-family:'DM Sans',sans-serif; font-size:.82rem; font-weight:700; cursor:pointer }
+  .distress-btn svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2.5 }
+  .profile-av-btn { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-dk)); cursor:pointer; border:2px solid var(--accent) }
+
+  /* ── SUBNAV ── */
+  #subnav { display:none; background:var(--surface); border-bottom:1.5px solid var(--border); padding:0 16px; gap:4px }
+  .snav { padding:10px 12px; font-size:.84rem; font-weight:500; color:var(--tx-dim); cursor:pointer }
+
+  /* ── SHELL ── */
+  #shell { position:relative; z-index:1; display:flex; min-height:calc(100vh - var(--topbar-h)) }
+
+  /* ── SIDEBAR ── */
+  #sidebar { width:var(--sb-w); flex-shrink:0; background:#f8faf5; border-right:1.5px solid var(--border); position:sticky; top:var(--topbar-h); height:calc(100vh - var(--topbar-h)); overflow-y:auto; box-shadow:2px 0 12px rgba(36,46,20,.05); padding:16px 12px }
+  .sb-prof { display:flex; align-items:center; gap:10px; padding:10px 8px 16px; border-bottom:1.5px solid var(--border); margin-bottom:10px }
+  .sb-av { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-dk)); flex-shrink:0; border:2px solid var(--accent) }
+  .sb-name { font-weight:700; font-size:.88rem; color:var(--tx) }
+  .sb-sub  { font-size:.75rem; color:var(--tx-dim); margin-top:2px }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; cursor:pointer; transition:background .14s; margin-bottom:2px; position:relative }
+  .nav-item:hover  { background:var(--surface3) }
+  .nav-item.active { background:var(--accent-lt) }
+  .nav-icon { width:18px; height:18px; stroke:var(--tx-dim); fill:none; stroke-width:1.8; stroke-linecap:round; flex-shrink:0 }
+  .nav-item.active .nav-icon { stroke:var(--accent) }
+  .nav-label { font-size:.86rem; font-weight:500; color:var(--tx-mid) }
+  .nav-item.active .nav-label { color:var(--accent); font-weight:700 }
+  .nav-dot { position:absolute; right:10px; top:50%; transform:translateY(-50%); width:7px; height:7px; border-radius:50%; border:2px solid #f8faf5 }
+
+  /* ── MAIN ── */
+  #main { flex:1; min-width:0; padding:24px 28px 64px }
+
+  /* ── BREADCRUMB ── */
+  .breadcrumb { display:flex; align-items:center; gap:6px; font-size:.79rem; color:var(--tx-dim); margin-bottom:20px; flex-wrap:wrap }
+  .breadcrumb a { color:var(--tx-dim); text-decoration:none; transition:color .14s }
+  .breadcrumb a:hover { color:var(--accent) }
+  .bc-sep { width:12px; height:12px; stroke:var(--tx-dim); fill:none; stroke-width:2; stroke-linecap:round; flex-shrink:0 }
+  .breadcrumb span { color:var(--tx-mid); font-weight:600 }
+
+  /* ══════════════════════
+     HERO BANNER
+  ══════════════════════ */
+  .hero-wrap {
+    border-radius:18px; overflow:hidden;
+    box-shadow:var(--sh-lg); margin-bottom:22px;
+    animation:fadeUp .35s var(--ease) both;
+  }
+  .hero-cover {
+    height:240px; position:relative; overflow:hidden;
+    background:linear-gradient(135deg,#d4a847 0%,#8f6e2a 100%);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .hero-cover::before {
+    content:''; position:absolute; inset:0; opacity:.07;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Ccircle cx='200' cy='200' r='160' fill='none' stroke='white' stroke-width='3'/%3E%3Ccircle cx='200' cy='200' r='100' fill='none' stroke='white' stroke-width='2'/%3E%3Ccircle cx='200' cy='200' r='40' fill='none' stroke='white' stroke-width='2'/%3E%3Cline x1='200' y1='40' x2='200' y2='360' stroke='white' stroke-width='1' opacity='.4'/%3E%3Cline x1='40' y1='200' x2='360' y2='200' stroke='white' stroke-width='1' opacity='.4'/%3E%3C/svg%3E");
+    background-size:cover;
+  }
+  .hero-emoji { font-size:5.5rem; position:relative; z-index:1; filter:drop-shadow(0 10px 28px rgba(0,0,0,.22)); animation:floatEmoji 4s ease-in-out infinite }
+  .hero-tl { position:absolute; top:14px; left:14px; z-index:2; display:flex; align-items:center; gap:7px; background:rgba(0,0,0,.32); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.18); border-radius:20px; padding:5px 13px; font-size:.73rem; font-weight:700; color:#fff }
+  .live-dot { width:7px; height:7px; border-radius:50%; background:#f5d060; flex-shrink:0; animation:pulse 1.6s infinite }
+  .hero-tr { position:absolute; top:14px; right:14px; z-index:2; display:flex; gap:7px }
+  .icon-btn { width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,.22); background:rgba(0,0,0,.28); backdrop-filter:blur(6px); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s }
+  .icon-btn:hover { background:rgba(0,0,0,.5) }
+  .icon-btn svg { width:14px; height:14px; stroke:#fff; fill:none; stroke-width:2; stroke-linecap:round }
+  .hero-br { position:absolute; bottom:14px; right:14px; z-index:2; display:flex; align-items:center; gap:6px; background:rgba(0,0,0,.32); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.15); border-radius:10px; padding:6px 12px; font-size:.79rem; font-weight:700; color:#fff }
+  .hero-br svg { width:13px; height:13px; stroke:#f5d060; fill:none; stroke-width:2; flex-shrink:0 }
+  .hero-bl { position:absolute; bottom:14px; left:14px; z-index:2 }
+  .diff-chip { display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:20px; font-size:.72rem; font-weight:700; backdrop-filter:blur(6px); border:1px solid rgba(255,255,255,.2) }
+  .diff-medium { background:rgba(164,104,24,.5); color:#ffe0a0 }
+  .diff-easy   { background:rgba(52,120,52,.5); color:#b0f0b0 }
+  .diff-hard   { background:rgba(192,56,40,.5); color:#ffc0b0 }
+
+  /* hero info bar */
+  .hero-info { background:var(--surface); padding:22px 26px 18px }
+  .hero-niche { font-size:.71rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.09em; margin-bottom:6px }
+  .hero-title { font-family:'Lora',serif; font-weight:700; font-size:1.65rem; color:var(--tx); line-height:1.3; margin-bottom:10px }
+  .hero-desc  { font-size:.88rem; color:var(--tx-mid); line-height:1.72; max-width:700px; margin-bottom:14px }
+  .hero-pills { display:flex; flex-wrap:wrap; gap:7px }
+  .pill { display:inline-flex; align-items:center; gap:5px; font-size:.75rem; font-weight:600; padding:4px 11px; border-radius:20px }
+  .pill svg { width:11px; height:11px; stroke:currentColor; fill:none; stroke-width:2; flex-shrink:0 }
+  .pill-green  { background:var(--green-bg);  color:var(--green);  border:1.5px solid rgba(52,120,52,.2) }
+  .pill-blue   { background:var(--blue-bg);   color:var(--blue);   border:1.5px solid rgba(52,104,164,.2) }
+  .pill-gold   { background:var(--gold-bg);   color:var(--gold);   border:1.5px solid rgba(200,149,26,.2) }
+  .pill-purple { background:var(--purple-bg); color:var(--purple); border:1.5px solid rgba(112,84,174,.2) }
+  .pill-amber  { background:var(--amber-bg);  color:var(--amber);  border:1.5px solid rgba(164,104,24,.2) }
+  .pill-muted  { background:var(--surface3);  color:var(--tx-dim); border:1.5px solid var(--border-d) }
+
+  /* hero CTA strip */
+  .hero-cta { background:var(--surface2); border-top:1.5px solid var(--border); padding:14px 26px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap }
+  .cta-info {}
+  .cta-main { font-weight:700; font-size:.9rem; color:var(--tx) }
+  .cta-sub  { font-size:.76rem; color:var(--tx-dim); margin-top:2px }
+  .cta-btns { display:flex; gap:7px; align-items:center; flex-wrap:wrap }
+
+  /* ══════════════════════
+     PROGRESS BAR (sticky)
+  ══════════════════════ */
+  .sticky-prog {
+    position:sticky; top:var(--topbar-h); z-index:100;
+    background:var(--surface); border-bottom:1.5px solid var(--border);
+    padding:10px 0; margin-bottom:20px;
+    box-shadow:0 2px 10px rgba(36,46,20,.07);
+    animation:fadeDown .3s var(--ease) both;
+  }
+  .sp-inner { display:flex; align-items:center; gap:14px }
+  .sp-label { font-size:.8rem; font-weight:700; color:var(--tx-mid); white-space:nowrap }
+  .sp-bar-wrap { flex:1; height:8px; background:var(--surface3); border-radius:4px; overflow:hidden }
+  .sp-bar { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--amber),#e6a830); transition:width .7s var(--ease) }
+  .sp-pct { font-family:'Lora',serif; font-weight:700; font-size:.88rem; color:var(--amber); white-space:nowrap }
+  .sp-rank { font-size:.76rem; color:var(--tx-dim); white-space:nowrap }
+
+  /* ══════════════════════
+     LAYOUT
+  ══════════════════════ */
+  .page-body { display:flex; gap:22px; align-items:flex-start }
+  .col-main  { flex:1; min-width:0; display:flex; flex-direction:column; gap:18px }
+  .col-aside { width:290px; flex-shrink:0; position:sticky; top:calc(var(--topbar-h) + 60px); display:flex; flex-direction:column; gap:14px }
+
+  /* ══════════════════════
+     SECTION CARDS
+  ══════════════════════ */
+  .card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); box-shadow:var(--sh); overflow:hidden; animation:fadeUp .4s var(--ease) both }
+  .card:nth-child(1){animation-delay:.05s}
+  .card:nth-child(2){animation-delay:.10s}
+  .card:nth-child(3){animation-delay:.15s}
+  .card:nth-child(4){animation-delay:.20s}
+  .card:nth-child(5){animation-delay:.25s}
+  .card-hdr { display:flex; align-items:center; justify-content:space-between; padding:13px 18px; border-bottom:1.5px solid var(--border); background:var(--surface2) }
+  .chdr-left { display:flex; align-items:center; gap:10px }
+  .chdr-ico { width:32px; height:32px; border-radius:9px; background:var(--accent-lt); display:flex; align-items:center; justify-content:center; flex-shrink:0 }
+  .chdr-ico svg { width:14px; height:14px; stroke:var(--accent); fill:none; stroke-width:2; stroke-linecap:round }
+  .chdr-title { font-weight:700; font-size:.89rem; color:var(--tx) }
+  .chdr-sub   { font-size:.74rem; color:var(--tx-dim); margin-top:1px }
+  .card-body  { padding:18px }
+
+  /* ══════════════════════
+     TASK LIST
+  ══════════════════════ */
+  .task-row { display:flex; align-items:flex-start; gap:12px; padding:13px 0; border-bottom:1.5px solid var(--border); transition:background .15s }
+  .task-row:last-child { border-bottom:none }
+  .task-row.completed .task-title { text-decoration:line-through; color:var(--tx-dim) }
+  .task-check {
+    width:24px; height:24px; border-radius:50%; border:2px solid var(--border-d); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; margin-top:1px;
+    transition:all .2s var(--ease);
+  }
+  .task-check.done   { background:var(--green); border-color:var(--green) }
+  .task-check.active { border-color:var(--amber); background:var(--amber-bg) }
+  .tick { width:10px; height:10px; stroke:#fff; fill:none; stroke-width:3; stroke-linecap:round; opacity:0; transition:opacity .2s }
+  .task-check.done .tick { opacity:1 }
+  .active-ring { width:8px; height:8px; border-radius:50%; background:var(--amber); opacity:0; transition:opacity .2s; animation:pulse 1.5s infinite }
+  .task-check.active .active-ring { opacity:1 }
+  .task-body  { flex:1; min-width:0 }
+  .task-title { font-size:.87rem; font-weight:700; color:var(--tx); margin-bottom:3px }
+  .task-desc  { font-size:.78rem; color:var(--tx-dim); line-height:1.55 }
+  .task-meta  { display:flex; align-items:center; gap:8px; margin-top:6px; flex-wrap:wrap }
+  .task-due   { font-size:.73rem; color:var(--tx-dim); font-weight:500 }
+  .task-tag   { font-size:.68rem; font-weight:700; border-radius:20px; padding:2px 8px }
+  .tag-pts    { background:var(--gold-bg); color:var(--gold); border:1px solid rgba(200,149,26,.2) }
+  .tag-badge  { background:var(--purple-bg); color:var(--purple); border:1px solid rgba(112,84,174,.2) }
+  .tag-req    { background:var(--red-bg); color:var(--red); border:1px solid rgba(192,56,40,.2) }
+  .tag-final  { background:var(--blue-bg); color:var(--blue); border:1px solid rgba(52,104,164,.2) }
+  .upload-btn { display:inline-flex; align-items:center; gap:5px; font-size:.74rem; font-weight:700; color:var(--accent-dk); background:var(--accent-lt); border:1.5px solid rgba(122,143,82,.25); border-radius:7px; padding:4px 10px; cursor:pointer; transition:background .14s; margin-top:4px }
+  .upload-btn:hover { background:rgba(122,143,82,.18) }
+  .upload-btn svg { width:11px; height:11px; stroke:currentColor; fill:none; stroke-width:2 }
+  .task-step-num { font-size:.7rem; font-weight:700; color:var(--tx-dim); position:absolute; right:0; top:13px }
+
+  /* my progress hero */
+  .prog-hero { background:linear-gradient(135deg,var(--accent-dk) 0%,var(--accent) 100%); border-radius:12px; padding:18px 20px; margin-bottom:16px; position:relative; overflow:hidden }
+  .prog-hero::before { content:''; position:absolute; right:-20px; top:-20px; width:120px; height:120px; border-radius:50%; background:rgba(255,255,255,.07) }
+  .prog-hero::after  { content:''; position:absolute; right:30px; bottom:-30px; width:80px; height:80px; border-radius:50%; background:rgba(255,255,255,.05) }
+  .ph-top { display:flex; align-items:flex-end; gap:10px; position:relative; z-index:1 }
+  .ph-pct { font-family:'Lora',serif; font-weight:700; font-size:3rem; color:#fff; line-height:1 }
+  .ph-label { font-size:.78rem; color:rgba(255,255,255,.75); font-weight:600; padding-bottom:6px }
+  .ph-bar { height:7px; background:rgba(255,255,255,.2); border-radius:4px; margin-top:12px; overflow:hidden; position:relative; z-index:1 }
+  .ph-fill { height:100%; background:#c8f07a; border-radius:4px; transition:width .9s var(--ease) }
+  .ph-sub { font-size:.77rem; color:rgba(255,255,255,.7); margin-top:7px; position:relative; z-index:1 }
+
+  /* ══════════════════════
+     REWARDS GRID
+  ══════════════════════ */
+  .rewards-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px }
+  .rw-card { border:1.5px solid var(--border); border-radius:12px; padding:16px 10px; text-align:center; background:var(--surface2); position:relative; transition:all .18s; cursor:default }
+  .rw-card:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:var(--sh) }
+  .rw-card.earned { border-color:var(--green); background:var(--green-bg) }
+  .rw-card.locked { opacity:.5; filter:grayscale(.4) }
+  .rw-icon  { font-size:2rem; margin-bottom:8px; display:block }
+  .rw-label { font-size:.77rem; font-weight:700; color:var(--tx); margin-bottom:3px }
+  .rw-sub   { font-size:.68rem; color:var(--tx-dim) }
+  .rw-badge-earned { position:absolute; top:-6px; right:-6px; background:var(--green); color:#fff; font-size:.58rem; font-weight:700; border-radius:20px; padding:2px 6px; border:2px solid var(--surface) }
+
+  /* ══════════════════════
+     RULES
+  ══════════════════════ */
+  .rule-item { display:flex; gap:12px; padding:11px 0; border-bottom:1.5px solid var(--border) }
+  .rule-item:last-child { border-bottom:none }
+  .rule-n { width:26px; height:26px; border-radius:50%; background:var(--accent-lt); border:1.5px solid rgba(122,143,82,.25); color:var(--accent-dk); font-size:.73rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px }
+  .rule-text { font-size:.84rem; color:var(--tx-mid); line-height:1.65 }
+  .rule-text strong { color:var(--tx) }
+
+  /* ══════════════════════
+     COMMUNITY FEED
+  ══════════════════════ */
+  .composer { background:var(--surface2); border:1.5px solid var(--border); border-radius:12px; padding:14px; margin-bottom:16px }
+  .composer-top { display:flex; gap:10px; margin-bottom:10px }
+  .comp-av { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-dk)); flex-shrink:0; border:2px solid var(--accent) }
+  .comp-ta { flex:1; background:var(--surface); border:1.5px solid var(--border); border-radius:9px; padding:9px 12px; font-family:'DM Sans',sans-serif; font-size:.84rem; color:var(--tx); outline:none; resize:none; min-height:70px; transition:border-color .2s }
+  .comp-ta:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(122,143,82,.1) }
+  .comp-ta::placeholder { color:var(--tx-dim) }
+  .composer-ft { display:flex; align-items:center; justify-content:space-between; gap:8px }
+  .attach-btn { display:inline-flex; align-items:center; gap:5px; font-size:.78rem; font-weight:600; color:var(--tx-dim); padding:5px 10px; border-radius:7px; border:1.5px solid var(--border); background:var(--surface); cursor:pointer; transition:background .14s }
+  .attach-btn:hover { background:var(--surface3) }
+  .attach-btn svg { width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:2 }
+
+  .feed-item { display:flex; gap:11px; padding:14px 0; border-bottom:1.5px solid var(--border) }
+  .feed-item:last-child { border-bottom:none }
+  .feed-av { width:36px; height:36px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:.69rem; font-weight:700; color:#fff }
+  .feed-body { flex:1; min-width:0 }
+  .feed-top { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px }
+  .feed-name { font-size:.84rem; font-weight:700; color:var(--tx) }
+  .feed-time { font-size:.73rem; color:var(--tx-dim) }
+  .feed-text { font-size:.83rem; color:var(--tx-mid); line-height:1.6; margin-bottom:7px }
+  .feed-attach { display:inline-flex; align-items:center; gap:7px; background:var(--surface2); border:1.5px solid var(--border); border-radius:8px; padding:6px 11px; font-size:.77rem; font-weight:600; color:var(--tx-mid); margin-bottom:7px; cursor:pointer; transition:background .14s }
+  .feed-attach:hover { background:var(--surface3) }
+  .feed-attach svg { width:12px; height:12px; stroke:var(--accent); fill:none; stroke-width:2; flex-shrink:0 }
+  .feed-reacts { display:flex; gap:5px; flex-wrap:wrap }
+  .react-btn { display:inline-flex; align-items:center; gap:4px; font-size:.75rem; font-weight:600; color:var(--tx-dim); background:var(--surface2); border:1.5px solid var(--border); border-radius:20px; padding:3px 9px; cursor:pointer; transition:all .14s; user-select:none }
+  .react-btn:hover  { background:var(--accent-lt); border-color:rgba(122,143,82,.3); color:var(--accent-dk) }
+  .react-btn.active { background:var(--accent-lt); border-color:rgba(122,143,82,.3); color:var(--accent-dk) }
+
+  /* ══════════════════════
+     ASIDE WIDGETS
+  ══════════════════════ */
+  .widget { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); box-shadow:var(--sh); overflow:hidden; animation:fadeUp .4s var(--ease) both }
+  .widget:nth-child(1){animation-delay:.08s}
+  .widget:nth-child(2){animation-delay:.14s}
+  .widget:nth-child(3){animation-delay:.20s}
+  .widget:nth-child(4){animation-delay:.26s}
+  .w-hdr { display:flex; align-items:center; gap:9px; padding:12px 16px; border-bottom:1.5px solid var(--border); background:var(--surface2) }
+  .w-hdr svg { width:14px; height:14px; stroke:var(--accent); fill:none; stroke-width:2; stroke-linecap:round; flex-shrink:0 }
+  .w-hdr-title { font-weight:700; font-size:.86rem; color:var(--tx) }
+  .w-body { padding:14px 16px }
+
+  /* deadline widget */
+  .deadline-ring-wrap { display:flex; justify-content:center; margin-bottom:14px }
+  .dl-ring { width:100px; height:100px; position:relative }
+  .dl-svg { width:100%; height:100%; transform:rotate(-90deg) }
+  .dl-track { fill:none; stroke:var(--surface3); stroke-width:8 }
+  .dl-prog  { fill:none; stroke:var(--amber); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset .8s var(--ease) }
+  .dl-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center }
+  .dl-days  { font-family:'Lora',serif; font-weight:700; font-size:1.8rem; color:var(--amber); line-height:1 }
+  .dl-label { font-size:.63rem; color:var(--tx-dim); font-weight:700; text-transform:uppercase; letter-spacing:.07em }
+  .dl-dates { display:flex; justify-content:space-between; font-size:.74rem; color:var(--tx-dim); font-weight:500; margin-bottom:10px }
+  .dl-dates span:last-child { color:var(--amber); font-weight:700 }
+  .dl-alert { background:var(--amber-bg); border:1.5px solid rgba(164,104,24,.2); border-radius:9px; padding:9px 11px; font-size:.77rem; color:var(--amber); line-height:1.55 }
+  .dl-alert strong { color:var(--amber) }
+
+  /* leaderboard widget */
+  .my-rank-pill { background:linear-gradient(135deg,var(--accent-dk),var(--accent)); border-radius:10px; padding:12px 14px; display:flex; align-items:center; gap:12px; margin-bottom:12px }
+  .mrp-rank { font-family:'Lora',serif; font-weight:700; font-size:2rem; color:#fff; line-height:1; min-width:48px }
+  .mrp-label { font-size:.7rem; font-weight:700; color:rgba(255,255,255,.7); text-transform:uppercase; letter-spacing:.07em }
+  .mrp-sub { font-size:.82rem; font-weight:700; color:#fff; margin-top:2px }
+  .lb-row { display:flex; align-items:center; gap:9px; padding:8px 0; border-bottom:1.5px solid var(--border) }
+  .lb-row:last-child { border-bottom:none }
+  .lb-row.me { background:var(--accent-lt); border-radius:8px; padding:8px 8px; border-color:transparent; margin:0 -2px }
+  .lb-rank { width:22px; font-family:'Lora',serif; font-weight:700; font-size:.86rem; color:var(--tx-dim); text-align:center; flex-shrink:0 }
+  .lb-av { width:30px; height:30px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:.64rem; font-weight:700; color:#fff }
+  .lb-info { flex:1; min-width:0 }
+  .lb-name  { font-size:.82rem; font-weight:700; color:var(--tx); overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+  .lb-tasks { font-size:.7rem; color:var(--tx-dim) }
+  .lb-score { font-family:'Lora',serif; font-weight:700; font-size:.85rem; color:var(--accent-dk) }
+
+  /* reward status widget */
+  .rw-mini { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1.5px solid var(--border) }
+  .rw-mini:last-child { border-bottom:none }
+  .rw-mini-ico { font-size:1.25rem; flex-shrink:0 }
+  .rw-mini-info { flex:1 }
+  .rw-mini-label { font-size:.81rem; font-weight:700; color:var(--tx) }
+  .rw-mini-sub   { font-size:.71rem; color:var(--tx-dim); margin-top:1px }
+  .status-tag { font-size:.68rem; font-weight:700; border-radius:20px; padding:2px 8px; white-space:nowrap }
+  .st-locked { background:var(--surface3); color:var(--tx-dim) }
+  .st-earned { background:var(--green-bg); color:var(--green) }
+
+  /* participants widget */
+  .av-mosaic { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px }
+  .av-tile { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.64rem; font-weight:700; color:#fff; cursor:pointer; transition:transform .14s }
+  .av-tile:hover { transform:scale(1.12) }
+  .av-more-tile { background:var(--surface3); color:var(--tx-dim); font-size:.62rem; font-weight:700 }
+  .part-count { font-size:.78rem; color:var(--tx-dim); font-weight:600; text-align:center }
+
+  /* ══════════════════════
+     BUTTONS
+  ══════════════════════ */
+  .btn { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:10px; border:none; font-family:'DM Sans',sans-serif; font-size:.84rem; font-weight:700; cursor:pointer; transition:all .16s; white-space:nowrap }
+  .btn svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round }
+  .btn-primary { background:var(--accent); color:#fff; box-shadow:0 3px 10px rgba(122,143,82,.28) }
+  .btn-primary:hover { background:var(--accent-dk); transform:translateY(-1px) }
+  .btn-ghost { background:var(--surface); color:var(--tx-mid); border:1.5px solid var(--border) }
+  .btn-ghost:hover { background:var(--surface3) }
+  .btn-amber { background:var(--amber-bg); color:var(--amber); border:1.5px solid rgba(164,104,24,.22) }
+  .btn-amber:hover { background:rgba(164,104,24,.16) }
+  .btn-red { background:var(--red-bg); color:var(--red); border:1.5px solid rgba(192,56,40,.2) }
+  .btn-red:hover { background:rgba(192,56,40,.14) }
+  .btn-sm { padding:6px 13px; font-size:.78rem; border-radius:8px }
+  .btn:disabled { opacity:.45; cursor:default; transform:none !important }
+
+  /* ══════════════════════
+     ANIMATIONS
+  ══════════════════════ */
+  @keyframes fadeUp  { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeDown{ from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes popIn   { from{opacity:0;transform:scale(.93)} to{opacity:1;transform:scale(1)} }
+  @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.35} }
+  @keyframes floatEmoji { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:1140px){ .col-aside{width:260px} }
+  @media(max-width:960px){
+    .page-body{flex-direction:column}
+    .col-aside{width:100%;position:static}
+    .rewards-grid{grid-template-columns:repeat(3,1fr)}
+    .col-aside .widget:nth-child(n){ animation-delay:.05s }
+  }
+  @media(max-width:700px){
+    #sidebar{display:none;position:fixed;top:var(--topbar-h);left:0;bottom:0;z-index:300;width:var(--sb-w)}
+    #sidebar.open{display:block}
+    #subnav{display:flex}
+    #main{padding:14px 14px 48px}
+    #desk-nav{display:none}
+    .hero-cover{height:180px}
+    .hero-emoji{font-size:4rem}
+    .hero-info{padding:16px 16px 14px}
+    .hero-title{font-size:1.3rem}
+    .hero-cta{padding:12px 16px}
+    .sticky-prog .sp-inner{padding:0 14px}
+    .card-body{padding:14px}
+  }
+  @media(max-width:480px){
+    .rewards-grid{grid-template-columns:repeat(2,1fr)}
+    .hero-cover{height:150px}
+    .cta-btns{width:100%}
+    .cta-btns .btn{flex:1;justify-content:center}
+  }
+  </style>
+</head>
+<body>
+
+<!-- ── LEAVE MODAL ── -->
+<div class="modal-wrap" id="leave-modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">Leave Challenge?</div>
+      <button class="modal-close" onclick="closeModal('leave-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.87rem;color:var(--tx-mid);line-height:1.7">If you leave now, your progress will be <strong style="color:var(--red)">permanently lost</strong> and you will be removed from the leaderboard. You can re-join if the challenge is still open, but your task history will be reset.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('leave-modal')">Cancel</button>
+      <button class="btn btn-red btn-sm" onclick="confirmLeave()">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Yes, Leave
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast">
+  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toast-msg"></span>
+</div>
+<div id="overlay" onclick="closeSidebar()"></div>
+
+<!-- ══ TOPBAR ══ -->
+<header id="topbar">
+  <button id="hamburger" onclick="toggleSidebar()">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div class="logo-pill"><svg viewBox="0 0 24 24"><path d="M12 3c-4.5 0-8 3.2-8 7 0 3.2 1.8 5.5 4.5 7L12 21l3.5-4C18.2 15.5 20 13.2 20 10c0-3.8-3.5-7-8-7z"/></svg></div>
+  <nav id="desk-nav">
+    <span class="tnav">Friends</span>
+    <span class="tnav">Explore</span>
+    <span class="tnav">Bookmarked</span>
+  </nav>
+  <div id="topbar-right">
+    <button class="distress-btn"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Distress Call</button>
+    <div class="profile-av-btn"></div>
+  </div>
+</header>
+<nav id="subnav">
+  <span class="snav">Friends</span>
+  <span class="snav">Explore</span>
+  <span class="snav">Bookmarked</span>
+</nav>
+
+<!-- ══ SHELL ══ -->
+<div id="shell">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sb-prof">
+      <div class="sb-av"></div>
+      <div><div class="sb-name">ResinQueenDelhi</div><div class="sb-sub">🏮 Resin Art · 840 pts</div></div>
+    </div>
+    <nav>
+      <div class="nav-item" onclick="location.href='craftsos-home.html'">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-label">Home</span>
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span class="nav-label">Explore</span>
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span class="nav-label">Search</span>
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="nav-label">Notifications</span>
+        <span class="nav-dot" style="background:#d35b3a"></span>
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span class="nav-label">Messages</span>
+        <span class="nav-dot" style="background:#3d5a99"></span>
+      </div>
+      <div class="nav-item active">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="nav-label">My Posts</span>
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-label">Profile</span>
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span class="nav-label">Settings</span>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main id="main">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="craftsos-home.html">Home</a>
+      <svg class="bc-sep" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+      <a href="challenges.html">Challenges</a>
+      <svg class="bc-sep" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+      <span>30-Day Order Fulfilment Sprint</span>
+    </nav>
+
+    <!-- ══ HERO ══ -->
+    <div class="hero-wrap">
+
+      <!-- cover -->
+      <div class="hero-cover">
+        <span class="hero-emoji">📦</span>
+        <div class="hero-tl"><div class="live-dot"></div> In Progress</div>
+        <div class="hero-tr">
+          <button class="icon-btn" onclick="copyLink()" title="Copy link">
+            <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+          <button class="icon-btn" onclick="showToast('Bookmarked!','success')" title="Bookmark">
+            <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+          </button>
+        </div>
+        <div class="hero-br">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          9 days left
+        </div>
+        <div class="hero-bl"><span class="diff-chip diff-medium">🟡 Medium</span></div>
+      </div>
+
+      <!-- info -->
+      <div class="hero-info">
+        <div class="hero-niche">📦 Orders &amp; Fulfilment</div>
+        <div class="hero-title">30-Day Order Fulfilment Sprint</div>
+        <div class="hero-desc">Process and ship at least 20 orders within 30 days while maintaining a 4.8★ customer rating or above. Track every shipment, document your fulfilment workflow, and share your system with the Craft-SOS community. Top finishers earn exclusive badges and a homepage feature.</div>
+        <div class="hero-pills">
+          <span class="pill pill-gold">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            +500 pts on completion
+          </span>
+          <span class="pill pill-purple">🏅 Fulfilment Pro badge</span>
+          <span class="pill pill-blue">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            128 participants
+          </span>
+          <span class="pill pill-green">📜 Certificate included</span>
+          <span class="pill pill-muted">🏮 All niches welcome</span>
+          <span class="pill pill-amber">Mar 1 – Mar 31, 2026</span>
+        </div>
+      </div>
+
+      <!-- CTA strip -->
+      <div class="hero-cta">
+        <div class="cta-info">
+          <div class="cta-main">You are participating · <span style="color:var(--amber);font-weight:700" id="cta-pct">62% complete</span></div>
+          <div class="cta-sub" id="cta-sub">5 of 10 tasks done · Rank #14 of 128 · 9 days remaining</div>
+        </div>
+        <div class="cta-btns">
+          <button class="btn btn-ghost btn-sm" onclick="openModal('leave-modal')">
+            <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Leave
+          </button>
+          <button class="btn btn-amber btn-sm" onclick="scrollTo('composer-section')">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Post Update
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="scrollTo('tasks-section')">
+            <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            My Tasks
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STICKY PROGRESS ══ -->
+    <div class="sticky-prog">
+      <div class="sp-inner" style="padding:0 2px">
+        <span class="sp-label">Your progress</span>
+        <div class="sp-bar-wrap"><div class="sp-bar" id="sp-bar" style="width:0%"></div></div>
+        <span class="sp-pct" id="sp-pct">62%</span>
+        <span class="sp-rank">Rank #14</span>
+      </div>
+    </div>
+
+    <!-- ══ BODY ══ -->
+    <div class="page-body">
+
+      <!-- ── MAIN COLUMN ── -->
+      <div class="col-main">
+
+        <!-- MY TASKS -->
+        <div class="card" id="tasks-section">
+          <div class="card-hdr">
+            <div class="chdr-left">
+              <div class="chdr-ico">
+                <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+              </div>
+              <div>
+                <div class="chdr-title">My Tasks</div>
+                <div class="chdr-sub">Check off each step as you complete it</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="prog-hero">
+              <div class="ph-top">
+                <div class="ph-pct" id="ph-pct">62%</div>
+                <div class="ph-label" id="ph-label">5 of 10 tasks done</div>
+              </div>
+              <div class="ph-bar"><div class="ph-fill" id="ph-fill" style="width:0%"></div></div>
+              <div class="ph-sub">Rank #14 of 128 participants · 9 days left</div>
+            </div>
+            <div id="task-list"></div>
+          </div>
+        </div>
+
+        <!-- REWARDS -->
+        <div class="card">
+          <div class="card-hdr">
+            <div class="chdr-left">
+              <div class="chdr-ico">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <div>
+                <div class="chdr-title">Rewards</div>
+                <div class="chdr-sub">Complete the challenge to unlock everything</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="rewards-grid">
+              <div class="rw-card">
+                <span class="rw-icon">⭐</span>
+                <div class="rw-label">+500 Points</div>
+                <div class="rw-sub">Added to your total</div>
+              </div>
+              <div class="rw-card">
+                <span class="rw-icon">🏅</span>
+                <div class="rw-label">Fulfilment Pro</div>
+                <div class="rw-sub">Exclusive badge</div>
+              </div>
+              <div class="rw-card">
+                <span class="rw-icon">📜</span>
+                <div class="rw-label">Certificate</div>
+                <div class="rw-sub">Downloadable PDF</div>
+              </div>
+              <div class="rw-card locked">
+                <span class="rw-icon">🥇</span>
+                <div class="rw-label">Top Finisher</div>
+                <div class="rw-sub">Rank 1–3 only</div>
+              </div>
+              <div class="rw-card locked">
+                <span class="rw-icon">📣</span>
+                <div class="rw-label">Homepage Feature</div>
+                <div class="rw-sub">Top 3 · 1 week</div>
+              </div>
+              <div class="rw-card locked">
+                <span class="rw-icon">🎁</span>
+                <div class="rw-label">Sponsor Prize</div>
+                <div class="rw-sub">#1 winner only</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RULES -->
+        <div class="card">
+          <div class="card-hdr">
+            <div class="chdr-left">
+              <div class="chdr-ico">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div>
+                <div class="chdr-title">Rules &amp; Guidelines</div>
+                <div class="chdr-sub">Read carefully before submitting</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="rule-item"><div class="rule-n">1</div><div class="rule-text"><strong>Minimum 20 orders</strong> must be processed and shipped within the 30-day window. Orders placed before the challenge start date do not count.</div></div>
+            <div class="rule-item"><div class="rule-n">2</div><div class="rule-text"><strong>Customer rating of 4.8★ or above</strong> must be maintained. Dropping below 4.8 disqualifies you from the top-3 prizes.</div></div>
+            <div class="rule-item"><div class="rule-n">3</div><div class="rule-text"><strong>Weekly update posts</strong> are required — share a screenshot or workflow note each week. At least one post per 7-day period.</div></div>
+            <div class="rule-item"><div class="rule-n">4</div><div class="rule-text"><strong>No self-purchasing or fake orders.</strong> Moderators may verify order legitimacy. Violations result in permanent disqualification.</div></div>
+            <div class="rule-item"><div class="rule-n">5</div><div class="rule-text"><strong>Final submission deadline</strong> is midnight on Day 30. Late submissions are not accepted under any circumstance.</div></div>
+            <div class="rule-item"><div class="rule-n">6</div><div class="rule-text"><strong>Stay constructive and supportive.</strong> React to others' posts, share tips, and keep the community spirit positive throughout.</div></div>
+          </div>
+        </div>
+
+        <!-- COMMUNITY FEED -->
+        <div class="card" id="composer-section">
+          <div class="card-hdr">
+            <div class="chdr-left">
+              <div class="chdr-ico">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              </div>
+              <div>
+                <div class="chdr-title">Community Updates</div>
+                <div class="chdr-sub" id="feed-count">24 posts from participants</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+
+            <!-- composer -->
+            <div class="composer">
+              <div class="composer-top">
+                <div class="comp-av"></div>
+                <textarea class="comp-ta" id="comp-ta" rows="2" placeholder="Share your progress, a win, or a tip for the community…" oninput="onCompInput()"></textarea>
+              </div>
+              <div class="composer-ft">
+                <div class="attach-btn" onclick="showToast('File attach coming soon','warn')">
+                  <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+                  Attach screenshot
+                </div>
+                <button class="btn btn-primary btn-sm" id="post-btn" onclick="postUpdate()" disabled>
+                  <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  Post Update
+                </button>
+              </div>
+            </div>
+
+            <!-- feed -->
+            <div id="feed-list"></div>
+
+          </div>
+        </div>
+
+      </div><!-- /col-main -->
+
+      <!-- ── ASIDE ── -->
+      <aside class="col-aside">
+
+        <!-- Deadline -->
+        <div class="widget">
+          <div class="w-hdr">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <div class="w-hdr-title">Deadline</div>
+          </div>
+          <div class="w-body">
+            <div class="deadline-ring-wrap">
+              <div class="dl-ring">
+                <svg class="dl-svg" viewBox="0 0 36 36">
+                  <circle class="dl-track" cx="18" cy="18" r="14"/>
+                  <circle class="dl-prog" cx="18" cy="18" r="14" id="dl-circle"
+                    stroke-dasharray="87.96"
+                    stroke-dashoffset="87.96"/>
+                </svg>
+                <div class="dl-center">
+                  <div class="dl-days">9</div>
+                  <div class="dl-label">days left</div>
+                </div>
+              </div>
+            </div>
+            <div class="dl-dates">
+              <span>Started Mar 1</span>
+              <span>Ends Mar 31</span>
+            </div>
+            <div class="dl-alert">
+              ⚡ You need <strong>19 more orders</strong> in 9 days to meet the minimum.
+            </div>
+          </div>
+        </div>
+
+        <!-- Rewards status -->
+        <div class="widget">
+          <div class="w-hdr">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <div class="w-hdr-title">My Rewards Status</div>
+          </div>
+          <div class="w-body">
+            <div class="rw-mini"><div class="rw-mini-ico">⭐</div><div class="rw-mini-info"><div class="rw-mini-label">+500 Points</div><div class="rw-mini-sub">On full completion</div></div><span class="status-tag st-locked">Locked</span></div>
+            <div class="rw-mini"><div class="rw-mini-ico">🏅</div><div class="rw-mini-info"><div class="rw-mini-label">Fulfilment Pro Badge</div><div class="rw-mini-sub">On full completion</div></div><span class="status-tag st-locked">Locked</span></div>
+            <div class="rw-mini"><div class="rw-mini-ico">📜</div><div class="rw-mini-info"><div class="rw-mini-label">Certificate</div><div class="rw-mini-sub">On full completion</div></div><span class="status-tag st-locked">Locked</span></div>
+          </div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="widget">
+          <div class="w-hdr">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <div class="w-hdr-title">Leaderboard</div>
+          </div>
+          <div class="w-body">
+            <div class="my-rank-pill">
+              <div class="mrp-rank">#14</div>
+              <div><div class="mrp-label">Your rank</div><div class="mrp-sub">Top 11% · 5 tasks done</div></div>
+            </div>
+            <div class="lb-row"><div class="lb-rank">🥇</div><div class="lb-av" style="background:#8b6914">WC</div><div class="lb-info"><div class="lb-name">WoolCraft_Co</div><div class="lb-tasks">9/10 tasks</div></div><div class="lb-score">9</div></div>
+            <div class="lb-row"><div class="lb-rank">🥈</div><div class="lb-av" style="background:#7054ae">FH</div><div class="lb-info"><div class="lb-name">FlourHousePune</div><div class="lb-tasks">8/10 tasks</div></div><div class="lb-score">8</div></div>
+            <div class="lb-row"><div class="lb-rank">🥉</div><div class="lb-av" style="background:#3468a4">SW</div><div class="lb-info"><div class="lb-name">StitchWorks_Ahm</div><div class="lb-tasks">8/10 tasks</div></div><div class="lb-score">8</div></div>
+            <div class="lb-row"><div class="lb-rank" style="font-size:.72rem">4</div><div class="lb-av" style="background:#a46818">BC</div><div class="lb-info"><div class="lb-name">BakersCircle</div><div class="lb-tasks">7/10 tasks</div></div><div class="lb-score">7</div></div>
+            <div class="lb-row me"><div class="lb-rank" style="color:var(--accent-dk);font-size:.72rem">14</div><div class="lb-av" style="background:var(--accent)">RQ</div><div class="lb-info"><div class="lb-name" style="color:var(--accent-dk)">You</div><div class="lb-tasks">5/10 tasks</div></div><div class="lb-score" style="color:var(--accent)">5</div></div>
+            <div style="margin-top:10px;text-align:center">
+              <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="showToast('Full leaderboard coming soon','warn')">View all 128</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Participants -->
+        <div class="widget">
+          <div class="w-hdr">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            <div class="w-hdr-title">128 Participants</div>
+          </div>
+          <div class="w-body">
+            <div class="av-mosaic" id="av-mosaic"></div>
+            <div class="part-count">+118 more crafters joined</div>
+          </div>
+        </div>
+
+      </aside>
+
+    </div><!-- /page-body -->
+
+  </main>
+</div><!-- /shell -->
+
+<script>
+/* ══════ DATA ══════ */
+const TASKS = [
+  { id:1, done:true,  active:false, title:'Join and confirm participation', desc:'Post an introduction update in the community feed to officially start.', due:'Done Mar 1', tag:null },
+  { id:2, done:true,  active:false, title:'Process first 5 orders', desc:'Ship at least 5 orders with tracking. Upload a screenshot of your order dashboard.', due:'Done Mar 5', tag:{cls:'tag-pts',text:'+50 pts'} },
+  { id:3, done:true,  active:false, title:'Post Week 1 workflow update', desc:'Share your tools, packing system, and courier choice.', due:'Done Mar 7', tag:null },
+  { id:4, done:true,  active:false, title:'Reach 10 orders shipped', desc:'Hit the halfway milestone. Post a screenshot of 10+ completed shipments.', due:'Done Mar 12', tag:{cls:'tag-pts',text:'+100 pts'} },
+  { id:5, done:true,  active:false, title:'Post Week 2 update', desc:'Share a customer review or a challenge you faced and how you solved it.', due:'Done Mar 14', tag:null },
+  { id:6, done:false, active:true,  title:'Reach 20 orders shipped', desc:'The minimum required threshold. Upload proof of 20+ completed shipments.', due:'Due Mar 22', tag:{cls:'tag-badge',text:'Key milestone'} },
+  { id:7, done:false, active:false, title:'Post Week 3 update', desc:'Document improvements to your packing or dispatch workflow since Week 1.', due:'Due Mar 21', tag:null },
+  { id:8, done:false, active:false, title:'Maintain 4.8\u2605 rating screenshot', desc:'Share your current platform rating to confirm you are on track.', due:'Due Mar 25', tag:{cls:'tag-req',text:'Required'} },
+  { id:9, done:false, active:false, title:'Final submission — 30 orders', desc:'Upload your final order count proof and a short summary of your experience.', due:'Due Mar 31', tag:{cls:'tag-final',text:'Final task'} },
+  { id:10,done:false, active:false, title:'Help 5 other participants', desc:'React to or comment on at least 5 other participants\u2019 updates.', due:'Due Mar 30', tag:null },
+];
+
+const FEED = [
+  { user:'WoolCraft_Co',    av:'WC', color:'#8b6914', time:'2h ago',     text:'Just hit 9 tasks done — feeling amazing! My new dispatch sheet saved me 2 hours this week.', attach:'dispatch-sheet-week3.png', reactions:[{e:'🙌',n:14,active:false},{e:'💚',n:8,active:false},{e:'🔥',n:5,active:false}] },
+  { user:'FlourHousePune',  av:'FH', color:'#7054ae', time:'5h ago',     text:'Switched to Delhivery from DTDC and my delivery time dropped from 5 days to 3. Customer satisfaction is up!', attach:null, reactions:[{e:'💡',n:9,active:false},{e:'👏',n:6,active:false}] },
+  { user:'StitchWorks_Ahm', av:'SW', color:'#3468a4', time:'Yesterday',  text:'Hit my 4.8\u2605 rating target. One more push this weekend to finish strong. Anyone finding packaging the biggest time drain?', attach:'rating-screenshot.jpg', reactions:[{e:'💪',n:11,active:false},{e:'🧵',n:3,active:false}] },
+  { user:'BakersCircle',    av:'BC', color:'#a46818', time:'2 days ago', text:'Quick tip: pre-printing labels the night before dropped my packing time from 90 min to 40 min. Try it!', attach:null, reactions:[{e:'🙌',n:18,active:true},{e:'💚',n:12,active:false},{e:'📦',n:7,active:false}] },
+];
+
+const PARTS = [
+  {i:'WC',c:'#8b6914'},{i:'FH',c:'#7054ae'},{i:'SW',c:'#3468a4'},
+  {i:'BC',c:'#a46818'},{i:'RQ',c:'var(--accent)'},{i:'NM',c:'#c03828'},
+  {i:'KC',c:'#346090'},{i:'SB',c:'#5e8a3a'},{i:'PL',c:'#7a5c10'},
+];
+
+/* ══════ COMPUTED PROGRESS ══════ */
+function doneTasks()  { return TASKS.filter(t => t.done).length }
+function totalTasks() { return TASKS.length }
+function pct()        { return Math.round((doneTasks() / totalTasks()) * 100) }
+
+/* ══════ RENDER TASKS ══════ */
+function renderTasks() {
+  const done = doneTasks();
+  const total = totalTasks();
+  const p = pct();
+
+  document.getElementById('ph-pct').textContent   = p + '%';
+  document.getElementById('ph-label').textContent = done + ' of ' + total + ' tasks done';
+  document.getElementById('ph-fill').style.width  = p + '%';
+  document.getElementById('sp-bar').style.width   = p + '%';
+  document.getElementById('sp-pct').textContent   = p + '%';
+  document.getElementById('cta-pct').textContent  = p + '% complete';
+  document.getElementById('cta-sub').textContent  = done + ' of ' + total + ' tasks done · Rank #14 of 128 · 9 days remaining';
+
+  document.getElementById('task-list').innerHTML = TASKS.map(function(t) {
+    var checkCls = t.done ? 'done' : (t.active ? 'active' : '');
+    var rowCls   = 'task-row' + (t.done ? ' completed' : '');
+    var tagHtml  = t.tag ? '<span class="task-tag ' + t.tag.cls + '">' + t.tag.text + '</span>' : '';
+    var upBtn    = (!t.done && t.active)
+      ? '<div class="upload-btn" onclick="completeTask(' + t.id + ')">'
+        + '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'
+        + 'Mark complete</div>'
+      : '';
+    var doneIcon = t.done ? '<svg class="tick" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+    var ringIcon = (!t.done && t.active) ? '<div class="active-ring"></div>' : '';
+    return '<div class="' + rowCls + '">'
+      + '<div class="task-check ' + checkCls + '" onclick="completeTask(' + t.id + ')">'
+      + doneIcon + ringIcon
+      + '</div>'
+      + '<div class="task-body">'
+      + '<div class="task-title">' + t.title + '</div>'
+      + '<div class="task-desc">' + t.desc + '</div>'
+      + '<div class="task-meta">'
+      + '<span class="task-due">' + (t.done ? '✓ ' : '📅 ') + t.due + '</span>'
+      + tagHtml
+      + '</div>'
+      + upBtn
+      + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function completeTask(id) {
+  var t = TASKS.find(function(x){ return x.id === id });
+  if (!t || t.done) return;
+  t.done = true; t.active = false;
+  var next = TASKS.find(function(x){ return !x.done && !x.active });
+  if (next) next.active = true;
+  renderTasks();
+  showToast('Task completed! Great work \uD83C\uDF89', 'success');
+}
+
+/* ══════ RENDER FEED ══════ */
+function renderFeed() {
+  document.getElementById('feed-count').textContent = FEED.length + ' posts from participants';
+  document.getElementById('feed-list').innerHTML = FEED.map(function(f, fi) {
+    var attachHtml = f.attach
+      ? '<div class="feed-attach"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" stroke="none"/><polyline points="21 15 16 10 5 21"/></svg>' + f.attach + '</div>'
+      : '';
+    var reacts = f.reactions.map(function(r, ri) {
+      var activeCls = r.active ? ' active' : '';
+      return '<span class="react-btn' + activeCls + '" onclick="toggleReact(' + fi + ',' + ri + ')">' + r.e + ' ' + r.n + '</span>';
+    }).join('');
+    return '<div class="feed-item">'
+      + '<div class="feed-av" style="background:' + f.color + '">' + f.av + '</div>'
+      + '<div class="feed-body">'
+      + '<div class="feed-top"><span class="feed-name">' + f.user + '</span><span class="feed-time">' + f.time + '</span></div>'
+      + '<div class="feed-text">' + f.text + '</div>'
+      + attachHtml
+      + '<div class="feed-reacts">' + reacts + '</div>'
+      + '</div></div>';
+  }).join('');
+}
+
+function toggleReact(fi, ri) {
+  var r = FEED[fi].reactions[ri];
+  r.active = !r.active;
+  r.n = r.active ? r.n + 1 : r.n - 1;
+  renderFeed();
+}
+
+/* ══════ PARTICIPANTS ══════ */
+function renderParts() {
+  document.getElementById('av-mosaic').innerHTML = PARTS.map(function(p) {
+    return '<div class="av-tile" style="background:' + p.c + '" title="' + p.i + '">' + p.i + '</div>';
+  }).join('') + '<div class="av-tile av-more-tile">+119</div>';
+}
+
+/* ══════ COMPOSER ══════ */
+function onCompInput() {
+  document.getElementById('post-btn').disabled = !document.getElementById('comp-ta').value.trim();
+}
+
+function postUpdate() {
+  var txt = document.getElementById('comp-ta').value.trim();
+  if (!txt) return;
+  FEED.unshift({ user:'ResinQueenDelhi', av:'RQ', color:'var(--accent)', time:'Just now', text:txt, attach:null, reactions:[{e:'🙌',n:0,active:false},{e:'💚',n:0,active:false}] });
+  document.getElementById('comp-ta').value = '';
+  document.getElementById('post-btn').disabled = true;
+  renderFeed();
+  showToast('Update posted! +10 pts earned', 'success');
+}
+
+/* ══════ DEADLINE RING ══════ */
+function animateRing() {
+  var pctElapsed = (30 - 9) / 30;
+  var circ = 2 * Math.PI * 14;
+  var offset = circ * (1 - pctElapsed);
+  var el = document.getElementById('dl-circle');
+  if (el) setTimeout(function() { el.style.strokeDashoffset = offset; }, 200);
+}
+
+/* ══════ UTILS ══════ */
+function scrollTo(id) {
+  var el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href).catch(function(){});
+  showToast('Link copied!', 'success');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function confirmLeave() {
+  closeModal('leave-modal');
+  showToast('You have left the challenge.', '');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('on');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('on');
+}
+
+var toastTimer;
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { t.className = ''; }, 3200);
+}
+
+/* ══════ INIT ══════ */
+renderTasks();
+renderFeed();
+renderParts();
+animateRing();
+setTimeout(function() {
+  document.getElementById('ph-fill').style.width = pct() + '%';
+  document.getElementById('sp-bar').style.width  = pct() + '%';
+}, 120);
+</script>
+</body>
+</html>

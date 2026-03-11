@@ -52,11 +52,16 @@ router.post("/badges", requireRole("admin"), bc.createBadge);
 router.post("/badges/:id/assign", bc.assignBadge);
 
 // ── Challenges ────────────────────────────────────────────
+// FIX 1: point to the ADMIN controller (controllers/admin/), not the public one
+// FIX 2: all routes prefixed with /challenges so they don't clash with other admin routes
 const cc = require("../controllers/admin/challengeController");
 router.get("/challenges/stats", cc.getChallengeStats); // before /:id
 router.get("/challenges", cc.getChallenges);
 router.post("/challenges", cc.createChallenge);
+router.get("/challenges/:id", cc.getChallenge);
+router.put("/challenges/:id", cc.updateChallenge);
 router.patch("/challenges/:id/end", cc.endChallenge);
+router.patch("/challenges/:id/reactivate", cc.reactivateChallenge);
 
 // ── Announcements ─────────────────────────────────────────
 const ac = require("../controllers/admin/announcementController");

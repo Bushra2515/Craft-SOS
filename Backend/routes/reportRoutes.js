@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Report = require("../models/Report");
-const { protect } = require("../Middleware/authMiddleware"); // use your actual middleware name
 
+const protect = require("../Middleware/authMiddleware");
 // targetType → targetModel map (matches schema enums exactly)
 const TARGET_MODEL_MAP = {
   post: "Post",
